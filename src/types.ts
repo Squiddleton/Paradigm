@@ -6,13 +6,13 @@ export interface EventData<T extends keyof ClientEvents> {
     execute: (...params: ClientEvents[T]) => Awaitable<void>
 }
 
-export class Event<T extends keyof ClientEvents> {
+export class Event<T extends keyof ClientEvents> implements EventData<T> {
 	name: T;
-	once?: boolean;
+	once = false;
 	execute: (...params: ClientEvents[T]) => Awaitable<void>;
 	constructor(data: EventData<T>) {
 		this.name = data.name;
-		this.once = data.once;
+		this.once = data.once ?? false;
 		this.execute = data.execute;
 	}
 }
