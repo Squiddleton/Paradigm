@@ -1,4 +1,4 @@
-import { Client } from '../client.js';
+import { Client } from '../clients/discord.js';
 import { Quantity } from '../types/types.js';
 
 export const deployCommands = async (client: Client<true>) => {

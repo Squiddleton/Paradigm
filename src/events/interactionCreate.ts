@@ -2,7 +2,7 @@ import { User, PermissionsBitField, InteractionType, RESTJSONErrorCodes, Applica
 import fetch from 'node-fetch';
 import { findBestMatch, Rating } from 'string-similarity';
 
-import client from '../client.js';
+import client from '../clients/discord.js';
 import giveaways from'../schemas/giveaways.js';
 import giveawayusers from'../schemas/giveawayusers.js';
 import behavior from'../schemas/behavior.js';

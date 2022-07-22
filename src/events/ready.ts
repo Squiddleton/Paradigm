@@ -1,4 +1,4 @@
-import client from '../client.js';
+import client from '../clients/discord.js';
 import { Event } from '../types/types.js';
 
 const ready: Event<'ready'> = {

@@ -1,5 +1,5 @@
 import { ApplicationCommandData, ApplicationCommandOptionData, Awaitable, ChatInputCommandInteraction, ClientEvents, PermissionResolvable } from 'discord.js';
-import { Client } from '../client';
+import { Client } from '../clients/discord.js';
 
 export interface EventData<T extends keyof ClientEvents> {
 	name: T;

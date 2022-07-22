@@ -2,7 +2,7 @@ import { ClientEvents } from 'discord.js';
 import mongoose from 'mongoose';
 import { readdirSync } from 'node:fs';
 import config from './config.js';
-import client from './client.js';
+import client from './clients/discord.js';
 import { Event } from './types/types.js';
 
 client.login(config.token);
