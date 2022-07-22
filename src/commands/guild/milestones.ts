@@ -23,7 +23,6 @@ export default new SlashCommand({
 	async execute(interaction) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
 
-		/** @type {GuildMember} */
 		const member = interaction.options.getMember('member') ?? interaction.member;
 		const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
 		const { displayName } = member;

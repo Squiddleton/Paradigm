@@ -183,7 +183,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			const variants = c.variants?.[0];
 			if (variants) {
 				components.push(
-					/** @type {ActionRowBuilder<import('discord.js').MessageActionRowComponentBuilder>} */
 					new ActionRowBuilder({
 						components: [
 							new SelectMenuBuilder()
@@ -206,7 +205,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			const variants = c.variants?.[0];
 			if (variants) {
 				components.push(
-				/** @type {ActionRowBuilder<import('discord.js').MessageActionRowComponentBuilder>} */
 					new ActionRowBuilder({
 						components: [
 							new SelectMenuBuilder()
@@ -229,7 +227,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			const variants = c.variants?.[0];
 			if (variants) {
 				components.push(
-				/** @type {ActionRowBuilder<import('discord.js').MessageActionRowComponentBuilder>} */
 					new ActionRowBuilder({
 						components: [
 							new SelectMenuBuilder()
@@ -252,7 +249,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			const variants = c.variants?.[0];
 			if (variants) {
 				components.push(
-				/** @type {ActionRowBuilder<import('discord.js').MessageActionRowComponentBuilder>} */
 					new ActionRowBuilder({
 						components: [
 							new SelectMenuBuilder()
@@ -271,7 +267,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 	if (components.length > 0) {
 		components.push(
-			/** @type {ActionRowBuilder<import('discord.js').MessageActionRowComponentBuilder>} */
 			new ActionRowBuilder({
 				components: [
 					new ButtonBuilder()
