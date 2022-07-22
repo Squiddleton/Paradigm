@@ -1,7 +1,7 @@
 import { ActivityType, ChannelType, Client as BaseClient, ClientOptions, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
-import config from './config';
-import { SlashCommand } from './types';
+import config from './config.js';
+import { SlashCommand } from './types.js';
 
 class Client extends BaseClient {
 	commands: Collection<string, SlashCommand>;
@@ -19,10 +19,10 @@ class Client extends BaseClient {
 	constructor(options: ClientOptions) {
 		super(options);
 		this.commands = new Collection();
-		for (const folder of readdirSync('./commands')) {
-			const commandFiles = readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+		for (const folder of readdirSync('./dist/commands')) {
+			const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
 			for (const file of commandFiles) {
-				import(`../commands/${folder}/${file}`).then(({ default: command }) => {
+				import(`./commands/${folder}/${file}`).then(({ default: command }) => {
 					if (command instanceof SlashCommand) this.commands.set(command.name, command);
 				});
 			}

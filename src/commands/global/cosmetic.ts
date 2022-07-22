@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { noPunc } from '../util/functions.js';
-import { createCosmeticEmbed, cosmetics } from '../util/fortniteFunctions.js';
-import { SlashCommand } from '../types.js';
+import { noPunc } from '../../util/functions.js';
+import { createCosmeticEmbed, cosmetics } from '../../util/fortniteFunctions.js';
+import { SlashCommand } from '../../types.js';
 
 export default new SlashCommand({
 	name: 'cosmetic',
@@ -78,7 +78,6 @@ export default new SlashCommand({
 			]
 		}
 	],
-	global: false,
 	async execute(interaction) {
 		await interaction.deferReply();
 

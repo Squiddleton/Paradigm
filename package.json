@@ -2,6 +2,7 @@
   "name": "paradigm",
   "version": "1.0.0",
   "description": "An open-source Discord bot designed for the /r/FortniteBR Discord server",
+  "type": "module",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",

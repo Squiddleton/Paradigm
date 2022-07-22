@@ -2,10 +2,10 @@
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, TextBasedChannel, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake } from 'discord.js';
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
-import { noPunc, randomFromArray } from '../util/functions';
-import milestoneUserSchema from '../schemas/milestoneusers';
-import wishlistSchema from '../schemas/wishlists';
-import { Cosmetic, CosmeticAPI, Shop } from '../types';
+import { noPunc, randomFromArray } from '../util/functions.js';
+import milestoneUserSchema from '../schemas/milestoneusers.js';
+import wishlistSchema from '../schemas/wishlists.js';
+import { Cosmetic, CosmeticAPI, Shop } from '../types.js';
 
 type StringOption = string | null;
 

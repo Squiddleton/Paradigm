@@ -1,4 +1,4 @@
-import { Event } from '../types';
+import { Event } from '../types.js';
 
 const ready: Event<'ready'> = {
 	name: 'ready',
