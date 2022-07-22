@@ -1,9 +1,12 @@
 import { ClientEvents } from 'discord.js';
 import mongoose from 'mongoose';
+import { SubmissionStream } from 'snoostorm';
 import { readdirSync } from 'node:fs';
+
 import config from './config.js';
 import client from './clients/discord.js';
 import { Event } from './types/types.js';
+import snoowrap from './clients/snoowrap.js';
 
 client.login(config.token);
 mongoose.connect(config.mongoPath);
@@ -20,3 +23,15 @@ for (const file of eventFiles) {
 		}
 	});
 }
+
+const fnbrSubmissions = new SubmissionStream(snoowrap, {
+	subreddit: 'FortniteBR',
+	pollTime: 15000
+});
+setTimeout(async () => {
+	fnbrSubmissions.on('item', async submission => {
+		if (submission.author.name === 'FortniteRedditMods' || submission.distinguished !== null) {
+			await client.devChannel.send(`New mod post detected: https://www.reddit.com${submission.permalink}`);
+		}
+	});
+}, 20000);

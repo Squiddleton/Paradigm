@@ -19,6 +19,8 @@
     "discord.js": "^14.0.3",
     "mongoose": "^6.4.6",
     "node-fetch": "^3.2.9",
+    "snoostorm": "^1.5.2",
+    "snoowrap": "^1.23.0",
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {
