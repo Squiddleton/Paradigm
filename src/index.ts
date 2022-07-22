@@ -1,8 +1,8 @@
-import { readdirSync } from 'fs';
+import { ClientEvents } from 'discord.js';
+import { readdirSync } from 'node:fs';
 import config from './config';
 import client from './client';
 import { Event } from './types';
-import { ClientEvents } from 'discord.js';
 
 client.login(config.token);
 
