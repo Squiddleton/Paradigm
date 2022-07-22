@@ -27,9 +27,10 @@ export default new SlashCommand({
 		const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
 		const { displayName } = member;
 		const user = await member.user.fetch();
+		const { guildId } = interaction;
 
 		const result = await milestoneUserSchema.findOneAndUpdate(
-			{ userId: member.id, guildId: interaction.guildId },
+			{ userId: member.id, guildId },
 			{ $setOnInsert: { milestones: [] } },
 			{ new: true, upsert: true }
 		);
@@ -44,7 +45,7 @@ export default new SlashCommand({
 			embed.setDescription('No milestones');
 		}
 		else {
-			const milestones = await milestoneSchema.find();
+			const milestones = await milestoneSchema.find({ guildId });
 			let i = 0;
 			for (const milestone of result.milestones.sort((a, b) => {
 				const fullA = milestones.find(m => m.name === a);
