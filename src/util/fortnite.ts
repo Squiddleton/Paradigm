@@ -2,10 +2,10 @@
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, TextBasedChannel, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake } from 'discord.js';
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
-import { noPunc, randomFromArray } from '../util/functions.js';
+import { noPunc, randomFromArray } from './functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import wishlistSchema from '../schemas/wishlists.js';
-import { Cosmetic, CosmeticAPI, Shop } from '../types.js';
+import { Cosmetic, CosmeticAPI, Shop } from '../types/fortniteapi.js';
 
 type StringOption = string | null;
 
@@ -16,8 +16,17 @@ const backgrounds = {
 	blue: 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
 	green: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 };
-
 const isBackground = (str: string): str is keyof typeof backgrounds => str in backgrounds;
+
+export const rarityOrdering = {
+	Common: 0,
+	Uncommon: 1,
+	Rare: 2,
+	Epic: 3,
+	Legendary: 4,
+	Mythic: 5
+};
+export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
 
 export const { data: cosmetics } = await fetch('https://fortnite-api.com/v2/cosmetics/br').then(response => response.json()) as CosmeticAPI;
 
@@ -92,7 +101,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	return embed;
 };
 
-export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: (keyof typeof backgrounds) | null, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
+export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
 	const rawBackground = chosenBackground === null ? randomFromArray(Object.values(backgrounds)) : chosenBackground;
 	const background = await Canvas.loadImage(rawBackground);
 	const canvas = Canvas.createCanvas(background.width, background.height);
@@ -164,7 +173,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	return new AttachmentBuilder(canvas.toBuffer(), { name: 'loadout.png' });
 };
 
-export const createStyleListeners = async (interaction: ChatInputCommandInteraction<'cached'>, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]) => {
+export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]): Promise<void> => {
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];

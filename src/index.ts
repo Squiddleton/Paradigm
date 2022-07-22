@@ -1,10 +1,12 @@
 import { ClientEvents } from 'discord.js';
+import mongoose from 'mongoose';
 import { readdirSync } from 'node:fs';
 import config from './config.js';
 import client from './client.js';
-import { Event } from './types';
+import { Event } from './types/types.js';
 
 client.login(config.token);
+mongoose.connect(config.mongoPath);
 
 const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {

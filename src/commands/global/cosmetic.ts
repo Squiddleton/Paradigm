@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { noPunc } from '../../util/functions.js';
-import { createCosmeticEmbed, cosmetics } from '../../util/fortniteFunctions.js';
-import { SlashCommand } from '../../types.js';
+import { createCosmeticEmbed, cosmetics } from '../../util/fortnite.js';
+import { SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'cosmetic',

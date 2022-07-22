@@ -1,5 +1,3 @@
-import { ApplicationCommandOptionData, Awaitable, ChatInputCommandInteraction, ClientEvents, PermissionFlagsBits } from 'discord.js';
-
 export interface CosmeticAPI {
 	status: number;
 	data: Cosmetic[];
@@ -10,14 +8,14 @@ export interface Cosmetic {
 	name: string;
 	description: string;
 	customExclusiveCallout: string | undefined;
-	type: Values;
-	rarity: Values;
+	type: CosmeticValues;
+	rarity: CosmeticValues;
 	series: {
 		value: string;
 		image: string | null;
 		backendValue: string;
 	} | null;
-	set: Values;
+	set: CosmeticValues;
 	introduction: {
 		chapter: string;
 		season: string;
@@ -53,7 +51,7 @@ export interface Cosmetic {
 	shopHistory: string[] | null;
 }
 
-export interface Values {
+export interface CosmeticValues {
 	value: string;
 	displayValue: string;
 	backendValue: string;
@@ -110,21 +108,23 @@ export interface Playlist {
 	added: string;
 }
 
-export interface EventData<T extends keyof ClientEvents> {
-	name: T;
-	once?: boolean;
-    execute: (...params: ClientEvents[T]) => Awaitable<void>;
-}
-
-export class Event<T extends keyof ClientEvents> implements EventData<T> {
-	name: T;
-	once = false;
-	execute: (...params: ClientEvents[T]) => Awaitable<void>;
-	constructor(data: EventData<T>) {
-		this.name = data.name;
-		this.once = data.once ?? false;
-		this.execute = data.execute;
-	}
+export interface Shop {
+	status: number;
+	data: {
+		hash: string;
+		date: string;
+		vbuckIcon: string;
+		featured: {
+			name: string;
+			entries: ShopEntry[];
+		};
+		daily: {
+			name: string;
+			entries: ShopEntry[];
+		};
+		votes: null;
+		voteWinners: null;
+	};
 }
 
 export interface ShopEntry {
@@ -181,49 +181,4 @@ export interface ShopEntry {
 		}[];
 	};
 	items: Cosmetic[];
-}
-
-export interface Shop {
-	status: number;
-	data: {
-		hash: string;
-		date: string;
-		vbuckIcon: string;
-		featured: {
-			name: string;
-			entries: ShopEntry[];
-		};
-		daily: {
-			name: string;
-			entries: ShopEntry[];
-		};
-		votes: null;
-		voteWinners: null;
-	};
-}
-
-export interface SlashCommandData {
-	name: string;
-	description: string;
-	options?: ApplicationCommandOptionData[];
-	global?: boolean;
-	permissions?: (typeof PermissionFlagsBits)[];
-	execute: (interaction: ChatInputCommandInteraction) => Awaitable<void>;
-}
-
-export class SlashCommand {
-	name: string;
-	description: string;
-	options: ApplicationCommandOptionData[] = [];
-	global = true;
-	permissions: (typeof PermissionFlagsBits)[] | null;
-	execute: (interaction: ChatInputCommandInteraction) => Awaitable<void>;
-	constructor(data: SlashCommandData) {
-		this.name = data.name;
-		this.description = data.description;
-		this.options = data.options = [];
-		this.global = data.global ?? true;
-		this.permissions = data.permissions ?? null;
-		this.execute = data.execute;
-	}
 }

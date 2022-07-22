@@ -1,19 +1,19 @@
 import { ActivityType, ChannelType, Client as BaseClient, ClientOptions, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from './config.js';
-import { SlashCommand } from './types.js';
+import { SlashCommand } from './types/types.js';
 
-class Client extends BaseClient {
+export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
 	commands: Collection<string, SlashCommand>;
 	get devChannel() {
 		const channel = this.channels.cache.get(config.devChannelId);
-		if (channel === undefined) throw new Error('Client#devChannel is not cached, or the provided id is incorrect');
+		if (channel === undefined) throw new Error(`Client#devChannel is not cached, or the provided id "${config.devChannelId}" is incorrect`);
 		if (channel.type === ChannelType.GuildText) return channel;
 		throw new Error('Client#devChannel did not return a TextChannel');
 	}
 	get devGuild() {
 		const guild = this.guilds.cache.get(config.devGuildId);
-		if (guild === undefined) throw new Error('Client#devGuild is not cached, or the provided id is incorrect');
+		if (guild === undefined) throw new Error(`Client#devGuild is not cached, or the provided id "${config.devGuildId}" is incorrect`);
 		return guild;
 	}
 	constructor(options: ClientOptions) {
