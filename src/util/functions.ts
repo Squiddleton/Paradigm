@@ -1,16 +1,21 @@
 import { Client } from '../clients/discord.js';
-import { Quantity } from '../types/types.js';
+import { Quantity, Scope } from '../types/types.js';
 
 export const deployCommands = async (client: Client<true>) => {
 	const application = await client.application.fetch();
 
 	await application.commands.set(client.commands
-		.filter(c => !c.devOnly && c.global)
+		.filter(c => c.scope === Scope.Global)
 		.map(c => c.toJSON())
 	);
 
 	await client.devGuild.commands.set(client.commands
-		.filter(c => c.devOnly || !c.global)
+		.filter(c => [Scope.Dev, Scope.Exclusive].includes(c.scope))
+		.map(c => c.toJSON())
+	);
+
+	await client.exclusiveGuild.commands.set(client.commands
+		.filter(c => c.scope === Scope.Exclusive)
 		.map(c => c.toJSON())
 	);
 };

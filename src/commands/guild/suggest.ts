@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import Canvas from 'canvas';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'suggest',
@@ -29,7 +29,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	global: false,
+	scope: Scope.Exclusive,
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
 

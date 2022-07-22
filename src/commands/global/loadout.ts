@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 
 export default new SlashCommand({
@@ -49,6 +49,7 @@ export default new SlashCommand({
 			]
 		}
 	],
+	scope: Scope.Global,
 	async execute(interaction) {
 		const outfit = interaction.options.getString('outfit');
 		const backbling = interaction.options.getString('backbling');

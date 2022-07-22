@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'leaks',
@@ -11,7 +11,7 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		}
 	],
-	global: false,
+	scope: Scope.Exclusive,
 	async execute(interaction) {
 		if (['886083204690370630', '488988723049136133', '895024792439251064', '509930374021775394', '740607796898168913'].includes(interaction.channelId)) {
 			await interaction.reply({ content: 'This command cannot be used in this channel.', ephemeral: true });

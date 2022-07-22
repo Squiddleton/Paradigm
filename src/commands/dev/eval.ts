@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, Formatters } from 'discord.js';
 import { inspect } from 'util';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'eval',
@@ -13,7 +13,7 @@ export default new SlashCommand({
 			required: true
 		}
 	],
-	devOnly: true,
+	scope: Scope.Dev,
 	async execute(interaction, client) {
 		const code = interaction.options.getString('code', true);
 		const { owner } = client.application;

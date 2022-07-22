@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import fetch from 'node-fetch';
 import { PlaylistAPI } from '../../types/fortniteapi.js';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 import { noPunc } from '../../util/functions.js';
 
 export default new SlashCommand({
@@ -16,6 +16,7 @@ export default new SlashCommand({
 			autocomplete: true
 		}
 	],
+	scope: Scope.Global,
 	async execute(interaction) {
 		await interaction.deferReply();
 

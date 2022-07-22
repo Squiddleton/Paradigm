@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import giveawayUserSchema from '../../schemas/giveawayusers.js';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'activity',
@@ -27,7 +27,7 @@ export default new SlashCommand({
 			maxValue: 25
 		}
 	],
-	global: false,
+	scope: Scope.Guild,
 	async execute(interaction, client) {
 		await interaction.deferReply();
 

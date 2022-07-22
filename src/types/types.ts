@@ -20,14 +20,19 @@ export class Event<T extends keyof ClientEvents> implements EventData<T> {
 
 export type Quantity = { [key: string]: number };
 
+export enum Scope {
+	Dev,
+	Exclusive,
+	Global,
+	Guild,
+}
 
 export interface SlashCommandData {
 	name: string;
 	description: string;
 	options?: ApplicationCommandOptionData[];
-	global?: boolean;
 	permissions?: PermissionResolvable[];
-	devOnly?: boolean;
+	scope: Scope;
 	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
 }
 
@@ -35,17 +40,15 @@ export class SlashCommand {
 	name: string;
 	description: string;
 	options: ApplicationCommandOptionData[] = [];
-	global = true;
 	permissions: PermissionResolvable | null;
-	devOnly = false;
+	scope: Scope;
 	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
 	constructor(data: SlashCommandData) {
 		this.name = data.name;
 		this.description = data.description;
 		this.options = data.options ?? [];
-		this.global = data.global ?? true;
 		this.permissions = data.permissions ?? null;
-		this.devOnly = data.devOnly ?? false;
+		this.scope = data.scope;
 		this.execute = data.execute;
 	}
 	/** Maps the SlashCommand into deployable JSON data */
@@ -55,7 +58,7 @@ export class SlashCommand {
 			description: this.description,
 			options: this.options ?? [],
 			defaultMemberPermissions: this.permissions,
-			dmPermission: this.global
+			dmPermission: this.scope === Scope.Global
 		};
 	}
 }

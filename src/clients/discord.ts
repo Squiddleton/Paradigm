@@ -16,6 +16,11 @@ export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
 		if (guild === undefined) throw new Error(`Client#devGuild is not cached, or the provided id "${config.devGuildId}" is incorrect`);
 		return guild;
 	}
+	get exclusiveGuild() {
+		const guild = this.guilds.cache.get(config.exclusiveGuildId);
+		if (guild === undefined) throw new Error(`Client#exclusiveGuild is not cached, or the provided id "${config.exclusiveGuildId}" is incorrect`);
+		return guild;
+	}
 	constructor(options: ClientOptions) {
 		super(options);
 		this.commands = new Collection();

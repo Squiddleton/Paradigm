@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { noPunc } from '../../util/functions.js';
 import { createCosmeticEmbed, cosmetics } from '../../util/fortnite.js';
-import { SlashCommand } from '../../types/types.js';
+import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'cosmetic',
@@ -78,6 +78,7 @@ export default new SlashCommand({
 			]
 		}
 	],
+	scope: Scope.Global,
 	async execute(interaction) {
 		await interaction.deferReply();
 

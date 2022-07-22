@@ -113,11 +113,6 @@ export default new Event<'interactionCreate'>({
 				return;
 			}
 
-			if (!command.global && !inCachedGuild) {
-				await interaction.reply({ content: 'Please execute that command in a server rather than DMs.', ephemeral: true });
-				return;
-			}
-
 			if (interaction.guildId === '486932163636232193') {
 				await grantMilestone(interaction.user.id, '486932163636232193', 'Operant conditioning');
 			}
