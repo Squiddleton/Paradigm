@@ -54,7 +54,8 @@ export class SlashCommand {
 			name: this.name,
 			description: this.description,
 			options: this.options ?? [],
-			defaultMemberPermissions: this.permissions
+			defaultMemberPermissions: this.permissions,
+			dmPermission: this.global
 		};
 	}
 }
