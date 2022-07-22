@@ -1,6 +1,6 @@
 import { User, PermissionsBitField, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData } from 'discord.js';
 import fetch from 'node-fetch';
-import { findBestMatch } from 'string-similarity';
+import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../client.js';
 import giveaways from'../schemas/giveaways.js';
@@ -14,11 +14,6 @@ import { Event } from '../types/types.js';
 import { Cosmetic, Playlist, PlaylistAPI } from '../types/fortniteapi.js';
 
 const { data: playlistData } = await fetch('https://fortnite-api.com/v1/playlists').then(response => response.json()) as PlaylistAPI;
-
-interface Rating {
-	target: string;
-	rating: number;
-}
 
 const sortByRating = (a: Rating, b: Rating): number => {
 	if (a.rating === b.rating) return a.target.localeCompare(b.target);
