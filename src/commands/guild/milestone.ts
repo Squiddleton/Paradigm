@@ -88,88 +88,88 @@ export default new SlashCommand({
 
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
-		case 'create': {
-			const name = interaction.options.getString('name');
-			const oldMilestone = await milestoneSchema.findOne({ guildId, name });
-			if (oldMilestone !== null) {
-				await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
-				return;
-			}
-
-			await milestoneSchema.create({
-				guildId,
-				name,
-				description: interaction.options.getString('description'),
-				rarity: interaction.options.getString('rarity')
-			});
-			await interaction.reply(`You created the following milestone: \`${name}\`.`);
-			return;
-		}
-		case 'delete': {
-			const milestoneName = interaction.options.getString('milestone', true);
-
-			const { deletedCount } = await milestoneSchema.deleteOne({ guildId, name: milestoneName });
-			if (deletedCount === 0) {
-				await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });
-				return;
-			}
-			await interaction.deferReply();
-			await milestoneUserSchema.updateMany(
-				{ guildId },
-				{ $pull: { milestones: milestoneName } }
-			);
-
-			await interaction.editReply(`You deleted the following milestone: \`${milestoneName}\`.`);
-			return;
-		}
-		case 'grant': {
-			const member = interaction.options.getMember('member');
-			if (member === null) {
-				await interaction.reply('The provided members is not in this server.');
-				return;
-			}
-			const milestoneName = interaction.options.getString('milestone', true);
-
-			const milestone = await milestoneSchema.findOne({ guildId, name: milestoneName });
-			if (milestone === null) {
-				await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
-				return;
-			}
-
-			const granted = await grantMilestone(member.id, guildId, milestoneName);
-			if (!granted) {
-				await interaction.reply({ content: `${member.displayName} already has the milestone \`${milestoneName}\`.`, ephemeral: true });
-				return;
-			}
-			await interaction.reply(`You granted ${member.displayName} the following milestone: \`${milestoneName}\`.`);
-			return;
-		}
-		case 'list': {
-			const guildName = interaction.guild.name;
-			const embed = new EmbedBuilder()
-				.setTitle(`${guildName}'${guildName.endsWith('s') ? '' : 's'} Milestones`)
-				.setThumbnail(interaction.guild.iconURL())
-				.setTimestamp();
-
-			const result = await milestoneSchema.find({ guildId });
-
-			if (result.length === 0) {
-				embed.setDescription('No milestones');
-			}
-			else {
-				let i = 0;
-				for (const milestone of result.sort((a, b) => {
-					if (!isRarity(a.rarity) || !isRarity(b.rarity)) throw new Error(`The rarity of a milestone in the guild with the id of "${guildId}" is not a valid rarity.`);
-					return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : rarityOrdering[a.rarity] - rarityOrdering[b.rarity];
-				})) {
-					if (i < 25) embed.addFields([{ name: milestone.name, value: milestone.description, inline: true }]);
-					i++;
+			case 'create': {
+				const name = interaction.options.getString('name');
+				const oldMilestone = await milestoneSchema.findOne({ guildId, name });
+				if (oldMilestone !== null) {
+					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
+					return;
 				}
-			}
 
-			await interaction.reply({ embeds: [embed], ephemeral: true });
-			return;
-		}
+				await milestoneSchema.create({
+					guildId,
+					name,
+					description: interaction.options.getString('description'),
+					rarity: interaction.options.getString('rarity')
+				});
+				await interaction.reply(`You created the following milestone: \`${name}\`.`);
+				return;
+			}
+			case 'delete': {
+				const milestoneName = interaction.options.getString('milestone', true);
+
+				const { deletedCount } = await milestoneSchema.deleteOne({ guildId, name: milestoneName });
+				if (deletedCount === 0) {
+					await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });
+					return;
+				}
+				await interaction.deferReply();
+				await milestoneUserSchema.updateMany(
+					{ guildId },
+					{ $pull: { milestones: milestoneName } }
+				);
+
+				await interaction.editReply(`You deleted the following milestone: \`${milestoneName}\`.`);
+				return;
+			}
+			case 'grant': {
+				const member = interaction.options.getMember('member');
+				if (member === null) {
+					await interaction.reply('The provided members is not in this server.');
+					return;
+				}
+				const milestoneName = interaction.options.getString('milestone', true);
+
+				const milestone = await milestoneSchema.findOne({ guildId, name: milestoneName });
+				if (milestone === null) {
+					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
+					return;
+				}
+
+				const granted = await grantMilestone(member.id, guildId, milestoneName);
+				if (!granted) {
+					await interaction.reply({ content: `${member.displayName} already has the milestone \`${milestoneName}\`.`, ephemeral: true });
+					return;
+				}
+				await interaction.reply(`You granted ${member.displayName} the following milestone: \`${milestoneName}\`.`);
+				return;
+			}
+			case 'list': {
+				const guildName = interaction.guild.name;
+				const embed = new EmbedBuilder()
+					.setTitle(`${guildName}'${guildName.endsWith('s') ? '' : 's'} Milestones`)
+					.setThumbnail(interaction.guild.iconURL())
+					.setTimestamp();
+
+				const result = await milestoneSchema.find({ guildId });
+
+				if (result.length === 0) {
+					embed.setDescription('No milestones');
+				}
+				else {
+					let i = 0;
+					for (const milestone of result.sort((a, b) => {
+						if (!isRarity(a.rarity) || !isRarity(b.rarity)) throw new Error(`The rarity of a milestone in the guild with the id of "${guildId}" is not a valid rarity.`);
+						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : rarityOrdering[a.rarity] - rarityOrdering[b.rarity];
+					})) {
+						if (i < 25) embed.addFields([{ name: milestone.name, value: milestone.description, inline: true }]);
+						i++;
+					}
+				}
+
+				await interaction.reply({ embeds: [embed], ephemeral: true });
+				return;
+			}
 		}
 	}
 });

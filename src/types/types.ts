@@ -4,7 +4,7 @@ import { Client } from '../client';
 export interface EventData<T extends keyof ClientEvents> {
 	name: T;
 	once?: boolean;
-    execute: (...params: ClientEvents[T]) => Awaitable<void>;
+	execute: (...params: ClientEvents[T]) => Awaitable<void>;
 }
 
 export class Event<T extends keyof ClientEvents> implements EventData<T> {
