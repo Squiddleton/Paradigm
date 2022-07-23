@@ -1,6 +1,18 @@
+import { Snowflake } from 'discord.js';
 import mongoose from 'mongoose';
 
-const msgSchema = new mongoose.Schema({
+export interface IMessage {
+	day: number;
+	msgs: number;
+}
+
+export interface IUser {
+	userId: Snowflake;
+	guildId: Snowflake;
+	messages: IMessage[];
+}
+
+const msgSchema = new mongoose.Schema<IMessage>({
 	day: {
 		type: Number,
 		required: true
@@ -11,7 +23,7 @@ const msgSchema = new mongoose.Schema({
 	}
 });
 
-const giveawayUsersSchema = new mongoose.Schema({
+const giveawayUsersSchema = new mongoose.Schema<IUser>({
 	userId: {
 		type: String,
 		required: true
