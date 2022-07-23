@@ -35,7 +35,7 @@ export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
 	}
 }
 
-export default new Client({
+export default new Client<true>({
 	allowedMentions: {
 		parse: ['users']
 	},

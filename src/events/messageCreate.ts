@@ -5,13 +5,12 @@ import { checkWishlists } from '../util/fortnite.js';
 import client from '../clients/discord.js';
 
 const denySubmissionMessage = 'Discussion is not allowed in this channel.  Please use the `/suggest` command for submissions.';
-const exclusiveGuildId = client.exclusiveGuild.id;
 
 export default new Event({
 	name: 'messageCreate',
 	async execute(message) {
 		const { guildId } = message;
-		if (!client.isReady()) throw new Error('The client is not ready');
+		const exclusiveGuildId = client.exclusiveGuild.id;
 
 		if (guildId === exclusiveGuildId) {
 			const deleteSubmission = async () => {

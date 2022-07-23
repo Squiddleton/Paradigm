@@ -33,8 +33,6 @@ const mapByName = (c: Cosmetic | Playlist) => c.name ?? 'null';
 export default new Event({
 	name: 'interactionCreate',
 	async execute(interaction) {
-		if (!client.isReady()) throw new Error('The client is not ready');
-
 		const inCachedGuild = interaction.inCachedGuild();
 		const { owner } = client.application;
 		if (!(owner instanceof User)) return;

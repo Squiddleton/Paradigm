@@ -20,8 +20,8 @@ for (const file of eventFiles) {
 	}
 }
 
-await client.login(config.token);
-await mongoose.connect(config.mongoPath);
+client.login(config.token);
+mongoose.connect(config.mongoPath);
 
 const fnbrSubmissions = new SubmissionStream(snoowrap, {
 	subreddit: 'FortniteBR',
