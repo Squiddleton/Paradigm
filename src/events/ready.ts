@@ -4,6 +4,7 @@ import client from '../clients/discord.js';
 import { Event } from '../types/types.js';
 import { randomFromArray, validateChannel } from '../util/functions.js';
 import guildSchema from '../schemas/guilds.js';
+import { checkWishlists } from '../util/fortnite.js';
 
 const ready: Event<'ready'> = {
 	name: 'ready',
@@ -11,6 +12,11 @@ const ready: Event<'ready'> = {
 	async execute() {
 		await client.application.fetch();
 		console.log(`${client.user.username} is ready!`);
+
+		schedule('30 0 0 * * *', async () => {
+			const channel = validateChannel(client, '489836390759268353', 'Wishlist channel');
+			await checkWishlists(channel);
+		}, { timezone: 'Etc/UTC' });
 
 		schedule('*/1 * * * *', async () => {
 			const guildResult = await guildSchema.find();
