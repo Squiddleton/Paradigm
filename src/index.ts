@@ -8,21 +8,20 @@ import client from './clients/discord.js';
 import { Event } from './types/types.js';
 import snoowrap from './clients/snoowrap.js';
 
-client.login(config.token);
-mongoose.connect(config.mongoPath);
-
 const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
-	import(`./events/${file}`).then(f => {
-		const event = f.default as Event<keyof ClientEvents>;
-		if (event.once) {
-			client.once(event.name, (...args) => event.execute(...args));
-		}
-		else {
-			client.on(event.name, (...args) => event.execute(...args));
-		}
-	});
+	const f = await import(`./events/${file}`);
+	const event = f.default as Event<keyof ClientEvents>;
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	}
+	else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
 }
+
+await client.login(config.token);
+await mongoose.connect(config.mongoPath);
 
 const fnbrSubmissions = new SubmissionStream(snoowrap, {
 	subreddit: 'FortniteBR',
