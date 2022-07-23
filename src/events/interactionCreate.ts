@@ -9,7 +9,7 @@ import behavior from'../schemas/behavior.js';
 import { noPunc } from'../util/functions.js';
 import milestoneSchema from '../schemas/milestones.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
-import { cosmetics, grantMilestone, itemShopCosmetics } from '../util/fortnite.js';
+import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import { Event } from '../types/types.js';
 import { Cosmetic, Playlist, PlaylistAPI } from '../types/fortniteapi.js';
 
@@ -111,10 +111,6 @@ export default new Event<'interactionCreate'>({
 			if (command === undefined) {
 				await interaction.reply({ content: 'I could not find a command matching that name!', ephemeral: true });
 				return;
-			}
-
-			if (interaction.guildId === '486932163636232193') {
-				await grantMilestone(interaction.user.id, '486932163636232193', 'Operant conditioning');
 			}
 
 			try {
