@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder, GuildMember, Snowflake } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder, Snowflake } from 'discord.js';
 
 import wishlistSchema from '../../schemas/wishlists.js';
 import { noPunc } from '../../util/functions.js';
@@ -14,7 +14,6 @@ interface UserProperties {
 }
 const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<UserProperties> => {
 	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
-	const mentionedMember = interaction.options.getMember('user');
 	// Users must be force-fetched to retrieve banners
 	const user = await unfetchedUser.fetch();
 	const userId = user.id;
@@ -40,10 +39,8 @@ const getUserProperties = async (interaction: ChatInputCommandInteraction): Prom
 		};
 	}
 
-	// Return mentioned user data is the mentioned member could not resolve
-	if (mentionedMember === null || !(mentionedMember instanceof GuildMember)) {
-		return userData;
-	}
+	const mentionedMember = interaction.options.getMember('user');
+	if (mentionedMember === null) return userData;
 
 	return {
 		id: userId,
