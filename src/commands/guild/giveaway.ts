@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction } from 'discord.js';
 import { randomFromArray, quantity } from '../../util/functions.js';
-import giveawaySchema from '../../schemas/giveaways.js';
+import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { Scope, SlashCommand } from '../../types/types.js';
 
 const factors = {
@@ -70,11 +70,6 @@ export default new SlashCommand({
 					type: ApplicationCommandOptionType.Integer,
 					minValue: 0,
 					maxValue: 10
-				},
-				{
-					name: 'allowmods',
-					description: 'Whether to allow mods to enter the giveaway; defaults to false',
-					type: ApplicationCommandOptionType.Boolean
 				}
 			]
 		},
@@ -171,11 +166,6 @@ export default new SlashCommand({
 					type: ApplicationCommandOptionType.Integer,
 					minValue: 0,
 					maxValue: 10
-				},
-				{
-					name: 'allowmods',
-					description: 'Whether to allow mods to enter the giveaway; defaults to false',
-					type: ApplicationCommandOptionType.Boolean
 				}
 			]
 		}
@@ -195,9 +185,15 @@ export default new SlashCommand({
 				const messages = interaction.options.getInteger('messages');
 				const regEntries = interaction.options.getInteger('regular');
 				const boosterEntries = interaction.options.getInteger('booster');
-				const allowMods = interaction.options.getBoolean('allowmods') ?? false;
-				const giveaway = await giveawaySchema.findById(messageId);
-				if (giveaway === null) {
+
+				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
+				const giveaway = giveaways.find(g => g.messageId === messageId);
+				if (giveaway === undefined) {
 					await interaction.reply({ content: 'No giveaway matches that message id.', ephemeral: true });
 					return;
 				}
@@ -228,8 +224,15 @@ export default new SlashCommand({
 				if (messages) giveaway.messages = messages;
 				if (regEntries) giveaway.regEntries = regEntries;
 				if (boosterEntries) giveaway.boosterEntries = boosterEntries;
-				if (allowMods) giveaway.allowMods = allowMods;
-				await giveawaySchema.findByIdAndUpdate(messageId, giveaway);
+				await guildSchema.findOneAndUpdate(
+					{
+						_id: interaction.guildId,
+						'giveaways.messageId': messageId
+					},
+					{
+						$set: { 'giveaways.$': giveaway }
+					}
+				);
 				await giveawayMessage.edit({ embeds: [embed] });
 				await interaction.reply('The giveaway has been updated.');
 				return;
@@ -239,18 +242,25 @@ export default new SlashCommand({
 				const messageId = interaction.options.getString('message', true);
 				const amount = interaction.options.getInteger('amount') ?? 1;
 
-				const result = await giveawaySchema.findById(messageId);
-				if (!result) {
+				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
+
+				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
+				if (giveaway === undefined) {
 					await interaction.editReply('I could not find a giveaway for that message id.');
 					return;
 				}
-				if (!result.completed) {
+				if (!giveaway.completed) {
 					await interaction.editReply('You cannot reroll a giveaway before it ends.');
 					return;
 				}
 
-				const { winners } = result;
-				const eligibleEntrants = result.entrants.filter(e => !result.winners.includes(e));
+				const { winners } = giveaway;
+				const eligibleEntrants = giveaway.entrants.filter(e => !giveaway.winners.includes(e));
 				if (!eligibleEntrants.length) {
 					await interaction.editReply('There are no more eligible entrants who can win.');
 					return;
@@ -263,13 +273,19 @@ export default new SlashCommand({
 				}
 
 				const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
-				const giveawayChannel = client.channels.cache.get(result.channelId);
-				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${result.channelId}" is incorrect`);
+				const giveawayChannel = client.channels.cache.get(giveaway.channelId);
+				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${giveaway.channelId}" is incorrect`);
 				if (!giveawayChannel.isTextBased()) throw new Error(`The giveaway channel is not text-based; received type "${giveawayChannel.type}"`);
 				const message = await giveawayChannel.messages.fetch(messageId);
 				await message.reply(`This giveaway has been rerolled, so congratulations to the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
 
-				await giveawaySchema.findByIdAndUpdate(messageId, { winners });
+				await guildSchema.findOneAndUpdate(
+					{
+						_id: interaction.guildId,
+						'giveaways.messageId': messageId
+					},
+					{ $set: { 'giveaways.$.winners': winners } }
+				);
 
 				await interaction.editReply(`The giveaway has been rerolled with the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
 				return;
@@ -277,9 +293,15 @@ export default new SlashCommand({
 			case 'review': {
 				const inc = 20;
 				const messageId = interaction.options.getString('message', true);
-				const giveaway = await giveawaySchema.findById(messageId);
+				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
+				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 
-				if (giveaway === null) {
+				if (giveaway === undefined) {
 					await interaction.reply({ content: 'I could not find a giveaway with that message id.', ephemeral: true });
 					return;
 				}
@@ -421,7 +443,6 @@ export default new SlashCommand({
 				const units = interaction.options.getString('unit', true);
 				const regEntries = interaction.options.getInteger('regular');
 				const boosterEntries = interaction.options.getInteger('booster');
-				const allowMods = interaction.options.getBoolean('allowmods') ?? false;
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
 				if (!isUnit(units)) throw new Error(`The unit "${units}" is not a valid unit`);
@@ -460,9 +481,8 @@ export default new SlashCommand({
 
 				const message = await channel.send({ components: [row], embeds: [embed] });
 
-				await giveawaySchema.create({
-					_id: message.id,
-					guildId: interaction.guildId,
+				const giveaway: IGiveaway = {
+					messageId: message.id,
 					channelId: channel.id,
 					startTime,
 					endTime,
@@ -472,9 +492,13 @@ export default new SlashCommand({
 					boosterEntries: boosterEntries ?? 0,
 					winnerNumber: winners,
 					entrants: [],
-					winners: [],
-					allowMods
-				});
+					winners: []
+				};
+				await guildSchema.findByIdAndUpdate(
+					interaction.guildId,
+					{ $push: { giveaways: giveaway } },
+					{ upsert: true }
+				);
 
 				await interaction.reply({ content: 'Succesfully hosted the giveaway!', ephemeral: true });
 				return;

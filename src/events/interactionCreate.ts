@@ -1,9 +1,9 @@
-import { User, PermissionsBitField, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData } from 'discord.js';
+import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData } from 'discord.js';
 import fetch from 'node-fetch';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../clients/discord.js';
-import giveaways from'../schemas/giveaways.js';
+import guildSchema from'../schemas/guilds.js';
 import giveawayusers from'../schemas/giveawayusers.js';
 import behavior from'../schemas/behavior.js';
 import { noPunc } from'../util/functions.js';
@@ -148,15 +148,18 @@ export default new Event<'interactionCreate'>({
 				return;
 			}
 
-			const giveawayResult = await giveaways.findById(interaction.message.id);
-			if (giveawayResult === null) throw new Error(`No giveaway was found for the id "${interaction.message.id}"`);
+			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
+				$setOnInsert: {
+					giveaways: [],
+					milestones: []
+				}
+			}, { new: true, upsert: true });
+
+			const giveawayResult = guildResult.giveaways.find(g => g.messageId === interaction.message.id);
+			if (giveawayResult === undefined) throw new Error(`No giveaway was found for the id "${interaction.message.id}"`);
+
 			if (giveawayResult.entrants.includes(userId)) {
 				await interaction.editReply('You have already entered this giveaway.');
-				return;
-			}
-
-			if (!giveawayResult.allowMods && (interaction.member.roles.cache.has('544952148790738954') || interaction.member.permissions.has(PermissionsBitField.Flags.Administrator))) {
-				await interaction.editReply('Mods cannot enter giveaways.');
 				return;
 			}
 
@@ -170,11 +173,13 @@ export default new Event<'interactionCreate'>({
 				return;
 			}
 
-			const behaviorResult = await behavior.findById(interaction.guildId);
-			if (behaviorResult === null) throw new Error(`No behavior document was found for the guild with the id "${interaction.guildId}"`);
-			if (behaviorResult.behaviors[0][userId]) {
-				await interaction.editReply('Only users with no mutes or bans in the past 30 days may enter.');
-				return;
+			if (interaction.guildId === client.exclusiveGuild.id) {
+				const behaviorResult = await behavior.findById(interaction.guildId);
+				if (behaviorResult === null) throw new Error(`No behavior document was found for the guild with the id "${interaction.guildId}"`);
+				if (behaviorResult.behaviors[0][userId]) {
+					await interaction.editReply('Only users with no mutes or bans in the past 30 days may enter.');
+					return;
+				}
 			}
 
 			const entries = [userId];
@@ -189,9 +194,12 @@ export default new Event<'interactionCreate'>({
 				}
 			}
 
-			await giveaways.updateOne(
-				{ _id: interaction.message.id },
-				{ $push: { entrants: { $each: entries } } }
+			await guildSchema.updateOne(
+				{
+					_id: interaction.guildId,
+					'giveaways.messageId': interaction.message.id
+				},
+				{ $push: { 'giveaways.$.entrants': { $each: entries } } }
 			);
 			await interaction.editReply(`You have successfully entered${entries.length === 1 ? '' : ` ${entries.length} times due to your roles`}.  Check back when the giveaway ends to see if you won.`);
 		}
