@@ -2,7 +2,7 @@
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, TextBasedChannel, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake } from 'discord.js';
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
-import { noPunc, randomFromArray } from './functions.js';
+import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import wishlistSchema from '../schemas/wishlists.js';
 import { Cosmetic, CosmeticAPI, Shop } from '../types/fortniteapi.js';
@@ -71,10 +71,8 @@ export const checkWishlists = async (channel: TextBasedChannel) => {
 		const msg = msgs.join('\n');
 		await channel.send(msg);
 
-		const friendChannel = channel.client.channels.cache.get('703027620555653180');
-		if (friendChannel !== undefined && friendChannel.isTextBased()) {
-			await friendChannel.send(msg);
-		}
+		const friendChannel = validateChannel(channel.client, '703027620555653180', 'Friend\'s channel');
+		await friendChannel.send(msg);
 	}
 };
 

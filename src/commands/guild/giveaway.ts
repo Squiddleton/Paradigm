@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction } from 'discord.js';
-import { randomFromArray, quantity } from '../../util/functions.js';
+import { randomFromArray, quantity, validateChannel } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { Scope, SlashCommand } from '../../types/types.js';
 
@@ -202,9 +202,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const giveawayChannel = client.channels.cache.get(giveaway.channelId);
-				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${giveaway.channelId}" is incorrect`);
-				if (!giveawayChannel.isTextBased()) throw new Error('Giveaway channel is not text-based.');
+				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
 				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 				const embed = EmbedBuilder.from(giveawayMessage.embeds[0]);
 				if (embed.data.fields === undefined) throw new Error(`A giveaway embed from the message id "${messageId}" is missing its "fields" property`);
@@ -273,9 +271,7 @@ export default new SlashCommand({
 				}
 
 				const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
-				const giveawayChannel = client.channels.cache.get(giveaway.channelId);
-				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${giveaway.channelId}" is incorrect`);
-				if (!giveawayChannel.isTextBased()) throw new Error(`The giveaway channel is not text-based; received type "${giveawayChannel.type}"`);
+				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
 				const message = await giveawayChannel.messages.fetch(messageId);
 				await message.reply(`This giveaway has been rerolled, so congratulations to the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
 
@@ -306,9 +302,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const giveawayChannel = client.channels.cache.get(giveaway.channelId);
-				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${giveaway.channelId}" is incorrect`);
-				if (!giveawayChannel.isTextBased()) throw new Error('Giveaway channel is not text-based.');
+				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
 				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
 				const quantities = quantity(giveaway.entrants);

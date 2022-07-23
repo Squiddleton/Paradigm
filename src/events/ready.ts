@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Message } f
 import { schedule } from 'node-cron';
 import client from '../clients/discord.js';
 import { Event } from '../types/types.js';
-import { randomFromArray } from '../util/functions.js';
+import { randomFromArray, validateChannel } from '../util/functions.js';
 import guildSchema from '../schemas/guilds.js';
 
 const ready: Event<'ready'> = {
@@ -17,9 +17,7 @@ const ready: Event<'ready'> = {
 			const giveaways = guildResult.map(g => g.giveaways).flat().filter(giveaway => !giveaway.completed && giveaway.endTime <= (Date.now() / 1000));
 
 			for (const giveaway of giveaways) {
-				const giveawayChannel = client.channels.cache.get(giveaway.channelId);
-				if (giveawayChannel === undefined) throw new Error(`The giveaway channel is not cached, or the provided id "${giveaway.channelId}" is incorrect`);
-				if (!giveawayChannel.isTextBased()) throw new Error(`The giveaway channel is not text-based; received type "${giveawayChannel.type}"`);
+				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
 
 				let message: Message;
 				try {

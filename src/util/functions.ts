@@ -1,3 +1,4 @@
+import { Client as BaseClient, Snowflake, TextBasedChannel } from 'discord.js';
 import { Client } from '../clients/discord.js';
 import { Quantity, Scope } from '../types/types.js';
 
@@ -52,3 +53,10 @@ export const quantity = (arr: string[]) => {
 };
 
 export const randomFromArray = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+export const validateChannel = (client: BaseClient, channelId: Snowflake, channelName: string): TextBasedChannel => {
+	const channel = client.channels.cache.get(channelId);
+	if (channel === undefined) throw new Error(`${channelName} is not cached, or the provided id "${channelId}" is incorrect`);
+	if (!channel.isTextBased()) throw new Error(`${channelName} is not text-based; received type "${channel.type}"`);
+	return channel;
+};

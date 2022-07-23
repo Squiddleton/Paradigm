@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import Canvas from 'canvas';
 import { Scope, SlashCommand } from '../../types/types.js';
+import { validateChannel } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'suggest',
@@ -46,9 +47,7 @@ export default new SlashCommand({
 
 		const submissionName = interaction.options.getString('name');
 		const type = interaction.options.getString('type');
-		const submissionChannel = client.channels.cache.get('895024792439251064');
-		if (submissionChannel === undefined) throw new Error('The giveaway channel is not cached, or the provided id "895024792439251064" is incorrect');
-		if (!submissionChannel.isTextBased()) throw new Error('Submission channel is not text-based.');
+		const submissionChannel = validateChannel(client, '895024792439251064', 'Submission channel');
 
 		try {
 			await submissionChannel.send({ content: `Submission by ${interaction.user.toString()}\n${submissionName} (${type})`, files: [url] });
