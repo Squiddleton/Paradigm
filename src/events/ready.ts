@@ -3,6 +3,8 @@ import { schedule } from 'node-cron';
 import client from '../clients/discord.js';
 import { Event } from '../types/types.js';
 import { randomFromArray, validateChannel } from '../util/functions.js';
+import behaviorSchema from '../schemas/behavior.js';
+import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 
@@ -17,6 +19,28 @@ const ready: Event<'ready'> = {
 			const channel = validateChannel(client, '489836390759268353', 'Wishlist channel');
 			await checkWishlists(channel);
 		}, { timezone: 'Etc/UTC' });
+
+		schedule('0 0 * * *', async () => {
+			const result = await behaviorSchema.findByIdAndUpdate('486932163636232193', {
+				$setOnInsert: {
+					behaviors: [{}],
+					date: new Date().getDate()
+				}
+			}, { new: true, upsert: true });
+			const behaviors = result.behaviors[0];
+			for (const b in behaviors) {
+				behaviors[b]--;
+				if (behaviors[b] === 0) delete behaviors[b];
+			}
+
+			await behaviorSchema.findByIdAndUpdate(
+				'486932163636232193',
+				{ behaviors: [behaviors], date: new Date().getDate() }
+			);
+
+			await giveawayUserSchema.updateMany({}, { $inc: { 'messages.$[].day': -1 } });
+			await giveawayUserSchema.updateMany({}, { $pull: { messages: { day: { $lte: 0 } } } });
+		}, { timezone: 'America/New_York' });
 
 		schedule('*/1 * * * *', async () => {
 			const guildResult = await guildSchema.find();
