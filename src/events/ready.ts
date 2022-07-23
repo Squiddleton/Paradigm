@@ -13,7 +13,10 @@ export default new Event({
 	once: true,
 	async execute() {
 		await client.application.fetch();
-		console.log(`${client.user.username} is ready!`);
+
+		const readyMessage = `${client.user.username} is ready!`;
+		await client.devChannel.send(readyMessage);
+		console.log(readyMessage);
 
 		schedule('30 0 0 * * *', async () => {
 			const channel = validateChannel(client, '489836390759268353', 'Wishlist channel');
