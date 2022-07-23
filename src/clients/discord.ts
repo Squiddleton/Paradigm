@@ -1,10 +1,10 @@
 import { ActivityType, ChannelType, Client as BaseClient, ClientOptions, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
-import { SlashCommand } from '../types/types.js';
+import { ContextMenu, ContextMenuType, SlashCommand } from '../types/types.js';
 
 export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
-	commands: Collection<string, SlashCommand>;
+	commands: Collection<string, ContextMenu<ContextMenuType> | SlashCommand>;
 	get devChannel() {
 		const channel = this.channels.cache.get(config.devChannelId);
 		if (channel === undefined) throw new Error(`Client#devChannel is not cached, or the provided id "${config.devChannelId}" is incorrect`);
@@ -28,7 +28,7 @@ export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
 			const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
 			for (const file of commandFiles) {
 				import(`../commands/${folder}/${file}`).then(({ default: command }) => {
-					if (command instanceof SlashCommand) this.commands.set(command.name, command);
+					if (command instanceof ContextMenu || command instanceof SlashCommand) this.commands.set(command.name, command);
 				});
 			}
 		}

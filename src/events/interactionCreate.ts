@@ -9,7 +9,7 @@ import behavior from'../schemas/behavior.js';
 import { noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
-import { Event } from '../types/types.js';
+import { ContextMenu, Event, SlashCommand } from '../types/types.js';
 import { Cosmetic, Playlist, PlaylistAPI } from '../types/fortniteapi.js';
 
 const { data: playlistData } = await fetch('https://fortnite-api.com/v1/playlists').then(response => response.json()) as PlaylistAPI;
@@ -109,7 +109,7 @@ export default new Event({
 			}
 		}
 
-		else if (interaction.isChatInputCommand()) {
+		else if (interaction.type === InteractionType.ApplicationCommand) {
 			const command = client.commands.get(interaction.commandName);
 			if (command === undefined) {
 				await interaction.reply({ content: 'I could not find a command matching that name!', ephemeral: true });
@@ -117,7 +117,18 @@ export default new Event({
 			}
 
 			try {
-				await command.execute(interaction, client);
+				// TODO: Simplify this block
+				if (interaction.isChatInputCommand() && command instanceof SlashCommand) {
+					await command.execute(interaction, client);
+				}
+				else if (command instanceof ContextMenu) {
+					if (interaction.isMessageContextMenuCommand() && command.isMessage()) {
+						await command.execute(interaction, client);
+					}
+					else if (interaction.isUserContextMenuCommand() && command.isUser()) {
+						await command.execute(interaction, client);
+					}
+				}
 			}
 			catch (error) {
 				console.error(
