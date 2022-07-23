@@ -176,7 +176,7 @@ export interface ShopEntry {
 				Background_Color_B: string;
 				FallOff_Color: string;
 			};
-			scalings: {[key: string]: number};
+			scalings: { [key: string]: number };
 			flags: null;
 		}[];
 	};

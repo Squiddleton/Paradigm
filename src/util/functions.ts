@@ -22,7 +22,7 @@ export const deployCommands = async (client: Client<true>) => {
 
 type noPuncOverload = {
 	(str: string): string;
-	(str: null|undefined): null;
+	(str: null | undefined): null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -42,6 +42,20 @@ export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 	!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
 });
 
+export const fetchItemShop = async () => {
+	const { data: rawAPI } = await fetch('https://fortnite-api.com/v2/shop/br/combined').then(r => r.json()) as Shop;
+
+	const withoutDupes: Cosmetic[] = [];
+	const withDupes: Cosmetic[] = rawAPI.featured.entries.concat(rawAPI.daily.entries).map(entry => entry.items).flat();
+
+	for (const item of withDupes) {
+		if (!withoutDupes.some(c => c.id === item.id)) {
+			withoutDupes.push(item);
+		}
+	}
+	return withoutDupes;
+};
+
 export const checkWishlists = async (channel: TextBasedChannel) => {
 	const entries = await fetchItemShop();
 	const wishlists = await wishlistSchema.find();
@@ -286,7 +300,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			return false;
 		};
 		const collector = message.createMessageComponentCollector({ filter, time: 120000 });
-		const options: {[key: string]: string} = {};
+		const options: { [key: string]: string } = {};
 
 		collector.on('collect', async i => {
 			if (i.customId === 'confirm') {
@@ -343,18 +357,4 @@ export const grantMilestone = async (userId: Snowflake, guildId: Snowflake, mile
 		{ upsert: true }
 	);
 	return true;
-};
-
-export const fetchItemShop = async () => {
-	const { data: rawAPI } = await fetch('https://fortnite-api.com/v2/shop/br/combined').then(r => r.json()) as Shop;
-
-	const withoutDupes: Cosmetic[] = [];
-	const withDupes: Cosmetic[] = rawAPI.featured.entries.concat(rawAPI.daily.entries).map(entry => entry.items).flat();
-
-	for (const item of withDupes) {
-		if (!withoutDupes.some(c => c.id === item.id)) {
-			withoutDupes.push(item);
-		}
-	}
-	return withoutDupes;
 };

@@ -24,7 +24,7 @@ export enum Scope {
 	Dev,
 	Exclusive,
 	Global,
-	Guild,
+	Guild
 }
 
 export interface SlashCommandData {
