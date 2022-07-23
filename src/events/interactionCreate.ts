@@ -7,7 +7,6 @@ import guildSchema from'../schemas/guilds.js';
 import giveawayusers from'../schemas/giveawayusers.js';
 import behavior from'../schemas/behavior.js';
 import { noPunc } from'../util/functions.js';
-import milestoneSchema from '../schemas/milestones.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import { Event } from '../types/types.js';
@@ -86,8 +85,14 @@ export default new Event<'interactionCreate'>({
 						return interaction.respond(choices);
 					}
 					case 'milestone': {
+						if (!interaction.inCachedGuild()) throw new Error('The /milestone command should only be usable in guilds');
 						const { guildId } = interaction;
-						let milestones = (await milestoneSchema.find({ guildId })).map(m => m.name);
+						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {
+							$setOnInsert: {
+								giveaways: [],
+								milestones: []
+							}
+						}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const userId = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
 						if (userId) {
 							const userMilestones = await milestoneUserSchema.findOne({ userId, guildId });

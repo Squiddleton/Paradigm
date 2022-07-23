@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
-import milestoneSchema from '../../schemas/milestones.js';
+import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { Scope, SlashCommand } from '../../types/types.js';
 import { grantMilestone, isRarity, rarityOrdering } from '../../util/fortnite.js';
@@ -89,18 +89,26 @@ export default new SlashCommand({
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'create': {
-				const name = interaction.options.getString('name');
-				const oldMilestone = await milestoneSchema.findOne({ guildId, name });
-				if (oldMilestone !== null) {
+				const name = interaction.options.getString('name', true);
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
+				if (milestones.some(m => m.name === name)) {
 					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
 					return;
 				}
 
-				await milestoneSchema.create({
-					guildId,
-					name,
-					description: interaction.options.getString('description'),
-					rarity: interaction.options.getString('rarity')
+				await guildSchema.findByIdAndUpdate(guildId, {
+					$push: {
+						milestones: {
+							name,
+							description: interaction.options.getString('description', true),
+							rarity: interaction.options.getString('rarity', true)
+						}
+					}
 				});
 				await interaction.reply(`You created the following milestone: \`${name}\`.`);
 				return;
@@ -108,11 +116,14 @@ export default new SlashCommand({
 			case 'delete': {
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const { deletedCount } = await milestoneSchema.deleteOne({ guildId, name: milestoneName });
-				if (deletedCount === 0) {
+				const matchingGuild = await guildSchema.findOneAndUpdate(
+					{ _id: guildId, 'milestones.name': milestoneName },
+					{ $pull: { milestones: { name: milestoneName } } });
+				if (matchingGuild === null) {
 					await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });
 					return;
 				}
+
 				await interaction.deferReply();
 				await milestoneUserSchema.updateMany(
 					{ guildId },
@@ -130,8 +141,14 @@ export default new SlashCommand({
 				}
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const milestone = await milestoneSchema.findOne({ guildId, name: milestoneName });
-				if (milestone === null) {
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
+				const milestone = milestones.find(m => m.name === milestoneName);
+				if (milestone === undefined) {
 					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
 					return;
 				}
@@ -151,14 +168,19 @@ export default new SlashCommand({
 					.setThumbnail(interaction.guild.iconURL())
 					.setTimestamp();
 
-				const result = await milestoneSchema.find({ guildId });
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
+					$setOnInsert: {
+						giveaways: [],
+						milestones: []
+					}
+				}, { new: true, upsert: true });
 
-				if (result.length === 0) {
+				if (milestones.length === 0) {
 					embed.setDescription('No milestones');
 				}
 				else {
 					let i = 0;
-					for (const milestone of result.sort((a, b) => {
+					for (const milestone of milestones.sort((a, b) => {
 						if (!isRarity(a.rarity) || !isRarity(b.rarity)) throw new Error(`The rarity of a milestone in the guild with the id of "${guildId}" is not a valid rarity.`);
 						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : rarityOrdering[a.rarity] - rarityOrdering[b.rarity];
 					})) {

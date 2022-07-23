@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import milestoneSchema from '../../schemas/milestones.js';
+import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { Scope, SlashCommand } from '../../types/types.js';
 import { isRarity, rarityOrdering } from '../../util/fortnite.js';
@@ -45,7 +45,13 @@ export default new SlashCommand({
 			embed.setDescription('No milestones');
 		}
 		else {
-			const milestones = await milestoneSchema.find({ guildId });
+			const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
+				$setOnInsert: {
+					giveaways: [],
+					milestones: []
+				}
+			}, { new: true, upsert: true });
+
 			let i = 0;
 			for (const milestone of result.milestones.sort((a, b) => {
 				const fullA = milestones.find(m => m.name === a);
