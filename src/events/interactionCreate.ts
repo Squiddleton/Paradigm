@@ -30,7 +30,7 @@ const mapById = (c: Rating): ApplicationCommandOptionChoiceData => {
 
 const mapByName = (c: Cosmetic | Playlist) => c.name ?? 'null';
 
-export default new Event<'interactionCreate'>({
+export default new Event({
 	name: 'interactionCreate',
 	async execute(interaction) {
 		if (!client.isReady()) throw new Error('The client is not ready');

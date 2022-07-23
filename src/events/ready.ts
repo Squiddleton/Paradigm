@@ -8,7 +8,7 @@ import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 
-const ready: Event<'ready'> = {
+export default new Event({
 	name: 'ready',
 	once: true,
 	async execute() {
@@ -96,6 +96,4 @@ const ready: Event<'ready'> = {
 			}
 		});
 	}
-};
-
-export default ready;
+});
