@@ -87,8 +87,16 @@ const guildSchema = new mongoose.Schema<IGuild>({
 		type: String,
 		required: true
 	},
-	giveaways: [giveawaySchema],
-	milestones: [milestoneSchema]
+	giveaways: {
+		type: [giveawaySchema],
+		required: true,
+		default: []
+	},
+	milestones: {
+		type: [milestoneSchema],
+		required: true,
+		default: []
+	}
 });
 
 export default mongoose.model('guilds', guildSchema);

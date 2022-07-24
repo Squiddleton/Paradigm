@@ -85,12 +85,7 @@ export default new Event({
 					case 'milestone': {
 						if (!interaction.inCachedGuild()) throw new Error('The /milestone command should only be usable in guilds');
 						const { guildId } = interaction;
-						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {
-							$setOnInsert: {
-								giveaways: [],
-								milestones: []
-							}
-						}, { new: true, upsert: true })).milestones.map(m => m.name);
+						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const userId = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
 						if (userId) {
 							const userMilestones = await milestoneUserSchema.findOne({ userId, guildId });
@@ -158,12 +153,7 @@ export default new Event({
 				return;
 			}
 
-			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
-				$setOnInsert: {
-					giveaways: [],
-					milestones: []
-				}
-			}, { new: true, upsert: true });
+			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 
 			const giveawayResult = guildResult.giveaways.find(g => g.messageId === interaction.message.id);
 			if (giveawayResult === undefined) throw new Error(`No giveaway was found for the id "${interaction.message.id}"`);
@@ -174,8 +164,8 @@ export default new Event({
 			}
 
 			const userResult = await giveawayusers.findOneAndUpdate(
-				{ userId },
-				{ $setOnInsert: { guildId: interaction.guildId, messages: [{ day: 30, msgs: 0 }] } },
+				{ userId, guildId: interaction.guildId },
+				{},
 				{ new: true, upsert: true }
 			);
 			if (userResult.messages.reduce((acc, msg) => acc + msg.msgs, 0) < giveawayResult.messages) {

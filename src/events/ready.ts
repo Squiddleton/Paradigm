@@ -24,12 +24,7 @@ export default new Event({
 		}, { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', async () => {
-			const result = await behaviorSchema.findByIdAndUpdate('486932163636232193', {
-				$setOnInsert: {
-					behaviors: [{}],
-					date: new Date().getDate()
-				}
-			}, { new: true, upsert: true });
+			const result = await behaviorSchema.findByIdAndUpdate('486932163636232193', {}, { new: true, upsert: true });
 			const behaviors = result.behaviors[0];
 			for (const b in behaviors) {
 				behaviors[b]--;
@@ -86,12 +81,15 @@ export default new Event({
 					],
 					components: [row]
 				});
+
+				giveaway.completed = true;
+				giveaway.winners = winnerIds;
 				await guildSchema.updateOne(
 					{
 						_id: message.guildId,
 						'giveaways.messageId': giveaway.messageId
 					},
-					{ $set: { 'giveaways.$': { completed: true, winners: winnerIds } } }
+					{ $set: { 'giveaways.$': giveaway } }
 				);
 
 				if (winnerIds.length === 0) return message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');

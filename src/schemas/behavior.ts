@@ -5,10 +5,15 @@ const behaviorSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	behaviors: [mongoose.Schema.Types.Mixed],
+	behaviors: {
+		type: [mongoose.Schema.Types.Mixed],
+		required: true,
+		default: [{}]
+	},
 	date: {
 		type: Number,
-		required: true
+		required: true,
+		default: () => new Date().getDate()
 	}
 });
 

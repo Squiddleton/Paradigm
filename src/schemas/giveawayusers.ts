@@ -32,7 +32,11 @@ const giveawayUsersSchema = new mongoose.Schema<IUser>({
 		type: String,
 		required: true
 	},
-	messages: [msgSchema]
+	messages: {
+		type: [msgSchema],
+		required: true,
+		default: [{ day: 30, msgs: 0 }]
+	}
 });
 
 export default mongoose.model('giveawayusers', giveawayUsersSchema);

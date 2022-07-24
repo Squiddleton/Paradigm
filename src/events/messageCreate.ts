@@ -55,11 +55,7 @@ export default new Event({
 			else if (message.channelId === '487026329016074241' && message.author.id === '383777390851260426' && message.embeds.length > 0) {
 				const { fields } = message.embeds[0].toJSON();
 				if (fields?.some(field => field.value.startsWith('Timeout'))) {
-					const result = await behaviorSchema.findOneAndUpdate(
-						{ _id: exclusiveGuildId },
-						{ $setOnInsert: { behaviors: [{}], date: new Date().getDate() } },
-						{ new: true, upsert: true }
-					);
+					const result = await behaviorSchema.findByIdAndUpdate(exclusiveGuildId, {}, { new: true, upsert: true });
 
 					const behaviors = result.behaviors[0];
 					const targetField = fields.find(field => field.name === 'Target User');

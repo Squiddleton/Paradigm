@@ -11,7 +11,8 @@ const milestoneUserSchema = new mongoose.Schema({
 	},
 	milestones: {
 		type: [String],
-		required: true
+		required: true,
+		default: []
 	}
 });
 

@@ -90,12 +90,7 @@ export default new SlashCommand({
 		switch (interaction.options.getSubcommand()) {
 			case 'create': {
 				const name = interaction.options.getString('name', true);
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				if (milestones.some(m => m.name === name)) {
 					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
 					return;
@@ -141,12 +136,7 @@ export default new SlashCommand({
 				}
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				const milestone = milestones.find(m => m.name === milestoneName);
 				if (milestone === undefined) {
 					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
@@ -168,12 +158,7 @@ export default new SlashCommand({
 					.setThumbnail(interaction.guild.iconURL())
 					.setTimestamp();
 
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 				if (milestones.length === 0) {
 					embed.setDescription('No milestones');

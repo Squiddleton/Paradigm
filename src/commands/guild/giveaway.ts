@@ -186,12 +186,7 @@ export default new SlashCommand({
 				const regEntries = interaction.options.getInteger('regular');
 				const boosterEntries = interaction.options.getInteger('booster');
 
-				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = giveaways.find(g => g.messageId === messageId);
 				if (giveaway === undefined) {
 					await interaction.reply({ content: 'No giveaway matches that message id.', ephemeral: true });
@@ -240,12 +235,7 @@ export default new SlashCommand({
 				const messageId = interaction.options.getString('message', true);
 				const amount = interaction.options.getInteger('amount') ?? 1;
 
-				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 
 				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 				if (giveaway === undefined) {
@@ -289,12 +279,7 @@ export default new SlashCommand({
 			case 'review': {
 				const inc = 20;
 				const messageId = interaction.options.getString('message', true);
-				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {
-					$setOnInsert: {
-						giveaways: [],
-						milestones: []
-					}
-				}, { new: true, upsert: true });
+				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 
 				if (giveaway === undefined) {

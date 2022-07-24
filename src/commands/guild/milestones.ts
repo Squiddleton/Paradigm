@@ -29,11 +29,7 @@ export default new SlashCommand({
 		const user = await member.user.fetch();
 		const { guildId } = interaction;
 
-		const result = await milestoneUserSchema.findOneAndUpdate(
-			{ userId: member.id, guildId },
-			{ $setOnInsert: { milestones: [] } },
-			{ new: true, upsert: true }
-		);
+		const result = await milestoneUserSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 		const embed = new EmbedBuilder()
 			.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)
@@ -45,12 +41,7 @@ export default new SlashCommand({
 			embed.setDescription('No milestones');
 		}
 		else {
-			const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {
-				$setOnInsert: {
-					giveaways: [],
-					milestones: []
-				}
-			}, { new: true, upsert: true });
+			const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 			let i = 0;
 			for (const milestone of result.milestones.sort((a, b) => {
