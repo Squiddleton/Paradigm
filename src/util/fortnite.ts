@@ -114,7 +114,9 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 };
 
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
-	const rawBackground = chosenBackground === null ? randomFromArray(Object.values(backgrounds)) : chosenBackground;
+	const noBackground = chosenBackground === null;
+	if (!noBackground && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
+	const rawBackground = noBackground ? randomFromArray(Object.values(backgrounds)) : backgrounds[chosenBackground];
 	const background = await Canvas.loadImage(rawBackground);
 	const canvas = Canvas.createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');
