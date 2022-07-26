@@ -66,7 +66,7 @@ export default new Event({
 				const row = new ActionRowBuilder<ButtonBuilder>({ components: [
 					new ButtonBuilder()
 						.setLabel('Enter')
-						.setCustomId('fnbrgiveaway')
+						.setCustomId('giveaway')
 						.setStyle(ButtonStyle.Success)
 						.setDisabled(true)
 				] });

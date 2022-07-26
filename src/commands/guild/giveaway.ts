@@ -437,7 +437,7 @@ export default new SlashCommand({
 				const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder({ components: [
 					new ButtonBuilder()
 						.setLabel('Enter')
-						.setCustomId('fnbrgiveaway')
+						.setCustomId('giveaway')
 						.setStyle(ButtonStyle.Success)
 				] });
 				const embed = new EmbedBuilder()

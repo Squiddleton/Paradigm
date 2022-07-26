@@ -145,7 +145,7 @@ export default new Event({
 			}
 		}
 
-		else if (interaction.isButton() && interaction.customId === 'fnbrgiveaway' && inCachedGuild) {
+		else if (interaction.isButton() && interaction.customId === 'giveaway' && inCachedGuild) {
 			const userId = interaction.user.id;
 			await interaction.deferReply({ ephemeral: true });
 			if (interaction.member.joinedTimestamp !== null && interaction.member.joinedTimestamp + 6 * 86400000 > Date.now()) {
