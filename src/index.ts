@@ -1,6 +1,6 @@
 import { ClientEvents } from 'discord.js';
 import mongoose from 'mongoose';
-import { SubmissionStream } from 'snoostorm';
+import { CommentStream, SubmissionStream } from 'snoostorm';
 import { readdirSync } from 'node:fs';
 
 import config from './config.js';
@@ -27,10 +27,21 @@ const fnbrSubmissions = new SubmissionStream(snoowrap, {
 	subreddit: 'FortniteBR',
 	pollTime: 15000
 });
+const fnbrComments = new CommentStream(snoowrap, {
+	subreddit: 'FortniteBR',
+	pollTime: 40000
+});
 setTimeout(async () => {
 	fnbrSubmissions.on('item', async submission => {
-		if (submission.author.name === 'FortniteRedditMods' || submission.distinguished !== null) {
-			await client.devChannel.send(`New mod post detected: https://www.reddit.com${submission.permalink}`);
+		if (submission.author.name === 'TheFortniteTeam' || submission.author_flair_text?.includes('Epic Games')) {
+			await client.devChannel.send(`New Epic post detected: https://www.reddit.com${submission.permalink}`);
 		}
 	});
 }, 20000);
+setTimeout(async () => {
+	fnbrComments.on('item', async comment => {
+		if (comment.author.name === 'TheFortniteTeam' || comment.author_flair_text?.includes('Epic Games')) {
+			await client.devChannel.send(`New Epic comment detected: https://www.reddit.com${comment.permalink}`);
+		}
+	});
+}, 45000);
