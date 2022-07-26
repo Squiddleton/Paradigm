@@ -3,6 +3,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentB
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
+import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import wishlistSchema from '../schemas/wishlists.js';
 import { Cosmetic, CosmeticAPI, Shop } from '../types/fortniteapi.js';
@@ -68,11 +69,19 @@ export const checkWishlists = async (channel: TextBasedChannel) => {
 	}
 	if (msgs.length > 1) {
 		msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command in <#742803449493717134>.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
-		const msg = msgs.join('\n');
-		await channel.send(msg);
 
-		const friendChannel = validateChannel(channel.client, '703027620555653180', 'Friend\'s channel');
-		await friendChannel.send(msg);
+		const guilds = await guildSchema.find();
+		for (const guild of guilds) {
+			if (guild.wishlistChannelId !== null) {
+				try {
+					const wishlistChannel = validateChannel(channel.client, guild.wishlistChannelId, `Guild (${guild._id}) wishlist channel`);
+					await wishlistChannel.send(msgs.join('\n'));
+				}
+				catch (error) {
+					console.error(error);
+				}
+			}
+		}
 	}
 };
 
