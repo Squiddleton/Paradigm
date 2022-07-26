@@ -24,6 +24,7 @@ interface IGuild {
 	_id: string;
 	giveaways: IGiveaway[];
 	milestones: IMilestone[];
+	wishlistChannelId: string | null;
 }
 
 const giveawaySchema = new mongoose.Schema<IGiveaway>({
@@ -96,6 +97,10 @@ const guildSchema = new mongoose.Schema<IGuild>({
 		type: [milestoneSchema],
 		required: true,
 		default: []
+	},
+	wishlistChannelId: {
+		type: String,
+		default: null
 	}
 });
 
