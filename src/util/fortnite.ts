@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
-import wishlistSchema from '../schemas/wishlists.js';
+import userSchema from '../schemas/users.js';
 import { Cosmetic, CosmeticAPI, Shop } from '../types/fortniteapi.js';
 
 type StringOption = string | null;
@@ -59,10 +59,10 @@ export const fetchItemShop = async () => {
 
 export const checkWishlists = async (channel: TextBasedChannel) => {
 	const entries = await fetchItemShop();
-	const wishlists = await wishlistSchema.find();
+	const wishlists = await userSchema.find();
 	const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 	for (const wishlist of wishlists) {
-		const items = [...new Set(entries.filter(item => wishlist.cosmeticIds.includes(item.id)).map(item => item.name))];
+		const items = [...new Set(entries.filter(item => wishlist.wishlistCosmeticIds.includes(item.id)).map(item => item.name))];
 		if (items.length > 0) {
 			msgs.push(`<@${wishlist._id}>: ${items.join(', ')}`);
 		}

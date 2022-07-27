@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder, Snowflake } from 'discord.js';
 
-import wishlistSchema from '../../schemas/wishlists.js';
+import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { itemShopCosmetics } from '../../util/fortnite.js';
 import { Scope, SlashCommand } from '../../types/types.js';
@@ -109,9 +109,9 @@ export default new SlashCommand({
 					return;
 				}
 
-				await wishlistSchema.findByIdAndUpdate(
+				await userSchema.findByIdAndUpdate(
 					userId,
-					{ $push: { cosmeticIds: cosmetic.id } },
+					{ $push: { wishlistCosmeticIds: cosmetic.id } },
 					{ upsert: true }
 				);
 				await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
@@ -120,18 +120,18 @@ export default new SlashCommand({
 			case 'list': {
 				const user = await getUserProperties(interaction);
 
-				const wishlist = await wishlistSchema.findById(user.id);
-				if (!wishlist?.cosmeticIds.length) {
+				const wishlist = await userSchema.findById(user.id);
+				if (!wishlist?.wishlistCosmeticIds.length) {
 					await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
 					return;
 				}
 
 				const embed = new EmbedBuilder()
 					.setColor(user.color)
-					.setDescription(wishlist.cosmeticIds
+					.setDescription(wishlist.wishlistCosmeticIds
 						.slice(0, 25)
 						.map((id, index) => {
-							if (index === 24 && wishlist.cosmeticIds.length !== 25) return `+ ${wishlist.cosmeticIds.length - 24} more`;
+							if (index === 24 && wishlist.wishlistCosmeticIds.length !== 25) return `+ ${wishlist.wishlistCosmeticIds.length - 24} more`;
 
 							const cosmetic = itemShopCosmetics.find(c => c.id === id);
 							if (cosmetic === undefined) throw new Error(`A wishlist contains the invalid cosmetic id "${id}"`);
@@ -156,19 +156,19 @@ export default new SlashCommand({
 					return;
 				}
 
-				const wishlist = await wishlistSchema.findById(userId);
+				const wishlist = await userSchema.findById(userId);
 				if (!wishlist) {
 					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
 					return;
 				}
-				if (!wishlist.cosmeticIds.includes(cosmetic.id)) {
+				if (!wishlist.wishlistCosmeticIds.includes(cosmetic.id)) {
 					await interaction.reply({ content: 'No cosmetic in your wishlist matches the option provided.', ephemeral: true });
 					return;
 				}
 
-				await wishlistSchema.findByIdAndUpdate(
+				await userSchema.findByIdAndUpdate(
 					userId,
-					{ $pull: { cosmeticIds: cosmetic.id } }
+					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
 				);
 				await interaction.reply(`${cosmetic.name} has been removed from your wishlist.`);
 			}
