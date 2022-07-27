@@ -50,7 +50,7 @@ export default new Event({
 				}
 			}
 			else if (message.channelId === '489836390759268353' && message.author.id === '848452706791981056' && message.mentions.roles.has('568590143640961037') && message.createdAt.getHours() !== 0) {
-				await checkWishlists(message.channel);
+				await checkWishlists(client);
 			}
 			else if (message.channelId === '487026329016074241' && message.author.id === '383777390851260426' && message.embeds.length > 0) {
 				const { fields } = message.embeds[0].toJSON();

@@ -19,8 +19,7 @@ export default new Event({
 		console.log(readyMessage);
 
 		schedule('30 0 0 * * *', async () => {
-			const channel = validateChannel(client, '489836390759268353', 'Wishlist channel');
-			await checkWishlists(channel);
+			await checkWishlists(client);
 		}, { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', async () => {

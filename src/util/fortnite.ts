@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, TextBasedChannel, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client } from 'discord.js';
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
@@ -57,7 +57,7 @@ export const fetchItemShop = async () => {
 	return withoutDupes;
 };
 
-export const checkWishlists = async (channel: TextBasedChannel) => {
+export const checkWishlists = async (client: Client) => {
 	const entries = await fetchItemShop();
 	const wishlists = await userSchema.find();
 	const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
@@ -70,11 +70,11 @@ export const checkWishlists = async (channel: TextBasedChannel) => {
 	if (msgs.length > 1) {
 		msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command in <#742803449493717134>.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
 
-		const guilds = await guildSchema.find();
+		const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 		for (const guild of guilds) {
 			if (guild.wishlistChannelId !== null) {
 				try {
-					const wishlistChannel = validateChannel(channel.client, guild.wishlistChannelId, `Guild (${guild._id}) wishlist channel`);
+					const wishlistChannel = validateChannel(client, guild.wishlistChannelId, `Guild (${guild._id}) wishlist channel`);
 					await wishlistChannel.send(msgs.join('\n'));
 				}
 				catch (error) {
