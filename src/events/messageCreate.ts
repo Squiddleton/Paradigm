@@ -35,18 +35,11 @@ export default new Event({
 				if (result === null) {
 					const msgObject: IMessage = { day: 30, msgs: 1 };
 
-					const oldResult = await giveawayUsersSchema.findOneAndUpdate(
+					await giveawayUsersSchema.updateOne(
 						{ userId: message.author.id, guildId: exclusiveGuildId },
-						{ $push: { messages: msgObject } }
+						{ $push: { messages: msgObject } },
+						{ upsert: true }
 					);
-
-					if (oldResult === null) {
-						await giveawayUsersSchema.create({
-							userId: message.author.id,
-							guildId: exclusiveGuildId,
-							messages: [msgObject]
-						});
-					}
 				}
 			}
 			else if (message.channelId === '489836390759268353' && message.author.id === '848452706791981056' && message.mentions.roles.has('568590143640961037') && message.createdAt.getHours() !== 0) {
