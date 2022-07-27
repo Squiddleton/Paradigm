@@ -59,26 +59,32 @@ export const fetchItemShop = async () => {
 
 export const checkWishlists = async (client: Client) => {
 	const entries = await fetchItemShop();
-	const wishlists = await userSchema.find();
-	const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
-	for (const wishlist of wishlists) {
-		const items = [...new Set(entries.filter(item => wishlist.wishlistCosmeticIds.includes(item.id)).map(item => item.name))];
-		if (items.length > 0) {
-			msgs.push(`<@${wishlist._id}>: ${items.join(', ')}`);
-		}
-	}
-	if (msgs.length > 1) {
-		msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command in <#742803449493717134>.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
+	const users = await userSchema.find();
+	const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
-		const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
-		for (const guild of guilds) {
-			if (guild.wishlistChannelId !== null) {
-				try {
-					const wishlistChannel = validateChannel(client, guild.wishlistChannelId, `Guild (${guild._id}) wishlist channel`);
-					await wishlistChannel.send(msgs.join('\n'));
+	for (const g of guilds) {
+		const guild = client.guilds.cache.get(g._id);
+		if (guild !== undefined) {
+			const members = await guild.members.fetch({ user: users.map(u => u._id) });
+			if (members.size !== 0) {
+				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
+
+				for (const user of users.filter(u => members.has(u._id))) {
+					const items = [...new Set(entries.filter(item => user.wishlistCosmeticIds.includes(item.id)).map(item => item.name))];
+					if (items.length > 0) {
+						msgs.push(`<@${user._id}>: ${items.join(', ')}`);
+					}
 				}
-				catch (error) {
-					console.error(error);
+
+				if (msgs.length !== 1 && g.wishlistChannelId !== null) {
+					msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
+					try {
+						const wishlistChannel = validateChannel(client, g.wishlistChannelId, `Guild (${guild.id}) wishlist channel`);
+						await wishlistChannel.send(msgs.join('\n'));
+					}
+					catch (error) {
+						console.error(error);
+					}
 				}
 			}
 		}
