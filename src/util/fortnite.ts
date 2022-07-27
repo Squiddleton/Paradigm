@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits } from 'discord.js';
 import Canvas from 'canvas';
 import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
@@ -57,7 +57,7 @@ export const fetchItemShop = async () => {
 	return withoutDupes;
 };
 
-export const checkWishlists = async (client: Client) => {
+export const checkWishlists = async (client: Client<true>) => {
 	const entries = await fetchItemShop();
 	const users = await userSchema.find();
 	const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
@@ -80,7 +80,11 @@ export const checkWishlists = async (client: Client) => {
 					msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
 					try {
 						const wishlistChannel = validateChannel(client, g.wishlistChannelId, `Guild (${guild.id}) wishlist channel`);
-						await wishlistChannel.send(msgs.join('\n'));
+						if (wishlistChannel.type !== ChannelType.DM) {
+							const permissions = wishlistChannel.permissionsFor(client.user);
+							if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${wishlistChannel.id}"`);
+							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) await wishlistChannel.send(msgs.join('\n'));
+						}
 					}
 					catch (error) {
 						console.error(error);
