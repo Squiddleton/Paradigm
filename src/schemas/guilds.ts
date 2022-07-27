@@ -1,14 +1,19 @@
 import mongoose from 'mongoose';
 
+export interface BonusRole {
+	id: string;
+	amount: number;
+}
+
 export interface IGiveaway {
 	messageId: string;
 	channelId: string;
+	text: string;
 	startTime: number;
 	endTime: number;
 	completed: boolean;
 	messages: number;
-	regEntries: number;
-	boosterEntries: number;
+	bonusRoles: BonusRole[];
 	winnerNumber: number;
 	entrants: string[];
 	winners: string[];
@@ -27,12 +32,27 @@ interface IGuild {
 	wishlistChannelId: string | null;
 }
 
+const bonusRoleSchema = new mongoose.Schema<BonusRole>({
+	id: {
+		type: String,
+		required: true
+	},
+	amount: {
+		type: Number,
+		required: true
+	}
+});
+
 const giveawaySchema = new mongoose.Schema<IGiveaway>({
 	messageId: {
 		type: String,
 		required: true
 	},
 	channelId: {
+		type: String,
+		required: true
+	},
+	text: {
 		type: String,
 		required: true
 	},
@@ -52,13 +72,9 @@ const giveawaySchema = new mongoose.Schema<IGiveaway>({
 		type: Number,
 		required: true
 	},
-	regEntries: {
-		type: Number,
-		required: true
-	},
-	boosterEntries: {
-		type: Number,
-		required: true
+	bonusRoles: {
+		type: [bonusRoleSchema],
+		default: []
 	},
 	winnerNumber: {
 		type: Number,

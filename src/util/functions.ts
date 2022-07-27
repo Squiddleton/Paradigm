@@ -1,8 +1,33 @@
-import { Client as BaseClient, Snowflake, TextBasedChannel } from 'discord.js';
+import { Client as BaseClient, Colors, EmbedBuilder, Guild, Snowflake, TextBasedChannel } from 'discord.js';
 import { Client } from '../clients/discord.js';
+import { IGiveaway } from '../schemas/guilds.js';
 import { Quantity, Scope } from '../types/types.js';
 
 const localScopes = [Scope.Dev, Scope.Exclusive];
+
+export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
+	const embed = new EmbedBuilder()
+		.setTitle(giveaway.text)
+		.setThumbnail(guild.iconURL())
+		.setColor(ended ? Colors.Red : Colors.Green)
+		.setFields(
+			ended
+				?
+				[
+					{ name: 'Winners', value: giveaway.winners.length === 0 ? 'None' : giveaway.winners.map((id, i) => `${i + 1}. <@${id}> (${id})`).join('\n'), inline: true },
+					{ name: 'Time', value: `Started <t:${giveaway.startTime}:R>\nEnded <t:${giveaway.endTime}:R>`, inline: true }
+				]
+				:
+				[
+					{ name: 'Winner Amount', value: giveaway.winnerNumber.toString(), inline: true },
+					{ name: 'Time', value: `Ends <t:${giveaway.endTime}:R>`, inline: true }
+				]
+		)
+		.setTimestamp();
+	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
+
+	return embed;
+};
 
 export const deployCommands = async (client: Client<true>) => {
 	const application = await client.application.fetch();

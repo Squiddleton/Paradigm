@@ -183,13 +183,14 @@ export default new Event({
 			}
 
 			const entries = [userId];
-			if (giveawayResult.regEntries > 0 && interaction.member.roles.cache.has('886071010581966851')) {
-				for (let i = 0; i < giveawayResult.regEntries; i++) {
+			const [role1, role2] = giveawayResult.bonusRoles;
+			if (role1 !== undefined && interaction.member.roles.cache.has(role1.id)) {
+				for (let i = 0; i < role1.amount; i++) {
 					entries.push(userId);
 				}
 			}
-			if (giveawayResult.boosterEntries > 0 && interaction.member.roles.cache.has('585533593565003819')) {
-				for (let i = 0; i < giveawayResult.boosterEntries; i++) {
+			if (role2 !== undefined && interaction.member.roles.cache.has(role2.id)) {
+				for (let i = 0; i < role2.amount; i++) {
 					entries.push(userId);
 				}
 			}

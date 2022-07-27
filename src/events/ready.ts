@@ -1,8 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, EmbedBuilder, Message, Snowflake } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import client from '../clients/discord.js';
 import { Event } from '../types/types.js';
-import { randomFromArray, validateChannel } from '../util/functions.js';
+import { createGiveawayEmbed, randomFromArray, validateChannel } from '../util/functions.js';
 import behaviorSchema from '../schemas/behavior.js';
 import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
@@ -63,7 +63,9 @@ export default new Event({
 						const winnerId = randomFromArray(entrantIds);
 						if (!winnerIds.includes(winnerId)) winnerIds.push(winnerId);
 					}
-					const winnersDisplay = winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n');
+
+					giveaway.completed = true;
+					giveaway.winners = winnerIds;
 
 					const row = new ActionRowBuilder<ButtonBuilder>({ components: [
 						new ButtonBuilder()
@@ -72,20 +74,8 @@ export default new Event({
 							.setStyle(ButtonStyle.Success)
 							.setDisabled(true)
 					] });
-					await message.edit({
-						embeds: [
-							new EmbedBuilder(message.embeds[0].toJSON())
-								.setColor('Red')
-								.setFields([
-									{ name: 'Winners', value: winnersDisplay === '' ? 'None' : winnersDisplay.slice(0, 1024), inline: true },
-									{ name: 'Time', value: `Started <t:${giveaway.startTime}:R>\nEnded <t:${giveaway.endTime}:R>`, inline: true }
-								])
-						],
-						components: [row]
-					});
+					await message.edit({ embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)], components: [row] });
 
-					giveaway.completed = true;
-					giveaway.winners = winnerIds;
 					await guildSchema.updateOne(
 						{
 							_id: message.guildId,
@@ -95,7 +85,7 @@ export default new Event({
 					);
 
 					if (winnerIds.length === 0) return message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
-					return message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnersDisplay}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
+					return message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
 				}
 			}
 		});

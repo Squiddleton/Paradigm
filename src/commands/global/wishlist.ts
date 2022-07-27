@@ -53,7 +53,7 @@ const getUserProperties = async (interaction: ChatInputCommandInteraction): Prom
 
 export default new SlashCommand({
 	name: 'wishlist',
-	description: 'Various methods involving Fortnite item shop wishlists',
+	description: 'Various methods with Fortnite item shop wishlists',
 	options: [
 		{
 			name: 'add',

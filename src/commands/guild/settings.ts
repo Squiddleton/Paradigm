@@ -4,7 +4,7 @@ import guildSchema from '../../schemas/guilds.js';
 
 export default new SlashCommand({
 	name: 'settings',
-	description: 'Various methods involving server settings',
+	description: 'Various methods with server settings',
 	options: [
 		{
 			name: 'edit',

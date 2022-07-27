@@ -1,14 +1,14 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction } from 'discord.js';
-import { randomFromArray, quantity, validateChannel } from '../../util/functions.js';
+import { randomFromArray, quantity, validateChannel, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { Scope, SlashCommand } from '../../types/types.js';
 
-const factors = {
+const unitToMS = {
 	minutes: 60,
 	hours: 3600,
 	days: 86400
 };
-const isUnit = (unit: string): unit is keyof typeof factors => unit in factors;
+const isUnit = (unit: string): unit is keyof typeof unitToMS => unit in unitToMS;
 
 export default new SlashCommand({
 	name: 'giveaway',
@@ -16,12 +16,12 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'edit',
-			description: 'Edit a pre-existing giveaway',
+			description: 'Edit an ongoing giveaway',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
 					name: 'message',
-					description: 'The message id of the giveaway to review',
+					description: 'The message id of the giveaway to edit',
 					type: ApplicationCommandOptionType.String,
 					required: true
 				},
@@ -32,12 +32,12 @@ export default new SlashCommand({
 				},
 				{
 					name: 'time',
-					description: 'Amount of time to host the giveaway',
+					description: 'The updated amount of time to host the giveaway',
 					type: ApplicationCommandOptionType.Integer
 				},
 				{
 					name: 'unit',
-					description: 'Unit of time to host the giveaway',
+					description: 'The updated unit of time to host the giveaway',
 					type: ApplicationCommandOptionType.String,
 					choices: [
 						{ name: 'Minutes', value: 'minutes' },
@@ -53,22 +53,32 @@ export default new SlashCommand({
 				},
 				{
 					name: 'messages',
-					description: 'The giveaway\'s updated minimum messages to enter (over the past month)',
+					description: 'The giveaway\'s updated minimum messages to enter',
 					type: ApplicationCommandOptionType.Integer,
 					minValue: 0
 				},
 				{
-					name: 'regular',
-					description: 'The giveaway\'s updated extra entries for Regulars',
+					name: 'bonusrole1',
+					description: 'Role that receives extra entries',
+					type: ApplicationCommandOptionType.Role
+				},
+				{
+					name: 'bonusrole1amount',
+					description: 'Amount of extra entries for members with bonusrole1',
 					type: ApplicationCommandOptionType.Integer,
-					minValue: 0,
+					minValue: 1,
 					maxValue: 10
 				},
 				{
-					name: 'booster',
-					description: 'The giveaway\'s updated extra entries for Nitro Boosters',
+					name: 'bonusrole2',
+					description: 'Role that receives extra entries',
+					type: ApplicationCommandOptionType.Role
+				},
+				{
+					name: 'bonusrole2amount',
+					description: 'Amount of extra entries for members with bonusrole2',
 					type: ApplicationCommandOptionType.Integer,
-					minValue: 0,
+					minValue: 1,
 					maxValue: 10
 				}
 			]
@@ -148,23 +158,32 @@ export default new SlashCommand({
 				},
 				{
 					name: 'messages',
-					description: 'Amount of messages necessary for entering',
+					description: 'Amount of monthly messages necessary for entering; defaults to 0',
 					type: ApplicationCommandOptionType.Integer,
-					required: true,
 					minValue: 0
 				},
 				{
-					name: 'regular',
-					description: 'Amount of extra entries for users with the Regular role',
+					name: 'bonusrole1',
+					description: 'Role that receives extra entries',
+					type: ApplicationCommandOptionType.Role
+				},
+				{
+					name: 'bonusrole1amount',
+					description: 'Amount of extra entries for members with bonusrole1',
 					type: ApplicationCommandOptionType.Integer,
-					minValue: 0,
+					minValue: 1,
 					maxValue: 10
 				},
 				{
-					name: 'booster',
-					description: 'Amount of extra entries for users with the Nitro Booster role',
+					name: 'bonusrole2',
+					description: 'Role that receives extra entries',
+					type: ApplicationCommandOptionType.Role
+				},
+				{
+					name: 'bonusrole2amount',
+					description: 'Amount of extra entries for members with bonusrole2',
 					type: ApplicationCommandOptionType.Integer,
-					minValue: 0,
+					minValue: 1,
 					maxValue: 10
 				}
 			]
@@ -183,8 +202,15 @@ export default new SlashCommand({
 				const units = interaction.options.getString('unit');
 				const winners = interaction.options.getInteger('winners');
 				const messages = interaction.options.getInteger('messages');
-				const regEntries = interaction.options.getInteger('regular');
-				const boosterEntries = interaction.options.getInteger('booster');
+				const role1 = interaction.options.getRole('bonusrole1');
+				const role2 = interaction.options.getRole('bonusrole2');
+				const role1Amount = interaction.options.getInteger('bonusrole1amount');
+				const role2Amount = interaction.options.getInteger('bonusrole2amount');
+
+				if ((role1 !== null && role1Amount === null) || (role1 === null && role1Amount !== null) || (role2 !== null && role2Amount === null) || (role2 === null && role2Amount !== null)) {
+					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
+					return;
+				}
 
 				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = giveaways.find(g => g.messageId === messageId);
@@ -199,24 +225,28 @@ export default new SlashCommand({
 
 				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
 				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
-				const embed = EmbedBuilder.from(giveawayMessage.embeds[0]);
-				if (embed.data.fields === undefined) throw new Error(`A giveaway embed from the message id "${messageId}" is missing its "fields" property`);
 
-				if (text !== null) embed.setTitle(text);
-				if (time && units) {
-					if (isUnit(units)) {
-						const endTime = giveaway.startTime + (time * factors[units]);
-						giveaway.endTime = endTime;
-						embed.data.fields[1].value = `Ends <t:${endTime}:R>`;
-					}
+				if (text !== null) {
+					giveaway.text = text;
 				}
-				if (winners) {
+				if (winners !== null) {
 					giveaway.winnerNumber = winners;
-					embed.data.fields[0].value = winners.toString();
 				}
-				if (messages) giveaway.messages = messages;
-				if (regEntries) giveaway.regEntries = regEntries;
-				if (boosterEntries) giveaway.boosterEntries = boosterEntries;
+				if (time !== null && units !== null && isUnit(units)) {
+					const endTime = giveaway.startTime + (time * unitToMS[units]);
+					giveaway.endTime = endTime;
+				}
+				else if ((time !== null && units === null) || (time === null && units !== null)) {
+					await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
+					return;
+				}
+				if (messages !== null) giveaway.messages = messages;
+				if (role1 !== null || role2 !== null) {
+					giveaway.bonusRoles = [];
+					if (role1 !== null && role1Amount !== null) giveaway.bonusRoles.push({ id: role1.id, amount: role1Amount });
+					if (role2 !== null && role2Amount !== null) giveaway.bonusRoles.push({ id: role2.id, amount: role2Amount });
+				}
+
 				await guildSchema.findOneAndUpdate(
 					{
 						_id: interaction.guildId,
@@ -226,8 +256,9 @@ export default new SlashCommand({
 						$set: { 'giveaways.$': giveaway }
 					}
 				);
-				await giveawayMessage.edit({ embeds: [embed] });
-				await interaction.reply('The giveaway has been updated.');
+
+				await giveawayMessage.edit({ embeds: [createGiveawayEmbed(giveaway, interaction.guild)] });
+				await interaction.reply({ content: 'The giveaway has been updated.', ephemeral: true });
 				return;
 			}
 			case 'reroll': {
@@ -302,12 +333,12 @@ export default new SlashCommand({
 					.setTimestamp();
 
 				embed.setFields([
-					{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
-					{ name: 'Message Requirement', value: giveaway.messages.toString(), inline: true },
-					{ name: 'Bonus Entries', value: `Regular: ${giveaway.regEntries ?? 0}\nNitro Booster: ${giveaway.boosterEntries ?? 0}`, inline: true },
-					{ name: 'Time', value: `<t:${giveaway.startTime}> - <t:${giveaway.endTime}> `, inline: true },
 					{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
-					{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true }
+					{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
+					{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
+					{ name: 'Time', value: `<t:${giveaway.startTime}> - <t:${giveaway.endTime}> `, inline: true },
+					{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
+					{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
 				]);
 
 				const willUseButtons = entrants.length > inc;
@@ -409,23 +440,29 @@ export default new SlashCommand({
 						}
 					});
 				}
-
 				break;
 			}
 			case 'start': {
 				const text = interaction.options.getString('text', true);
 				const winners = interaction.options.getInteger('winners', true);
-				const messages = interaction.options.getInteger('messages', true);
+				const messages = interaction.options.getInteger('messages') ?? 0;
 				const channel = interaction.options.getChannel('channel', true);
 				if (!channel.isTextBased()) return;
 				const time = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
-				const regEntries = interaction.options.getInteger('regular');
-				const boosterEntries = interaction.options.getInteger('booster');
+				const role1 = interaction.options.getRole('bonusrole1');
+				const role2 = interaction.options.getRole('bonusrole2');
+				const role1Amount = interaction.options.getInteger('bonusrole1amount');
+				const role2Amount = interaction.options.getInteger('bonusrole2amount');
+
+				if ((role1 !== null && role1Amount === null) || (role1 === null && role1Amount !== null) || (role2 !== null && role2Amount === null) || (role2 === null && role2Amount !== null)) {
+					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
+					return;
+				}
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
 				if (!isUnit(units)) throw new Error(`The unit "${units}" is not a valid unit`);
-				const endTime = startTime + (time * factors[units]);
+				const endTime = startTime + (time * unitToMS[units]);
 
 				const permissions = channel.permissionsFor(client.user);
 				if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${channel.id}"`);
@@ -434,45 +471,37 @@ export default new SlashCommand({
 					return;
 				}
 
+				const bonusRoles = [];
+				if (role1 !== null && role1Amount !== null) bonusRoles.push({ id: role1.id, amount: role1Amount });
+				if (role2 !== null && role2Amount !== null) bonusRoles.push({ id: role2.id, amount: role2Amount });
+
+				const withoutMessage: Omit<IGiveaway, 'messageId'> = {
+					channelId: channel.id,
+					text,
+					startTime,
+					endTime,
+					completed: false,
+					messages,
+					bonusRoles,
+					winnerNumber: winners,
+					entrants: [],
+					winners: []
+				};
+
 				const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder({ components: [
 					new ButtonBuilder()
 						.setLabel('Enter')
 						.setCustomId('giveaway')
 						.setStyle(ButtonStyle.Success)
 				] });
-				const embed = new EmbedBuilder()
-					.setTitle(text)
-					.setThumbnail(interaction.guild.iconURL())
-					.setColor('Green')
-					.setFields([
-						{ name: 'Winner Amount', value: winners.toString(), inline: true },
-						{ name: 'Time', value: `Ends <t:${endTime}:R>`, inline: true }
-					])
-					.setTimestamp();
-
-				if (regEntries) {
-					if (boosterEntries) embed.setDescription(`**The following roles receive bonus entries:**\nNitro Booster (+${boosterEntries})\nRegular (+${regEntries})`);
-					else embed.setDescription(`**The following roles receive bonus entries:**\nRegular (+${regEntries})`);
-				}
-				else if (boosterEntries) {
-					embed.setDescription(`**The following roles receive bonus entries:**\nNitro Booster (+${boosterEntries})`);
-				}
-
+				const embed = createGiveawayEmbed(withoutMessage, interaction.guild);
 				const message = await channel.send({ components: [row], embeds: [embed] });
 
 				const giveaway: IGiveaway = {
 					messageId: message.id,
-					channelId: channel.id,
-					startTime,
-					endTime,
-					completed: false,
-					messages,
-					regEntries: regEntries ?? 0,
-					boosterEntries: boosterEntries ?? 0,
-					winnerNumber: winners,
-					entrants: [],
-					winners: []
+					...withoutMessage
 				};
+
 				await guildSchema.findByIdAndUpdate(
 					interaction.guildId,
 					{ $push: { giveaways: giveaway } },

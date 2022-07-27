@@ -6,7 +6,7 @@ import { grantMilestone, isRarity, rarityOrdering } from '../../util/fortnite.js
 
 export default new SlashCommand({
 	name: 'milestone',
-	description: 'Various methods involving milestone moderation',
+	description: 'Various methods with milestone moderation',
 	options: [
 		{
 			name: 'create',
