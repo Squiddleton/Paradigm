@@ -4,7 +4,7 @@ import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'terminal',
-	description: 'Runs a command in the terminal',
+	description: 'Run a command in the terminal',
 	options: [
 		{
 			name: 'command',

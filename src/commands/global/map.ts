@@ -5,7 +5,7 @@ import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'map',
-	description: 'Display info on the current Fortnite island',
+	description: 'Display info about the current Fortnite island',
 	scope: Scope.Global,
 	async execute(interaction) {
 		const { data } = await fetch('https://fortnite-api.com/v1/map').then(response => response.json()) as MapAPI;

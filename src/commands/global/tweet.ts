@@ -4,7 +4,7 @@ import { createLoadoutAttachment, createStyleListeners } from '../../util/fortni
 
 export default new SlashCommand({
 	name: 'tweet',
-	description: 'Make a fake Tweet of your Fortnite locker bundle',
+	description: 'Create a fake Tweet of your Fortnite locker bundle',
 	options: [
 		{
 			name: 'text',

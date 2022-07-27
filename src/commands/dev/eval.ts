@@ -4,7 +4,7 @@ import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'eval',
-	description: 'Evaluates code',
+	description: 'Evaluate code',
 	options: [
 		{
 			name: 'code',

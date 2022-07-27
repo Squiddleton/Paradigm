@@ -57,12 +57,12 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'add',
-			description: 'Add a cosmetic to get pinged when it appears in the item shop',
+			description: 'Add a cosmetic to be pinged when it appears in the item shop',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
 					name: 'cosmetic',
-					description: 'The cosmetic to listen for',
+					description: 'The name of the cosmetic',
 					type: ApplicationCommandOptionType.String,
 					required: true,
 					autocomplete: true

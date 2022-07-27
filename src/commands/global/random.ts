@@ -6,12 +6,12 @@ import { Scope, SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'random',
-	description: 'Randomly generates an image of cosmetics or shows info on a random cosmetic',
+	description: 'Generate an image or display info about random Fortnite cosmetics',
 	options: [
 		{
 			name: 'type',
 			type: ApplicationCommandOptionType.String,
-			description: 'A specific type of cosmetic to choose; defaults to an image of multiple',
+			description: 'A specific type of cosmetic to choose; defaults to a collection of multiple types',
 			choices: [
 				{
 					name: 'Outfit',

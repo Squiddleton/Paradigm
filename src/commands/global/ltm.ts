@@ -6,7 +6,7 @@ import { noPunc } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'ltm',
-	description: 'Display info about a limited-time mode',
+	description: 'Display info about a Fortnite limited-time mode',
 	options: [
 		{
 			name: 'ltm',

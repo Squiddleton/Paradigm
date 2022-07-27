@@ -8,7 +8,7 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'time',
-			description: 'The timeframe to begin measuring activity from',
+			description: 'The interval to measure activity from',
 			type: ApplicationCommandOptionType.Integer,
 			required: true,
 			choices: [
@@ -21,7 +21,7 @@ export default new SlashCommand({
 		},
 		{
 			name: 'max',
-			description: 'The maximum amount of members to show',
+			description: 'The maximum amount of members to display',
 			type: ApplicationCommandOptionType.Integer,
 			minValue: 1,
 			maxValue: 25
