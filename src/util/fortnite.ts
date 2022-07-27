@@ -114,8 +114,8 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		'Shadow Series': 0x0f0f0f,
 		'Slurp Series': 0x1ac1a4,
 		'Gaming Legends Series': 0x1f0937
-	}[cosmetic.rarity.displayValue] || 'Random';
-	const image = cosmetic.images.featured || cosmetic.images.icon;
+	}[cosmetic.rarity.displayValue] ?? 'Random';
+	const image = cosmetic.images.featured ?? cosmetic.images.icon;
 	const embed = new EmbedBuilder()
 		.setTitle(`${cosmetic.name} (${cosmetic.type.displayValue})`)
 		.setColor(color)

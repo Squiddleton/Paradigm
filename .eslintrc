@@ -41,6 +41,7 @@
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/no-use-before-define": "error",
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
+    "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/quotes": ["error", "single"],
     "semi": "off",
     "@typescript-eslint/semi": ["error", "always"],
