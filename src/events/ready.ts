@@ -74,7 +74,7 @@ export default new Event({
 						new EmbedBuilder(message.embeds[0].toJSON())
 							.setColor('Red')
 							.setFields([
-								{ name: 'Winners', value: winnersDisplay?.slice(0, 1024) || 'None', inline: true },
+								{ name: 'Winners', value: winnersDisplay.slice(0, 1024) || 'None', inline: true },
 								{ name: 'Time', value: `Started <t:${giveaway.startTime}:R>\nEnded <t:${giveaway.endTime}:R>`, inline: true }
 							])
 					],
