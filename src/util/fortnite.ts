@@ -65,7 +65,10 @@ export const checkWishlists = async (client: Client<true>) => {
 	for (const g of guilds) {
 		const guild = client.guilds.cache.get(g._id);
 		if (guild !== undefined) {
-			const members = await guild.members.fetch({ user: users.map(u => u._id) });
+			const members = guild.memberCount > 100
+				? (await guild.members.fetch()).filter(m => users.some(u => u._id === m.id))
+				: await guild.members.fetch({ user: users.map(u => u._id) });
+
 			if (members.size !== 0) {
 				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 

@@ -44,7 +44,8 @@ export default new Client<true>({
 		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.Guilds,
-		GatewayIntentBits.MessageContent
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildMembers
 	],
 	makeCache: Options.cacheWithLimits({
 		ApplicationCommandManager: 10,
@@ -53,8 +54,7 @@ export default new Client<true>({
 		GuildScheduledEventManager: 10,
 		MessageManager: 10,
 		PresenceManager: 10,
-		ReactionUserManager: 10,
-		UserManager: 10
+		ReactionUserManager: 10
 	}),
 	partials: [
 		Partials.Message,
