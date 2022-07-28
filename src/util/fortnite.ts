@@ -59,13 +59,13 @@ export const fetchItemShop = async () => {
 
 export const checkWishlists = async (client: Client<true>) => {
 	const entries = await fetchItemShop();
-	const users = await userSchema.find();
+	const users = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(cosmetic => cosmetic.id) } });
 	const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
 	for (const g of guilds) {
 		const guild = client.guilds.cache.get(g._id);
 		if (guild !== undefined) {
-			const members = guild.memberCount > 100
+			const members = users.length > 100
 				? (await guild.members.fetch()).filter(m => users.some(u => u._id === m.id))
 				: await guild.members.fetch({ user: users.map(u => u._id) });
 
