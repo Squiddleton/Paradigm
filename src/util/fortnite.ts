@@ -57,7 +57,7 @@ export const fetchItemShop = async () => {
 	return withoutDupes;
 };
 
-export const checkWishlists = async (client: Client<true>) => {
+export const checkWishlists = async (client: Client<true>, debug = false) => {
 	const entries = await fetchItemShop();
 	const users = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(cosmetic => cosmetic.id) } });
 	const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
@@ -86,7 +86,7 @@ export const checkWishlists = async (client: Client<true>) => {
 						if (wishlistChannel.type !== ChannelType.DM) {
 							const permissions = wishlistChannel.permissionsFor(client.user);
 							if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${wishlistChannel.id}"`);
-							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) await wishlistChannel.send(msgs.join('\n'));
+							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) debug ? console.log(msgs.join('\n')) : await wishlistChannel.send(msgs.join('\n'));
 						}
 					}
 					catch (error) {
