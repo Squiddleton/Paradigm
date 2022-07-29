@@ -1,5 +1,4 @@
 import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData } from 'discord.js';
-import fetch from 'node-fetch';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../clients/discord.js';
@@ -10,11 +9,12 @@ import { noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import { ContextMenu, Event, SlashCommand } from '../types/types.js';
-import { Cosmetic, Playlist, PlaylistAPI } from '../types/fortniteapi.js';
+import FortniteAPI from '../clients/fortnite.js';
+import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 
-const { data: playlistData } = await fetch('https://fortnite-api.com/v1/playlists').then(response => response.json()) as PlaylistAPI;
+const playlists = await FortniteAPI.playlists();
 
-const sortByRating = (a: Rating, b: Rating): number => {
+const sortByRating = (a: Rating, b: Rating) => {
 	if (a.rating === b.rating) return a.target.localeCompare(b.target);
 	return b.rating - a.rating;
 };
@@ -53,7 +53,7 @@ export default new Event({
 						return interaction.respond(choices);
 					}
 					case 'ltm': {
-						const closest = findBestMatch(input, [...new Set(playlistData.map(mapByName))]);
+						const closest = findBestMatch(input, [...new Set(playlists.map(mapByName))]);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
 						return interaction.respond(choices);
 					}

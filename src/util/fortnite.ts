@@ -1,12 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits } from 'discord.js';
 import Canvas from 'canvas';
-import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
-import { Cosmetic, CosmeticAPI, Shop } from '../types/fortniteapi.js';
+import { Cosmetic } from '@squiddleton/fortnite-api';
+import FortniteAPI from '../clients/fortnite.js';
 
 type StringOption = string | null;
 
@@ -29,7 +29,7 @@ export const rarityOrdering = {
 };
 export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
 
-export const { data: cosmetics } = await fetch('https://fortnite-api.com/v2/cosmetics/br').then(response => response.json()) as CosmeticAPI;
+export const cosmetics = await FortniteAPI.listCosmetics();
 
 export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 	if (cosmetic.shopHistory?.length) return true;
@@ -44,10 +44,10 @@ export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 });
 
 export const fetchItemShop = async () => {
-	const { data: rawAPI } = await fetch('https://fortnite-api.com/v2/shop/br/combined').then(r => r.json()) as Shop;
+	const rawAPI = await FortniteAPI.shop({ combined: true });
 
 	const withoutDupes: Cosmetic[] = [];
-	const withDupes: Cosmetic[] = rawAPI.featured.entries.concat(rawAPI.daily.entries).map(entry => entry.items).flat();
+	const withDupes: Cosmetic[] = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(entry => entry.items).flat();
 
 	for (const item of withDupes) {
 		if (!withoutDupes.some(c => c.id === item.id)) {
