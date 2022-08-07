@@ -58,30 +58,26 @@ export const evalCommand = async (interaction: CommandInteraction, client: Clien
 
 	await interaction.deferReply();
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const clean = (text: any) => (typeof text === 'string') ? text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203)) : text;
-
 	try {
-		let evaled = await eval(allowAsync ? `(async () => {${code}})();` : code);
+		const evaled = await eval(allowAsync ? `(async () => {${code}})();` : code);
 
-		if (evaled === undefined) {
-			await interaction.editReply('No returned output to print.');
-			return;
+		switch (typeof evaled) {
+			case 'undefined': {
+				await interaction.editReply('No returned output to print.');
+				break;
+			}
+			case 'string': {
+				await interaction.editReply(evaled.slice(0, 2000));
+				break;
+			}
+			default: {
+				const isJSON = evaled !== null && typeof evaled === 'object' && evaled.constructor.name === 'Object';
+				await interaction.editReply(codeBlock(isJSON ? 'json' : 'js', (isJSON ? JSON.stringify(evaled, null, 2) : inspect(evaled)).slice(0, 1987)));
+			}
 		}
-		if (typeof evaled === 'string' && evaled.length > 0) {
-			await interaction.editReply(evaled.slice(0, 2000));
-			return;
-		}
-
-		const isJSON = evaled !== null && typeof evaled === 'object' && evaled.constructor.name === 'Object';
-		if (isJSON) evaled = JSON.stringify(evaled, null, 2);
-
-		if (typeof evaled !== 'string') evaled = inspect(evaled);
-
-		await interaction.editReply(codeBlock(isJSON ? 'json' : 'js', clean(evaled).slice(0, 1987)));
 	}
 	catch (error) {
-		await interaction.editReply(`\`ERROR\` ${codeBlock('xl', clean(error))}`);
+		await interaction.editReply(`\`ERROR\` ${codeBlock('xl', inspect(error))}`);
 	}
 };
 
