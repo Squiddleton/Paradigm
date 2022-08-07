@@ -109,12 +109,15 @@ export default new SlashCommand({
 					return;
 				}
 
-				await userSchema.findByIdAndUpdate(
+				const result = await userSchema.findByIdAndUpdate(
 					userId,
-					{ $push: { wishlistCosmeticIds: cosmetic.id } },
+					{ $addToSet: { wishlistCosmeticIds: cosmetic.id } },
 					{ upsert: true }
 				);
-				await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
+				result?.wishlistCosmeticIds.includes(cosmetic.id)
+					? await interaction.reply({ content: `${cosmetic.name} is already on your wishlist.`, ephemeral: true })
+					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
+
 				return;
 			}
 			case 'list': {
