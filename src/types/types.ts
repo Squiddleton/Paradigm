@@ -3,31 +3,68 @@ import { Client } from '../clients/discord.js';
 
 export type Scope = 'Dev' | 'Exclusive' | 'Global' | 'Guild';
 
+export interface CommandData {
+	name: string;
+	permissions?: PermissionResolvable[];
+	scope: Scope;
+}
+
+export class Command {
+	name: string;
+	permissions: PermissionResolvable | null;
+	scope: Scope;
+	constructor(data: CommandData) {
+		this.name = data.name;
+		this.permissions = data.permissions ?? null;
+		this.scope = data.scope;
+	}
+}
+
+export interface SlashCommandData extends CommandData {
+	description: string;
+	options?: ApplicationCommandOptionData[];
+	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
+}
+
+export class SlashCommand extends Command {
+	description: string;
+	options: ApplicationCommandOptionData[] = [];
+	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
+	constructor(data: SlashCommandData) {
+		super(data);
+		this.description = data.description;
+		this.options = data.options ?? [];
+		this.execute = data.execute;
+	}
+	/** Maps the SlashCommand into deployable JSON data */
+	toJSON(): ApplicationCommandData {
+		return {
+			name: this.name,
+			description: this.description,
+			options: this.options ?? [],
+			defaultMemberPermissions: this.permissions,
+			dmPermission: this.scope === 'Global'
+		};
+	}
+}
+
 export type ContextMenuType = Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
 
-export interface ContextMenuData<Type extends ContextMenuType> {
-	name: string;
+export interface ContextMenuData<Type extends ContextMenuType> extends CommandData {
 	type: Type;
-	permissions?: PermissionResolvable;
-	scope: Scope;
 	execute: Type extends ApplicationCommandType.Message
 		? (interaction: MessageContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>
 		: (interaction: UserContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>;
 }
 
-export class ContextMenu<Type extends ContextMenuType> {
-	name: string;
+export class ContextMenu<Type extends ContextMenuType> extends Command {
 	type: Type;
-	permissions: PermissionResolvable | null;
-	scope: Scope;
 	execute: Type extends ApplicationCommandType.Message
 		? (interaction: MessageContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>
 		: (interaction: UserContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>;
 	constructor(data: ContextMenuData<Type>) {
-		this.name = data.name;
+		super(data);
 		this.type = data.type;
-		this.permissions = data.permissions ?? null;
-		this.scope = data.scope;
 		this.execute = data.execute;
 	}
 	isMessage(): this is ContextMenu<ApplicationCommandType.Message> {
@@ -65,39 +102,3 @@ export class Event<T extends keyof ClientEvents> implements EventData<T> {
 }
 
 export type Quantity = { [key: string]: number };
-
-export interface SlashCommandData {
-	name: string;
-	description: string;
-	options?: ApplicationCommandOptionData[];
-	permissions?: PermissionResolvable[];
-	scope: Scope;
-	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
-}
-
-export class SlashCommand {
-	name: string;
-	description: string;
-	options: ApplicationCommandOptionData[] = [];
-	permissions: PermissionResolvable | null;
-	scope: Scope;
-	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
-	constructor(data: SlashCommandData) {
-		this.name = data.name;
-		this.description = data.description;
-		this.options = data.options ?? [];
-		this.permissions = data.permissions ?? null;
-		this.scope = data.scope;
-		this.execute = data.execute;
-	}
-	/** Maps the SlashCommand into deployable JSON data */
-	toJSON(): ApplicationCommandData {
-		return {
-			name: this.name,
-			description: this.description,
-			options: this.options ?? [],
-			defaultMemberPermissions: this.permissions,
-			dmPermission: this.scope === 'Global'
-		};
-	}
-}
