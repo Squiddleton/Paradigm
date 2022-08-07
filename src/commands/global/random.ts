@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'd
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { cosmetics, createCosmeticEmbed } from '../../util/fortnite.js';
 import Canvas from 'canvas';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'random',
@@ -72,7 +72,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	scope: Scope.Global,
+	scope: 'Global',
 	async execute(interaction) {
 		await interaction.deferReply();
 		const type = interaction.options.getString('type');

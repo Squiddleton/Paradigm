@@ -1,12 +1,7 @@
 import { ApplicationCommandData, ApplicationCommandOptionData, ApplicationCommandType, Awaitable, ChatInputCommandInteraction, ClientEvents, MessageContextMenuCommandInteraction, PermissionResolvable, UserContextMenuCommandInteraction } from 'discord.js';
 import { Client } from '../clients/discord.js';
 
-export enum Scope {
-	Dev,
-	Exclusive,
-	Global,
-	Guild
-}
+export type Scope = 'Dev' | 'Exclusive' | 'Global' | 'Guild';
 
 export type ContextMenuType = Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
 
@@ -47,7 +42,7 @@ export class ContextMenu<Type extends ContextMenuType> {
 			name: this.name,
 			type: this.type,
 			defaultMemberPermissions: this.permissions,
-			dmPermission: this.scope === Scope.Global
+			dmPermission: this.scope === 'Global'
 		};
 	}
 }
@@ -102,7 +97,7 @@ export class SlashCommand {
 			description: this.description,
 			options: this.options ?? [],
 			defaultMemberPermissions: this.permissions,
-			dmPermission: this.scope === Scope.Global
+			dmPermission: this.scope === 'Global'
 		};
 	}
 }

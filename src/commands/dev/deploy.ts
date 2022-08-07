@@ -1,10 +1,10 @@
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { deployCommands } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'deploy',
 	description: 'Deploy all application commands to Discord',
-	scope: Scope.Dev,
+	scope: 'Dev',
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
 

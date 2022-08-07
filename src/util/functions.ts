@@ -2,9 +2,9 @@ import { Client as BaseClient, codeBlock, Colors, CommandInteraction, EmbedBuild
 import { inspect } from 'util';
 import { Client } from '../clients/discord.js';
 import { IGiveaway } from '../schemas/guilds.js';
-import { Quantity, Scope } from '../types/types.js';
+import { Quantity } from '../types/types.js';
 
-const localScopes = [Scope.Dev, Scope.Exclusive];
+const localScopes = ['Dev', 'Exclusive'];
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()
@@ -44,7 +44,7 @@ export const deployCommands = async (client: Client<true>) => {
 	);
 
 	await client.exclusiveGuild.commands.set(client.commands
-		.filter(c => c.scope === Scope.Exclusive)
+		.filter(c => c.scope === 'Exclusive')
 		.map(c => c.toJSON())
 	);
 };

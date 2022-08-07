@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import FortniteAPI from '../../clients/fortnite.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { noPunc } from '../../util/functions.js';
 
 export default new SlashCommand({
@@ -15,7 +15,7 @@ export default new SlashCommand({
 			autocomplete: true
 		}
 	],
-	scope: Scope.Global,
+	scope: 'Global',
 	async execute(interaction) {
 		await interaction.deferReply();
 

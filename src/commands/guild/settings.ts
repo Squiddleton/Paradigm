@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import guildSchema from '../../schemas/guilds.js';
 
 export default new SlashCommand({
@@ -25,7 +25,7 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.Subcommand
 		}
 	],
-	scope: Scope.Guild,
+	scope: 'Guild',
 	async execute(interaction, client) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
 		const { guildId } = interaction;

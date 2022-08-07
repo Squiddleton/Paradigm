@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 
 export default new SlashCommand({
@@ -54,7 +54,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	scope: Scope.Global,
+	scope: 'Global',
 	async execute(interaction) {
 		const text = interaction.options.getString('text');
 		const outfit = interaction.options.getString('outfit');

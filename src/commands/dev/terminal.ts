@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { ApplicationCommandOptionType, Formatters } from 'discord.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 
 export default new SlashCommand({
 	name: 'terminal',
@@ -13,7 +13,7 @@ export default new SlashCommand({
 			required: true
 		}
 	],
-	scope: Scope.Dev,
+	scope: 'Dev',
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		exec(interaction.options.getString('command', true), { encoding: 'utf8' }, async (error, stdout, stderr) => {

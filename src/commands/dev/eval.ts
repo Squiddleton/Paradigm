@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { evalCommand } from '../../util/functions.js';
 
 export default new SlashCommand({
@@ -13,7 +13,7 @@ export default new SlashCommand({
 			required: true
 		}
 	],
-	scope: Scope.Dev,
+	scope: 'Dev',
 	async execute(interaction, client) {
 		await evalCommand(interaction, client, interaction.options.getString('code', true), false);
 	}

@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { isRarity, rarityOrdering } from '../../util/fortnite.js';
 
 export default new SlashCommand({
@@ -19,7 +19,7 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.Boolean
 		}
 	],
-	scope: Scope.Guild,
+	scope: 'Guild',
 	async execute(interaction) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
 

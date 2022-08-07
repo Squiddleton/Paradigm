@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import Canvas from 'canvas';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 import { validateChannel } from '../../util/functions.js';
 
 export default new SlashCommand({
@@ -30,7 +30,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	scope: Scope.Exclusive,
+	scope: 'Exclusive',
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
 

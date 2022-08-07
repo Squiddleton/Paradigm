@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction } from 'discord.js';
 import { randomFromArray, quantity, validateChannel, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 
 const unitToMS = {
 	minutes: 60,
@@ -189,7 +189,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	scope: Scope.Guild,
+	scope: 'Guild',
 	permissions: [PermissionFlagsBits.ManageGuild],
 	async execute(interaction, client) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);

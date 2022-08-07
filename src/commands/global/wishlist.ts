@@ -3,7 +3,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, Embe
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { itemShopCosmetics } from '../../util/fortnite.js';
-import { Scope, SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '../../types/types.js';
 
 interface UserProperties {
 	id: Snowflake;
@@ -96,7 +96,7 @@ export default new SlashCommand({
 			]
 		}
 	],
-	scope: Scope.Global,
+	scope: 'Global',
 	async execute(interaction) {
 		const userId = interaction.user.id;
 
