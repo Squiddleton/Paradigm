@@ -1,4 +1,4 @@
-import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData } from 'discord.js';
+import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError } from 'discord.js';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../clients/discord.js';
@@ -98,9 +98,8 @@ export default new Event({
 					}
 				}
 			}
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			catch (error: any) {
-				if (error.code !== RESTJSONErrorCodes.UnknownInteraction) throw error;
+			catch (error) {
+				if (error instanceof DiscordAPIError && error.code !== RESTJSONErrorCodes.UnknownInteraction) throw error;
 			}
 		}
 
