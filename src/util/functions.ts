@@ -1,4 +1,5 @@
-import { Client as BaseClient, Colors, EmbedBuilder, Guild, Snowflake, TextBasedChannel } from 'discord.js';
+import { Client as BaseClient, codeBlock, Colors, CommandInteraction, EmbedBuilder, Guild, Snowflake, TextBasedChannel } from 'discord.js';
+import { inspect } from 'util';
 import { Client } from '../clients/discord.js';
 import { IGiveaway } from '../schemas/guilds.js';
 import { Quantity, Scope } from '../types/types.js';
@@ -46,6 +47,42 @@ export const deployCommands = async (client: Client<true>) => {
 		.filter(c => c.scope === Scope.Exclusive)
 		.map(c => c.toJSON())
 	);
+};
+
+export const evalCommand = async (interaction: CommandInteraction, client: Client<true>, code: string, allowAsync: boolean) => {
+	if (interaction.user.id !== client.application.owner?.id) {
+		await interaction.reply({ content: 'Only the owner may use this command', ephemeral: true });
+		await client.devChannel.send(`${interaction.user} used the eval context menu with the argument "${code}" in ${interaction.channel} at <t:${Math.floor(Date.now() / 1000)}>`);
+		return;
+	}
+
+	await interaction.deferReply();
+
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const clean = (text: any) => (typeof text === 'string') ? text.replace(/`/g, '`' + String.fromCharCode(8203)).replace(/@/g, '@' + String.fromCharCode(8203)) : text;
+
+	try {
+		let evaled = await eval(allowAsync ? `(async () => {${code}})();` : code);
+
+		if (evaled === undefined) {
+			await interaction.editReply('No returned output to print.');
+			return;
+		}
+		if (typeof evaled === 'string' && evaled.length > 0) {
+			await interaction.editReply(evaled.slice(0, 2000));
+			return;
+		}
+
+		const isJSON = evaled !== null && typeof evaled === 'object' && evaled.constructor.name === 'Object';
+		if (isJSON) evaled = JSON.stringify(evaled, null, 2);
+
+		if (typeof evaled !== 'string') evaled = inspect(evaled);
+
+		await interaction.editReply(codeBlock(isJSON ? 'json' : 'js', clean(evaled).slice(0, 1987)));
+	}
+	catch (error) {
+		await interaction.editReply(`\`ERROR\` ${codeBlock('xl', clean(error))}`);
+	}
 };
 
 type noPuncOverload = {
