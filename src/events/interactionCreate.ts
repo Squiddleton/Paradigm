@@ -42,7 +42,7 @@ export default new Event({
 		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			const { name, value } = interaction.options.getFocused(true);
 			if (typeof value !== 'string') throw new Error('Unexpected autocomplete value type.');
-			const input = noPunc(value) ?? '';
+			const input = noPunc(value);
 
 			try {
 				switch (name) {
