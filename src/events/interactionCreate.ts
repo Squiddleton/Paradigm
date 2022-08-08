@@ -1,4 +1,4 @@
-import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction } from 'discord.js';
+import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction, InteractionReplyOptions } from 'discord.js';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../clients/discord.js';
@@ -43,11 +43,10 @@ const playlists = [...new Set((await FortniteAPI.playlists()).map(mapByName))];
 export default new Event({
 	name: 'interactionCreate',
 	async execute(interaction) {
+		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { owner } = client.application;
-		if (!(owner instanceof User)) return;
-
-		const errorMessage = `There was an error trying to execute that command!  Please contact ${owner.tag} or DM me if this issue persists.`;
+		if (!(owner instanceof User)) throw new Error('The owner is not a User instance.');
 
 		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			const { name, value } = interaction.options.getFocused(true);
@@ -92,9 +91,9 @@ export default new Event({
 						if (!inCachedGuild) throw new Error('The /milestone command should only be usable in guilds');
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
-						const userId = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
-						if (userId) {
-							const userMilestones = await milestoneUserSchema.findOne({ userId, guildId });
+						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
+						if (memberOption) {
+							const userMilestones = await milestoneUserSchema.findOne({ userId: memberOption, guildId });
 							milestones = milestones.filter(m => !userMilestones?.milestones.includes(m));
 						}
 
@@ -138,21 +137,20 @@ export default new Event({
 						date: new Date().toLocaleString('en-us', { timeZone: 'America/New_York' }),
 						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
 						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message' } (${interaction.channelId})`,
-						user: `${interaction.user.tag} (${interaction.user.id})`
+						user: `${interaction.user.tag} (${userId})`,
+						options: interaction.options.data
 					},
 					error
 				);
-				if (interaction.replied || interaction.deferred) {
-					await interaction.followUp(errorMessage);
-				}
-				else {
-					await interaction.reply(errorMessage);
-				}
+				const errorMessage: InteractionReplyOptions = {
+					content: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.tag} if this issue persists.`}`,
+					ephemeral: true
+				};
+				(interaction.replied || interaction.deferred) ? await interaction.followUp(errorMessage) : await interaction.reply(errorMessage);
 			}
 		}
 
 		else if (interaction.isButton() && interaction.customId === 'giveaway' && inCachedGuild) {
-			const userId = interaction.user.id;
 			await interaction.deferReply({ ephemeral: true });
 			if (interaction.member.joinedTimestamp !== null && interaction.member.joinedTimestamp + 6 * 86400000 > Date.now()) {
 				await interaction.editReply('You need to have been in the server for at least 6 days to enter.');
