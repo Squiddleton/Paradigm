@@ -41,7 +41,7 @@ export default new Event({
 
 		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			const { name, value } = interaction.options.getFocused(true);
-			const input = noPunc(value);
+			const input = value === '' ? 'a' : noPunc(value);
 
 			try {
 				switch (name) {
