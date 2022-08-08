@@ -120,15 +120,15 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	}[cosmetic.rarity.displayValue] ?? 'Random';
 
 	const embed = new EmbedBuilder()
-		.setTitle(`${cosmetic.name} (${cosmetic.type.displayValue})`)
+		.setTitle(cosmetic.name)
 		.setDescription(cosmetic.description)
 		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
 		.setThumbnail(cosmetic.images.smallIcon)
 		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
 		.addFields(
-			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
+			{ name: 'Type', value: cosmetic.type.displayValue, inline: true },
 			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
-			cosmetic.customExclusiveCallout === undefined ? { name: '\u200b', value: '\u200b', inline: true } : { name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true },
+			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
 		);
 		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
@@ -136,6 +136,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		const debut = cosmetic.shopHistory[0];
 		embed.addFields({ name: 'Shop History', value: `First: <t:${new Date(debut).getTime()}>\nLast: <t:${new Date(cosmetic.shopHistory.at(-1) ?? debut).getTime()}>\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
+	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
 
