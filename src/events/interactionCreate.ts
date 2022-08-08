@@ -1,4 +1,4 @@
-import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError } from 'discord.js';
+import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction } from 'discord.js';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import client from '../clients/discord.js';
@@ -12,23 +12,31 @@ import { ContextMenu, Event, SlashCommand } from '../types/types.js';
 import FortniteAPI from '../clients/fortnite.js';
 import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 
-const playlists = await FortniteAPI.playlists();
+const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
+
+const mapById = (rating: Rating): ApplicationCommandOptionChoiceData => {
+	const cosmetic = itemShopCosmetics.find(cos => cos.name === rating.target);
+	if (cosmetic === undefined) throw new Error(`No cosmetic has the name "${rating.target}"`);
+	return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+};
+
+const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
 
 const sortByRating = (a: Rating, b: Rating) => {
 	if (a.rating === b.rating) return a.target.localeCompare(b.target);
 	return b.rating - a.rating;
 };
 
-const mapByTarget = (c: Rating): ApplicationCommandOptionChoiceData => ({ name: c.target, value: c.target });
-
-
-const mapById = (c: Rating): ApplicationCommandOptionChoiceData => {
-	const cosmetic = itemShopCosmetics.find(cos => cos.name === c.target);
-	if (cosmetic === undefined) throw new Error(`No cosmetic has the name "${c.target}"`);
-	return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
+	const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
+	const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
+	await interaction.respond(choices);
 };
 
-const mapByName = (c: Cosmetic | Playlist) => c.name ?? 'null';
+const cosmeticNames = cosmetics.map(mapByName);
+const shopCosmeticNames = itemShopCosmetics.map(mapByName);
+
+const playlists = [...new Set((await FortniteAPI.playlists()).map(mapByName))];
 
 export default new Event({
 	name: 'interactionCreate',
@@ -47,45 +55,35 @@ export default new Event({
 				switch (name) {
 					case 'cosmetic': {
 						const isWishlist = interaction.commandName === 'wishlist';
-						const closest = findBestMatch(input, (isWishlist ? itemShopCosmetics : cosmetics).map(mapByName));
+						const closest = findBestMatch(input, isWishlist ? cosmeticNames : shopCosmeticNames);
 						const choices = closest.ratings.sort(sortByRating).map(isWishlist ? mapById : mapByTarget).slice(0, 10);
 						await interaction.respond(choices);
 						break;
 					}
 					case 'ltm': {
-						const closest = findBestMatch(input, [...new Set(playlists.map(mapByName))]);
+						const closest = findBestMatch(input, playlists);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
 						await interaction.respond(choices);
 						break;
 					}
 					case 'outfit': {
-						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Outfit').map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						await interaction.respond(choices);
+						await filterCosmetics(interaction, input, 'Outfit');
 						break;
 					}
 					case 'backbling': {
-						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Back Bling').map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						await interaction.respond(choices);
+						await filterCosmetics(interaction, input, 'Back Bling');
 						break;
 					}
 					case 'harvestingtool': {
-						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Harvesting Tool').map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						await interaction.respond(choices);
+						await filterCosmetics(interaction, input, 'Harvesting Tool');
 						break;
 					}
 					case 'glider': {
-						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Glider').map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						await interaction.respond(choices);
+						await filterCosmetics(interaction, input, 'Glider');
 						break;
 					}
 					case 'wrap': {
-						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Wrap').map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						await interaction.respond(choices);
+						await filterCosmetics(interaction, input, 'Wrap');
 						break;
 					}
 					case 'milestone': {
