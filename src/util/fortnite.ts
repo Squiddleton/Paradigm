@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
@@ -134,7 +134,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
 		const debut = cosmetic.shopHistory[0];
-		embed.addFields({ name: 'Shop History', value: `First: <t:${new Date(debut).getTime()}>\nLast: <t:${new Date(cosmetic.shopHistory.at(-1) ?? debut).getTime()}>\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
+		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))})\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
 	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
