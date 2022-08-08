@@ -128,15 +128,14 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		.addFields(
 			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
 			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
-			{ name: '\u200B', value: '\u200B', inline: true },
+			cosmetic.customExclusiveCallout === undefined ? { name: '\u200b', value: '\u200b', inline: true } : { name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
-		)
-		.setFooter({ text: cosmetic.id });
+		);
+		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
 		const debut = cosmetic.shopHistory[0];
 		embed.addFields({ name: 'Shop History', value: `First: <t:${new Date(debut).getTime()}>\nLast: <t:${new Date(cosmetic.shopHistory.at(-1) ?? debut).getTime()}>\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
-	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
 
