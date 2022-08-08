@@ -1,7 +1,9 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { noPunc } from '../../util/functions.js';
 import { createCosmeticEmbed, cosmetics } from '../../util/fortnite.js';
-import { SlashCommand } from '../../types/types.js';
+import { LanguageChoices, SlashCommand } from '../../types/types.js';
+import FortniteAPI from '../../clients/fortnite.js';
+import { Language } from '@squiddleton/fortnite-api';
 
 export default new SlashCommand({
 	name: 'cosmetic',
@@ -76,6 +78,12 @@ export default new SlashCommand({
 					value: 'banner'
 				}
 			]
+		},
+		{
+			name: 'language',
+			description: 'The language for the returned cosmetic',
+			type: ApplicationCommandOptionType.String,
+			choices: LanguageChoices
 		}
 	],
 	scope: 'Global',
@@ -84,6 +92,7 @@ export default new SlashCommand({
 
 		const input = noPunc(interaction.options.getString('cosmetic', true));
 		const type = interaction.options.getString('type');
+		const language = interaction.options.getString('language') as Language | null;
 		const data = type !== null ? cosmetics.filter(i => i.type.value === type) : cosmetics;
 
 		const item = data.find(o => [o.name, o.id].some(keyword => noPunc(keyword) === input)) ?? data.find(o => noPunc(o.set?.value) === input);
@@ -91,7 +100,7 @@ export default new SlashCommand({
 			await interaction.editReply('No cosmetic matches your query.');
 		}
 		else {
-			await interaction.editReply({ embeds: [createCosmeticEmbed(item)] });
+			await interaction.editReply({ embeds: [createCosmeticEmbed(language === null ? item : await FortniteAPI.findCosmetic({ id: item.id, language }))] });
 		}
 	}
 });
