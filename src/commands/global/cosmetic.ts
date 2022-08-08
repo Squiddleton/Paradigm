@@ -95,7 +95,7 @@ export default new SlashCommand({
 		const language = interaction.options.getString('language') as Language | null;
 		const data = type !== null ? cosmetics.filter(i => i.type.value === type) : cosmetics;
 
-		const item = data.find(o => [o.name, o.id].some(keyword => noPunc(keyword) === input)) ?? data.find(o => noPunc(o.set?.value) === input);
+		const item = data.find(o => [o.name, o.id].some(keyword => noPunc(keyword) === input));
 		if (item === undefined) {
 			await interaction.editReply('No cosmetic matches your query.');
 		}

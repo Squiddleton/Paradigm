@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable } from 'discord.js';
 import Canvas from 'canvas';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
@@ -118,20 +118,25 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		'Slurp Series': 0x1ac1a4,
 		'Gaming Legends Series': 0x1f0937
 	}[cosmetic.rarity.displayValue] ?? 'Random';
-	const image = cosmetic.images.featured ?? cosmetic.images.icon;
+
 	const embed = new EmbedBuilder()
 		.setTitle(`${cosmetic.name} (${cosmetic.type.displayValue})`)
-		.setColor(color)
+		.setDescription(cosmetic.description)
+		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
 		.setThumbnail(cosmetic.images.smallIcon)
-		.setImage(image)
-		.addFields([
-			{ name: 'Description', value: cosmetic.description, inline: true }, { name: 'Set', value: cosmetic.set ? cosmetic.set.value : 'None', inline: true },
-			{ name: '\u200B', value: '\u200B' },
-			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true }, { name: 'Debut', value: cosmetic.introduction ? `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}` : 'N/A', inline: true }
-		])
+		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
+		.addFields(
+			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
+			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
+			{ name: '\u200B', value: '\u200B', inline: true },
+			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
+		)
 		.setFooter({ text: cosmetic.id });
-	if (cosmetic.shopHistory) embed.addFields([{ name: 'Appearances', value: `First: ${cosmetic.shopHistory[0].substring(0, 10)}\nLast: ${cosmetic.shopHistory[cosmetic.shopHistory.length - 1].substring(0, 10)}\nTotal: ${cosmetic.shopHistory.length}` }]);
-	if (cosmetic.customExclusiveCallout) embed.setDescription(cosmetic.customExclusiveCallout);
+	if (cosmetic.shopHistory !== null) {
+		const debut = cosmetic.shopHistory[0];
+		embed.addFields({ name: 'Shop History', value: `First: <t:${new Date(debut).getTime()}>\nLast: <t:${new Date(cosmetic.shopHistory.at(-1) ?? debut).getTime()}>\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
+	}
+	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
 
