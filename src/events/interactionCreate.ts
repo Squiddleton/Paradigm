@@ -89,7 +89,7 @@ export default new Event({
 						break;
 					}
 					case 'milestone': {
-						if (!interaction.inCachedGuild()) throw new Error('The /milestone command should only be usable in guilds');
+						if (!inCachedGuild) throw new Error('The /milestone command should only be usable in guilds');
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const userId = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
@@ -137,7 +137,7 @@ export default new Event({
 					{
 						date: new Date().toLocaleString('en-us', { timeZone: 'America/New_York' }),
 						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
-						channel: `${interaction.inCachedGuild() ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message' } (${interaction.channelId})`,
+						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message' } (${interaction.channelId})`,
 						user: `${interaction.user.tag} (${interaction.user.id})`
 					},
 					error
