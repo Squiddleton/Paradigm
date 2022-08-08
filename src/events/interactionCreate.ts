@@ -60,7 +60,7 @@ export default new Event({
 						await interaction.respond(choices);
 						break;
 					}
-					case 'ltm': {
+					case 'playlist': {
 						const closest = findBestMatch(input, playlists);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
 						await interaction.respond(choices);
