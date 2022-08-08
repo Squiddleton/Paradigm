@@ -49,37 +49,44 @@ export default new Event({
 						const isWishlist = interaction.commandName === 'wishlist';
 						const closest = findBestMatch(input, (isWishlist ? itemShopCosmetics : cosmetics).map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(isWishlist ? mapById : mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'ltm': {
 						const closest = findBestMatch(input, [...new Set(playlists.map(mapByName))]);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'outfit': {
 						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Outfit').map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'backbling': {
 						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Back Bling').map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'harvestingtool': {
 						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Harvesting Tool').map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'glider': {
 						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Glider').map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'wrap': {
 						const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === 'Wrap').map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices);
+						await interaction.respond(choices);
+						break;
 					}
 					case 'milestone': {
 						if (!interaction.inCachedGuild()) throw new Error('The /milestone command should only be usable in guilds');
@@ -93,7 +100,8 @@ export default new Event({
 
 						const closest = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
-						return interaction.respond(choices[0]?.name === 'None' ? [] : choices);
+						await interaction.respond(choices[0]?.name === 'None' ? [] : choices);
+						break;
 					}
 				}
 			}
