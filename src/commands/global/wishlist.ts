@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, Embe
 
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
-import { itemShopCosmetics } from '../../util/fortnite.js';
+import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '../../types/types.js';
 
 interface UserProperties {
@@ -103,8 +103,8 @@ export default new SlashCommand({
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
 				const input = interaction.options.getString('cosmetic', true);
-				const cosmetic = itemShopCosmetics.find(c => c.id === input) ?? itemShopCosmetics.find(c => input.includes(c.id)) ?? itemShopCosmetics.find(c => noPunc(c.name) === noPunc(input));
-				if (cosmetic === undefined) {
+				const cosmetic = findCosmetic(input, true);
+				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;
 				}

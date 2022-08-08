@@ -43,6 +43,14 @@ export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 	!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
 });
 
+export const findCosmetic = (input: string, itemShop = false) => {
+	const list = itemShop ? itemShopCosmetics : cosmetics;
+	const id = list.find(c => c.id === input) ?? list.find(c => input.includes(c.id));
+	if (id !== undefined) return id;
+	input = noPunc(input);
+	return list.find(c => noPunc(c.name) === input) ?? null;
+};
+
 export const fetchItemShop = async () => {
 	const rawAPI = await FortniteAPI.shop({ combined: true });
 

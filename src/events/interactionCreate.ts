@@ -14,10 +14,12 @@ import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 
-const mapById = (rating: Rating): ApplicationCommandOptionChoiceData => {
-	const cosmetic = itemShopCosmetics.find(cos => cos.name === rating.target);
-	if (cosmetic === undefined) throw new Error(`No cosmetic has the name "${rating.target}"`);
-	return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+const mapById = (shopOnly: boolean) => {
+	return (rating: Rating): ApplicationCommandOptionChoiceData => {
+		const cosmetic = (shopOnly ? itemShopCosmetics : cosmetics).find(cos => cos.name === rating.target);
+		if (cosmetic === undefined) throw new Error(`No cosmetic has the name "${rating.target}"`);
+		return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+	};
 };
 
 const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
@@ -29,7 +31,7 @@ const sortByRating = (a: Rating, b: Rating) => {
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
 	const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
-	const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
+	const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 	await interaction.respond(choices);
 };
 
@@ -54,15 +56,15 @@ export default new Event({
 			try {
 				switch (name) {
 					case 'cosmetic': {
-						const isWishlist = interaction.commandName === 'wishlist';
-						const closest = findBestMatch(input, isWishlist ? cosmeticNames : shopCosmeticNames);
-						const choices = closest.ratings.sort(sortByRating).map(isWishlist ? mapById : mapByTarget).slice(0, 10);
+						const shopOnly = interaction.commandName === 'wishlist';
+						const closest = findBestMatch(input, shopOnly ? shopCosmeticNames : cosmeticNames);
+						const choices = closest.ratings.sort(sortByRating).map(mapById(shopOnly)).slice(0, 25);
 						await interaction.respond(choices);
 						break;
 					}
 					case 'playlist': {
 						const closest = findBestMatch(input, playlists);
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
+						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);
 						break;
 					}
@@ -97,7 +99,7 @@ export default new Event({
 						}
 
 						const closest = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 10);
+						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices[0]?.name === 'None' ? [] : choices);
 						break;
 					}
