@@ -10,6 +10,11 @@ import { Cosmetic } from '@squiddleton/fortnite-api';
 import FortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 
+/**
+ * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
+ */
+const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+
 interface DeviceAuth {
 	grant_type: 'device_auth';
 	account_id: string;
@@ -50,7 +55,6 @@ export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering 
  * @returns Device auth credentials
  */
 export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {
-	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 	const stats = await FortniteAPI.stats({ name: accountName });
 	const accountId = stats.account.id;
 
@@ -85,7 +89,6 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 
 export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
 	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
-	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 	const { access_token } = await fetch('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token', {
 		method: 'post',
 		headers: {
