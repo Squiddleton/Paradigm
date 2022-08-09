@@ -4,7 +4,7 @@ import { Event } from '../types/types.js';
 import { checkWishlists } from '../util/fortnite.js';
 import client from '../clients/discord.js';
 
-const denySubmissionMessage = 'Discussion is not allowed in this channel.  Please use the `/suggest` command for submissions.';
+const denySubmissionMessage = 'Discussion is not allowed in this channel. Please use the `/suggest` command for submissions.';
 
 export default new Event({
 	name: 'messageCreate',

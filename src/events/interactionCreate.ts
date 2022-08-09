@@ -173,7 +173,7 @@ export default new Event({
 				{ new: true, upsert: true }
 			);
 			if (userResult.messages.reduce((acc, msg) => acc + msg.msgs, 0) < giveawayResult.messages) {
-				await interaction.editReply('You do not currently have enough messages to enter.  Continue actively participating, then try again later.');
+				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}
 
@@ -206,7 +206,7 @@ export default new Event({
 				},
 				{ $push: { 'giveaways.$.entrants': { $each: entries } } }
 			);
-			await interaction.editReply(`You have successfully entered${entries.length === 1 ? '' : ` ${entries.length} times due to your roles`}.  Check back when the giveaway ends to see if you won.`);
+			await interaction.editReply(`You have successfully entered${entries.length === 1 ? '' : ` ${entries.length} times due to your roles`}. Check back when the giveaway ends to see if you won.`);
 		}
 	}
 });
