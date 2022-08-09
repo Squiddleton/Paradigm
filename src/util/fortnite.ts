@@ -1,12 +1,25 @@
 // eslint-disable-next-line no-unused-vars
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
+import fetch from 'node-fetch';
 import { noPunc, randomFromArray, validateChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
 import FortniteAPI from '../clients/fortnite.js';
+
+interface DeviceAuth {
+	grant_type: 'device_auth';
+	account_id: string;
+	device_id: string;
+	secret: string;
+}
+
+interface AccessTokenAndId {
+	accessToken: string;
+	accountId: string;
+}
 
 type StringOption = string | null;
 
@@ -28,6 +41,68 @@ export const rarityOrdering = {
 	Mythic: 5
 };
 export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
+
+export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {
+	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+	const stats = await FortniteAPI.stats({ name: accountName });
+	const accountId = stats.account.id;
+
+	const { access_token: firstAccessToken } = await fetch('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
+		{
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded',
+				Authorization: `basic ${encodedClient}`
+			},
+			method: 'post',
+			body: new URLSearchParams({
+				grant_type: 'authorization_code',
+				code: authorizationCode
+			})
+		}
+	).then(r => r.json()) as any;
+
+	const { deviceId, secret } = await fetch(`https://account-public-service-prod.ol.epicgames.com/account/api/public/account/${accountId}/deviceAuth`, {
+		method: 'post',
+		headers: {
+			Authorization: `Bearer ${firstAccessToken}`
+		}
+	}).then(r => r.json()) as any;
+
+	return {
+		grant_type: 'device_auth',
+		account_id: accountId,
+		device_id: deviceId as string,
+		secret: secret as string
+	};
+};
+
+export const getAccessToken = async (deviceAuth: DeviceAuth): Promise<AccessTokenAndId> => {
+	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+	const { access_token } = await fetch('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token', {
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			Authorization: `basic ${encodedClient}`
+		},
+		body: new URLSearchParams({ ...deviceAuth })
+	}).then(r => r.json()) as any;
+
+	return {
+		accessToken: access_token as string,
+		accountId: deviceAuth.account_id
+	};
+};
+
+export const changeHomebaseName = async (accessTokenAndId: AccessTokenAndId, newHomebaseName: string) => {
+	return fetch(`https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/${accessTokenAndId.accountId}/client/SetHomebaseName?profileId=common_public&rvn=1`, {
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `bearer ${accessTokenAndId.accessToken}`
+		},
+		body: JSON.stringify({ homebaseName: newHomebaseName })
+	}).then(r => r.json());
+};
 
 export const cosmetics = await FortniteAPI.listCosmetics();
 
