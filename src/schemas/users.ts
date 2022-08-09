@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
+	epicAccountId: {
+		type: String,
+		default: null
+	},
 	wishlistCosmeticIds: {
 		type: [String],
 		required: true,
