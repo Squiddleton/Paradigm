@@ -4,6 +4,7 @@ import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '../../types/types.js';
+import guilds from '../../schemas/guilds.js';
 
 interface UserProperties {
 	id: Snowflake;
@@ -118,7 +119,11 @@ export default new SlashCommand({
 					? await interaction.reply({ content: `${cosmetic.name} is already on your wishlist.`, ephemeral: true })
 					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
 
-				return;
+				if (interaction.inCachedGuild()) {
+					const guild = await guilds.findById(interaction.guild.id);
+					if (guild !== null && guild.wishlistChannelId === null) await interaction.followUp({ content: 'This server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one up.', ephemeral: true });
+				}
+				break;
 			}
 			case 'list': {
 				const user = await getUserProperties(interaction);
@@ -149,7 +154,7 @@ export default new SlashCommand({
 					.setTimestamp()
 					.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`);
 				await interaction.reply({ embeds: [embed], ephemeral: !user.same });
-				return;
+				break;
 			}
 			case 'remove': {
 				const input = interaction.options.getString('cosmetic', true);
@@ -174,6 +179,7 @@ export default new SlashCommand({
 					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
 				);
 				await interaction.reply(`${cosmetic.name} has been removed from your wishlist.`);
+				break;
 			}
 		}
 	}
