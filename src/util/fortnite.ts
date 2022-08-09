@@ -42,6 +42,12 @@ export const rarityOrdering = {
 };
 export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
 
+/**
+ *
+ * @param accountName - The Epic account username
+ * @param authorizationCode - The cocde obtained from https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code
+ * @returns Device auth credentials
+ */
 export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {
 	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 	const stats = await FortniteAPI.stats({ name: accountName });
