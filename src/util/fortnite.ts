@@ -45,7 +45,7 @@ export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering 
 /**
  *
  * @param accountName - The Epic account username
- * @param authorizationCode - The cocde obtained from https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code
+ * @param authorizationCode - The code obtained from {@link https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code here} while logged in on epicgames.com
  * @returns Device auth credentials
  */
 export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {
