@@ -121,7 +121,7 @@ export default new SlashCommand({
 
 				if (interaction.inCachedGuild()) {
 					const guild = await guilds.findById(interaction.guild.id);
-					if (guild !== null && guild.wishlistChannelId === null) await interaction.followUp({ content: 'This server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one up.', ephemeral: true });
+					if (guild === null || guild.wishlistChannelId === null) await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one up.', ephemeral: true });
 				}
 				break;
 			}
