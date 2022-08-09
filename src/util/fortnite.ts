@@ -8,6 +8,7 @@ import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
 import FortniteAPI from '../clients/fortnite.js';
+import config from '../config.js';
 
 interface DeviceAuth {
 	grant_type: 'device_auth';
@@ -82,7 +83,8 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 	};
 };
 
-export const getAccessToken = async (deviceAuth: DeviceAuth): Promise<AccessTokenAndId> => {
+export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
+	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
 	const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 	const { access_token } = await fetch('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token', {
 		method: 'post',
