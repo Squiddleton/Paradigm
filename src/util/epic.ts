@@ -86,7 +86,7 @@ interface EpicAccount {
 	externalAuths: Record<string, AnyObject>;
 }
 
-const epicFetch = async <Response = unknown>(url: string, init: RequestInit) => {
+export const epicFetch = async <Response = unknown>(url: string, init: RequestInit) => {
 	const res = await fetch(url, init).then(r => r.json()) as Response | RawEpicError;
 	if (isError(res)) {
 		throw new EpicError(res);
