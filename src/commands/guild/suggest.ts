@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, Message } from 'discord.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '../../types/types.js';
 import { validateChannel } from '../../util/functions.js';
@@ -49,13 +49,16 @@ export default new SlashCommand({
 		const type = interaction.options.getString('type');
 		const submissionChannel = validateChannel(client, '895024792439251064', 'Submission channel');
 
+		let message: Message;
 		try {
-			await submissionChannel.send({ content: `Submission by ${interaction.user.toString()}\n${submissionName} (${type})`, files: [url] });
+			message = await submissionChannel.send({ content: `Submission by ${interaction.user.toString()}\n${submissionName} (${type})`, files: [url] });
 		}
 		catch {
-			await submissionChannel.send(`Submission by ${interaction.user.toString()}\n${submissionName} (${type})\n${url}`);
+			message = await submissionChannel.send(`Submission by ${interaction.user.toString()}\n${submissionName} (${type})\n${url}`);
 		}
+		await message.react('492412118952574997');
+		await message.react('492412142306197504');
+
 		await interaction.editReply('You have successfully submitted your suggestion.');
-		return;
 	}
 });
