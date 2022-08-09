@@ -1,4 +1,4 @@
-import fetch, { RequestInit } from 'node-fetch';
+import fetch, { RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import FortniteAPI from '../clients/fortnite.js';
 import { DateString } from '@squiddleton/fortnite-api';
@@ -86,12 +86,44 @@ interface EpicAccount {
 	externalAuths: Record<string, AnyObject>;
 }
 
-export const epicFetch = async <Response = unknown>(url: string, init: RequestInit) => {
-	const res = await fetch(url, init).then(r => r.json()) as Response | RawEpicError;
+const checkError = async <Res = unknown>(raw: Response): Promise<Res> => {
+	const res = await raw.json() as Res | RawEpicError;
 	if (isError(res)) {
 		throw new EpicError(res);
 	}
 	return res;
+};
+
+export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
+	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
+	const res = await fetch('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token', {
+		method: 'post',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			Authorization: `basic ${encodedClient}`
+		},
+		body: new URLSearchParams({ ...deviceAuth })
+	});
+	const { access_token } = await checkError<AccessTokenResponse>(res);
+
+	return {
+		accessToken: access_token,
+		accountId: deviceAuth.account_id
+	};
+};
+
+export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) => {
+	if (init === undefined) {
+		const { accessToken } = await getAccessToken();
+		init = {
+			headers: {
+				Authorization: `bearer ${accessToken}`
+			}
+		};
+	}
+
+	const res = await fetch(url, init);
+	return checkError<Res>(res);
 };
 
 /**
@@ -133,23 +165,6 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 		account_id: accountId,
 		device_id: deviceId,
 		secret: secret
-	};
-};
-
-export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
-	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
-	const { access_token } = await epicFetch<AccessTokenResponse>('https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token', {
-		method: 'post',
-		headers: {
-			'Content-Type': 'application/x-www-form-urlencoded',
-			Authorization: `basic ${encodedClient}`
-		},
-		body: new URLSearchParams({ ...deviceAuth })
-	});
-
-	return {
-		accessToken: access_token as string,
-		accountId: deviceAuth.account_id
 	};
 };
 
