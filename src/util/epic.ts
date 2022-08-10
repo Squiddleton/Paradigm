@@ -4,7 +4,7 @@ import FortniteAPI from '../clients/fortnite.js';
 import { DateString } from '@squiddleton/fortnite-api';
 
 enum Endpoints {
-	GetAccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
+	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
 	DeviceAuth = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{accountId}/deviceAuth',
 	AccountByDisplayName = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/displayName/{displayName}',
 	AccountById = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account',
@@ -122,7 +122,7 @@ const checkError = async <Res = unknown>(raw: Response): Promise<Res> => {
 
 export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
 	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
-	const res = await fetch(Endpoints.GetAccessToken, {
+	const res = await fetch(Endpoints.AccessToken, {
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
@@ -167,7 +167,7 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 	const stats = await FortniteAPI.stats({ name: accountName });
 	const accountId = stats.account.id;
 
-	const { access_token } = await epicFetch<AuthorizationCodeResponse>(Endpoints.GetAccessToken, {
+	const { access_token } = await epicFetch<AuthorizationCodeResponse>(Endpoints.AccessToken, {
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
