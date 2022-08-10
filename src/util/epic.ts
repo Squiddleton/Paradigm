@@ -215,6 +215,11 @@ export const getFriends = async (accountId: string, init?: RequestInit) => epicF
 	init
 );
 
+export const getTimeline = async (init?: RequestInit) => epicFetch(
+	'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
+	init
+);
+
 export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: Profile, payload: Record<string, string> = {}) => epicFetch(
 	`https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/${accessTokenAndId.accountId}/client/${operation}?profileId=${profile}&rvn=-1`,
 	{
