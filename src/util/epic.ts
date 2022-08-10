@@ -8,6 +8,8 @@ import { DateString } from '@squiddleton/fortnite-api';
  */
 const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 
+type Profile = 'common_public' | 'athena' | 'campaign';
+
 type AnyObject = Record<string, unknown>;
 
 interface RawEpicError {
@@ -84,6 +86,19 @@ interface EpicAccount {
 	passwordResetRequired?: boolean;
 	links?: AnyObject;
 	externalAuths: Record<string, AnyObject>;
+}
+
+interface BlockList {
+	blockedUsers: string[];
+}
+
+interface Friend {
+	accountId: string;
+	status: string;
+	direction: string;
+	alias?: string;
+	created: DateString;
+	favorite: boolean;
 }
 
 const checkError = async <Res = unknown>(raw: Response): Promise<Res> => {
@@ -190,16 +205,34 @@ export const getAccount = async (accessToken: string, nameOrId: string | string[
 	return epicFetch<EpicAccount>(`https://account-public-service-prod.ol.epicgames.com/account/api/public/account?accountId=${ids.join('&accountId=')}`, init);
 };
 
-export const changeHomebaseName = async (accessTokenAndId: AccessTokenAndId, newHomebaseName: string) => epicFetch(
-	`https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/${accessTokenAndId.accountId}/client/SetHomebaseName?profileId=common_public&rvn=1`,
+export const getBlockList = async (accountId: string, init?: RequestInit) => epicFetch<BlockList>(
+	`https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/blocklist/${accountId}`,
+	init
+);
+
+export const getFriends = async (accountId: string, init?: RequestInit) => epicFetch<Friend[]>(
+	`https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/friends/${accountId}`,
+	init
+);
+
+export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: Profile, payload: Record<string, string> = {}) => epicFetch(
+	`https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/${accessTokenAndId.accountId}/client/${operation}?profileId=${profile}&rvn=-1`,
 	{
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `bearer ${accessTokenAndId.accessToken}`
 		},
-		body: JSON.stringify({
-			homebaseName: newHomebaseName
-		})
+		body: JSON.stringify(payload)
 	}
 );
+
+export const claimLoginReward = async (accessTokenAndId?: AccessTokenAndId) => {
+	if (accessTokenAndId === undefined) accessTokenAndId = await getAccessToken();
+	return mcpRequest(accessTokenAndId, 'ClaimLoginReward', 'campaign');
+};
+
+export const setHomebaseName = async (homebaseName: string, accessTokenAndId?: AccessTokenAndId) => {
+	if (accessTokenAndId === undefined) accessTokenAndId = await getAccessToken();
+	return mcpRequest(accessTokenAndId, 'SetHomebaseName', 'common_public', { homebaseName });
+};
