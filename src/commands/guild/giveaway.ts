@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction } from 'discord.js';
+import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
 import { randomFromArray, quantity, validateChannel, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { SlashCommand } from '../../types/types.js';
@@ -223,43 +223,57 @@ export default new SlashCommand({
 					return;
 				}
 
-				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
-				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
+				try {
+					const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
+					try {
+						const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
-				if (text !== null) {
-					giveaway.text = text;
-				}
-				if (winners !== null) {
-					giveaway.winnerNumber = winners;
-				}
-				if (time !== null && units !== null && isUnit(units)) {
-					const endTime = giveaway.startTime + (time * unitToMS[units]);
-					giveaway.endTime = endTime;
-				}
-				else if ((time !== null && units === null) || (time === null && units !== null)) {
-					await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
-					return;
-				}
-				if (messages !== null) giveaway.messages = messages;
-				if (role1 !== null || role2 !== null) {
-					giveaway.bonusRoles = [];
-					if (role1 !== null && role1Amount !== null) giveaway.bonusRoles.push({ id: role1.id, amount: role1Amount });
-					if (role2 !== null && role2Amount !== null) giveaway.bonusRoles.push({ id: role2.id, amount: role2Amount });
-				}
+						if (text !== null) {
+							giveaway.text = text;
+						}
+						if (winners !== null) {
+							giveaway.winnerNumber = winners;
+						}
+						if (time !== null && units !== null && isUnit(units)) {
+							const endTime = giveaway.startTime + (time * unitToMS[units]);
+							giveaway.endTime = endTime;
+						}
+						else if ((time !== null && units === null) || (time === null && units !== null)) {
+							await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
+							return;
+						}
+						if (messages !== null) giveaway.messages = messages;
+						if (role1 !== null || role2 !== null) {
+							giveaway.bonusRoles = [];
+							if (role1 !== null && role1Amount !== null) giveaway.bonusRoles.push({ id: role1.id, amount: role1Amount });
+							if (role2 !== null && role2Amount !== null) giveaway.bonusRoles.push({ id: role2.id, amount: role2Amount });
+						}
 
-				await guildSchema.findOneAndUpdate(
-					{
-						_id: interaction.guildId,
-						'giveaways.messageId': messageId
-					},
-					{
-						$set: { 'giveaways.$': giveaway }
+						await guildSchema.findOneAndUpdate(
+							{
+								_id: interaction.guildId,
+								'giveaways.messageId': messageId
+							},
+							{
+								$set: { 'giveaways.$': giveaway }
+							}
+						);
+
+						await giveawayMessage.edit({ embeds: [createGiveawayEmbed(giveaway, interaction.guild)] });
+						await interaction.reply({ content: 'The giveaway has been updated.', ephemeral: true });
+						return;
 					}
-				);
-
-				await giveawayMessage.edit({ embeds: [createGiveawayEmbed(giveaway, interaction.guild)] });
-				await interaction.reply({ content: 'The giveaway has been updated.', ephemeral: true });
-				return;
+					catch (error) {
+						if (error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownMessage) {
+							await interaction.reply({ content: 'That giveaway message has been deleted.', ephemeral: true });
+							return;
+						}
+					}
+				}
+				catch (error) {
+					await interaction.reply({ content: 'This giveaway\'s channel has been deleted, or the bot cannot access it.', ephemeral: true });
+				}
+				break;
 			}
 			case 'reroll': {
 				await interaction.deferReply({ ephemeral: true });

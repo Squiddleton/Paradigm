@@ -97,7 +97,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 						}
 					}
 					catch (error) {
-						console.error(error);
+						console.error('An error has occured while posting a wishlist announcement', g, error);
 					}
 				}
 			}
