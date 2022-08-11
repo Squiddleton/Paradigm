@@ -264,20 +264,18 @@ export const getStats = async (accountId: string) => epicFetch<Stats>(Endpoints.
 
 export const getTimeline = async () => epicFetch(Endpoints.Timeline);
 
-export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => epicFetch(
-	Endpoints.MCP
-		.replace('{accountId}', accessTokenAndId.accountId)
-		.replace('{operation}', operation)
-		.replace('{profile}', profile),
-	postBody(accessTokenAndId.accessToken, JSON.stringify(payload))
-);
+export const mcpRequest = async (operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => {
+	const accessTokenAndId = await getAccessToken();
 
-export const claimLoginReward = async (accessTokenAndId?: AccessTokenAndId) => {
-	if (accessTokenAndId === undefined) accessTokenAndId = await getAccessToken();
-	return mcpRequest(accessTokenAndId, 'ClaimLoginReward', 'campaign');
+	return epicFetch(
+		Endpoints.MCP
+			.replace('{accountId}', accessTokenAndId.accountId)
+			.replace('{operation}', operation)
+			.replace('{profile}', profile),
+		postBody(accessTokenAndId.accessToken, JSON.stringify(payload))
+	);
 };
 
-export const setHomebaseName = async (homebaseName: string, accessTokenAndId?: AccessTokenAndId) => {
-	if (accessTokenAndId === undefined) accessTokenAndId = await getAccessToken();
-	return mcpRequest(accessTokenAndId, 'SetHomebaseName', 'common_public', { homebaseName });
-};
+export const claimLoginReward = async () => mcpRequest('ClaimLoginReward', 'campaign');
+
+export const setHomebaseName = async (homebaseName: string) => mcpRequest('SetHomebaseName', 'common_public', { homebaseName });
