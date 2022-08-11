@@ -25,8 +25,6 @@ const seasons = Array.from({
 	length: 21 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
-type Profile = 'common_public' | 'athena' | 'campaign';
-
 type AnyObject = Record<string, unknown>;
 
 interface RawEpicError {
@@ -266,7 +264,7 @@ export const getStats = async (accountId: string) => epicFetch<Stats>(Endpoints.
 
 export const getTimeline = async () => epicFetch(Endpoints.Timeline);
 
-export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: Profile, payload: Record<string, string> = {}) => epicFetch(
+export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => epicFetch(
 	Endpoints.MCP
 		.replace('{accountId}', accessTokenAndId.accountId)
 		.replace('{operation}', operation)
