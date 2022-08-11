@@ -1,7 +1,7 @@
-import fetch, { RequestInit, Response } from 'node-fetch';
+import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import FortniteAPI from '../clients/fortnite.js';
-import { DateString } from '@squiddleton/fortnite-api';
+import type { DateString } from '@squiddleton/fortnite-api';
 
 enum Endpoints {
 	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
@@ -10,6 +10,8 @@ enum Endpoints {
 	AccountById = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account',
 	BlockList = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/blocklist/{accountId}',
 	Friends = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/friends/{accountId}',
+	Levels = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/query',
+	Stats = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/account/${accountId},',
 	Timeline = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
 	MCP = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{accountId}/client/{operation}?profileId={profile}&rvn=-1'
 }
@@ -18,6 +20,10 @@ enum Endpoints {
  * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
  */
 const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+
+const seasons = Array.from({
+	length: 21 // Increment this value every season
+}, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 type Profile = 'common_public' | 'athena' | 'campaign';
 
@@ -111,6 +117,22 @@ interface Friend {
 	created: DateString;
 	favorite: boolean;
 }
+
+interface Stats {
+	startTime: number;
+	endTime: number;
+	stats: Record<string, number>;
+	accountId: string;
+}
+
+const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
+	method: 'post',
+	headers: {
+		'Content-Type': 'application/json',
+		Authorization: `bearer ${accessToken}`
+	},
+	body
+});
 
 const checkError = async <Res = unknown>(raw: Response): Promise<Res> => {
 	const res = await raw.json() as Res | RawEpicError;
@@ -216,25 +238,40 @@ export const getAccount = async (accessToken: string, nameOrId: string | string[
 	return epicFetch<EpicAccount>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`, init);
 };
 
-export const getBlockList = async (accountId: string, init?: RequestInit) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId), init);
+export const getBlockList = async (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
 
-export const getFriends = async (accountId: string, init?: RequestInit) => epicFetch<Friend[]>(Endpoints.Friends.replace('{accountId}', accountId), init);
+export const getFriends = async (accountId: string) => epicFetch<Friend[]>(Endpoints.Friends.replace('{accountId}', accountId));
 
-export const getTimeline = async (init?: RequestInit) => epicFetch(Endpoints.Timeline, init);
+export const getLevels = async (accountId: string, accessToken?: string) => {
+	if (accessToken === undefined) {
+		const accessTokenAndId = await getAccessToken();
+		accessToken = accessTokenAndId.accessToken;
+	}
+
+	const levels = await epicFetch<Stats>(
+		Endpoints.Levels,
+		postBody(accessToken, JSON.stringify({
+			appId: 'fortnite',
+			startDate: 0,
+			endDate: 0,
+			owners: [accountId],
+			stats: seasons
+		}))
+	);
+
+	return levels.stats;
+};
+
+export const getStats = async (accountId: string) => epicFetch<Stats>(Endpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
+
+export const getTimeline = async () => epicFetch(Endpoints.Timeline);
 
 export const mcpRequest = async (accessTokenAndId: AccessTokenAndId, operation: string, profile: Profile, payload: Record<string, string> = {}) => epicFetch(
 	Endpoints.MCP
 		.replace('{accountId}', accessTokenAndId.accountId)
 		.replace('{operation}', operation)
 		.replace('{profile}', profile),
-	{
-		method: 'post',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `bearer ${accessTokenAndId.accessToken}`
-		},
-		body: JSON.stringify(payload)
-	}
+	postBody(accessTokenAndId.accessToken, JSON.stringify(payload))
 );
 
 export const claimLoginReward = async (accessTokenAndId?: AccessTokenAndId) => {
