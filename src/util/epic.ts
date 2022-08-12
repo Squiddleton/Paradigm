@@ -36,7 +36,7 @@ interface RawEpicError {
 	intent: string;
 }
 
-class EpicError extends Error {
+export class EpicError extends Error {
 	constructor(error: RawEpicError) {
 		super(error.errorMessage);
 		Object.assign(this, error);
@@ -214,18 +214,13 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 	};
 };
 
-export const getAccount = async (accessToken: string, nameOrId: string | string[], isId = false) => {
+export const getAccount = async (nameOrId: string | string[], isId = false) => {
 	const namesOrIds = [nameOrId].flat();
-	const init = {
-		headers: {
-			Authorization: `bearer ${accessToken}`
-		}
-	};
 
 	let ids: string[] = [];
 	if (!isId) {
 		for (const displayName of namesOrIds) {
-			const res = await epicFetch<EpicAccount>(Endpoints.AccountByDisplayName.replace('displayName', displayName), init);
+			const res = await epicFetch<EpicAccount>(Endpoints.AccountByDisplayName.replace('{displayName}', displayName));
 			ids.push(res.id);
 		}
 	}
@@ -233,7 +228,7 @@ export const getAccount = async (accessToken: string, nameOrId: string | string[
 		ids = namesOrIds;
 	}
 
-	return epicFetch<EpicAccount>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`, init);
+	return epicFetch<EpicAccount>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
 };
 
 export const getBlockList = async (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
@@ -246,7 +241,7 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 		accessToken = accessTokenAndId.accessToken;
 	}
 
-	const levels = await epicFetch<Stats>(
+	const levels = await epicFetch<Stats[]>(
 		Endpoints.Levels,
 		postBody(accessToken, JSON.stringify({
 			appId: 'fortnite',
@@ -257,7 +252,7 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 		}))
 	);
 
-	return levels.stats;
+	return levels[0].stats;
 };
 
 export const getStats = async (accountId: string) => epicFetch<Stats>(Endpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
