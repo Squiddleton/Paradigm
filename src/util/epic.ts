@@ -228,7 +228,7 @@ export const getAccount = async (nameOrId: string | string[], isId = false) => {
 		ids = namesOrIds;
 	}
 
-	return epicFetch<EpicAccount>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
+	return epicFetch<EpicAccount[]>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
 };
 
 export const getBlockList = async (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
