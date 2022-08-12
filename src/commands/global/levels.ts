@@ -37,7 +37,7 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'player',
-			description: 'The player\'s username; defaults to your linked username, if any',
+			description: 'The player\'s username; defaults to your linked account, if any',
 			type: ApplicationCommandOptionType.String
 		},
 		{
@@ -52,7 +52,7 @@ export default new SlashCommand({
 		},
 		{
 			name: 'link',
-			description: 'Whether to link this player\'s username with the bot; defaults to false',
+			description: 'Whether to link this player\'s account with the bot; defaults to false',
 			type: ApplicationCommandOptionType.Boolean
 		}
 	],
