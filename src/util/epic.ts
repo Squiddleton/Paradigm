@@ -210,7 +210,7 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 		grant_type: 'device_auth',
 		account_id: accountId,
 		device_id: deviceId,
-		secret: secret
+		secret
 	};
 };
 
