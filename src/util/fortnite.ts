@@ -93,7 +93,17 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 						if (wishlistChannel.type !== ChannelType.DM) {
 							const permissions = wishlistChannel.permissionsFor(client.user);
 							if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${wishlistChannel.id}"`);
-							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) debug ? console.log(msgs.join('\n')) : await wishlistChannel.send(msgs.join('\n'));
+							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
+								const fullMsg = msgs.join('\n');
+								if (debug) {
+									console.log(fullMsg);
+								}
+								else {
+									for (const message of fullMsg.match(/.{1,2000}/g) ?? []) {
+										await wishlistChannel.send(message);
+									}
+								}
+							}
 						}
 					}
 					catch (error) {
