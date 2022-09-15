@@ -173,36 +173,6 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		let image: Canvas.Image | null = null;
 		const link = links[displayType];
 
-		const drawImage = (img: Canvas.Image) => {
-			const dimensions: Dimensions = {
-				Outfit: [
-					(background.width - (background.height * img.width / img.height)) / 2,
-					0,
-					background.height * img.width / img.height,
-					background.height
-				],
-				'Back Bling': [
-					0,
-					0,
-					background.height * img.width / img.height / 2,
-					background.height / 2
-				],
-				'Harvesting Tool': [
-					0,
-					background.height / 2,
-					background.height * img.width / img.height / 2,
-					background.height / 2
-				],
-				Glider: [
-					background.width - (background.height * img.width / img.height / 2),
-					0,
-					background.height * img.width / img.height / 2,
-					background.height / 2
-				]
-			};
-			ctx.drawImage(img, ...dimensions[displayType]);
-		};
-
 		if (link !== undefined) {
 			image = await Canvas.loadImage(link);
 		}
@@ -214,7 +184,35 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 			image = await Canvas.loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
 		}
 
-		if (image !== null) drawImage(image);
+		if (image !== null) {
+			const dimensions: Dimensions = {
+				Outfit: [
+					(background.width - (background.height * image.width / image.height)) / 2,
+					0,
+					background.height * image.width / image.height,
+					background.height
+				],
+				'Back Bling': [
+					0,
+					0,
+					background.height * image.width / image.height / 2,
+					background.height / 2
+				],
+				'Harvesting Tool': [
+					0,
+					background.height / 2,
+					background.height * image.width / image.height / 2,
+					background.height / 2
+				],
+				Glider: [
+					background.width - (background.height * image.width / image.height / 2),
+					0,
+					background.height * image.width / image.height / 2,
+					background.height / 2
+				]
+			};
+			ctx.drawImage(image, ...dimensions[displayType]);
+		}
 	};
 
 	const args: [StringOption, Link, string[]][] = [
