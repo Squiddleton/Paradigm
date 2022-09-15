@@ -235,94 +235,40 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
-	if (outfit !== null) {
-		const c = cosmetics.find(cosmetic => cosmetic.type.displayValue === 'Outfit' && noPunc(cosmetic.name.toLowerCase().replace(/ /g, '')) === noPunc(outfit));
-		if (c) {
-			const variants = c.variants?.[0];
-			if (variants) {
-				components.push(
-					new ActionRowBuilder({
-						components: [
-							new SelectMenuBuilder()
-								.setCustomId(c.id)
-								.setOptions([
-									{ label: 'Default Outfit', value: 'truedefault', default: true },
-									...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
-								])
-								.setMinValues(1)
-								.setMaxValues(1)
-						]
-					})
-				);
+
+	const handleVariants = (input: StringOption, displayValues: string[], displayType: string) => {
+		if (input !== null) {
+			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && noPunc(c.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
+			if (cosmetic !== undefined) {
+				const variants = cosmetic.variants?.[0];
+				if (variants) {
+					components.push(
+						new ActionRowBuilder({
+							components: [
+								new SelectMenuBuilder()
+									.setCustomId(cosmetic.id)
+									.setOptions([
+										{ label: `Default ${displayType}`, value: 'truedefault', default: true },
+										...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
+									])
+									.setMinValues(1)
+									.setMaxValues(1)
+							]
+						})
+					);
+				}
 			}
 		}
-	}
-	if (backbling !== null) {
-		const c = cosmetics.find(cosmetic => ['Back Bling', 'Pet'].includes(cosmetic.type.displayValue) && noPunc(cosmetic.name.toLowerCase().replace(/ /g, '')) === noPunc(backbling));
-		if (c) {
-			const variants = c.variants?.[0];
-			if (variants) {
-				components.push(
-					new ActionRowBuilder({
-						components: [
-							new SelectMenuBuilder()
-								.setCustomId(c.id)
-								.setOptions([
-									{ label: 'Default Back Bling', value: 'trudefault', default: true },
-									...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
-								])
-								.setMinValues(1)
-								.setMaxValues(1)
-						]
-					})
-				);
-			}
-		}
-	}
-	if (harvestingtool !== null) {
-		const c = cosmetics.find(cosmetic => cosmetic.type.displayValue === 'Harvesting Tool' && noPunc(cosmetic.name.toLowerCase().replace(/ /g, '')) === noPunc(harvestingtool));
-		if (c) {
-			const variants = c.variants?.[0];
-			if (variants) {
-				components.push(
-					new ActionRowBuilder({
-						components: [
-							new SelectMenuBuilder()
-								.setCustomId(c.id)
-								.setOptions([
-									{ label: 'Default Pickaxe', value: 'truedefault', default: true },
-									...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
-								])
-								.setMinValues(1)
-								.setMaxValues(1)
-						]
-					})
-				);
-			}
-		}
-	}
-	if (glider !== null) {
-		const c = cosmetics.find(cosmetic => cosmetic.type.displayValue === 'Glider' && noPunc(cosmetic.name.toLowerCase().replace(/ /g, '')) === noPunc(glider));
-		if (c) {
-			const variants = c.variants?.[0];
-			if (variants) {
-				components.push(
-					new ActionRowBuilder({
-						components: [
-							new SelectMenuBuilder()
-								.setCustomId(c.id)
-								.setOptions([
-									{ label: 'Default Glider', value: 'truedefault', default: true },
-									...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
-								])
-								.setMinValues(1)
-								.setMaxValues(1)
-						]
-					})
-				);
-			}
-		}
-	}
+	};
+
+	const args: [StringOption, string[], string][] = [
+		[outfit, ['Outfit'], 'Outfit'],
+		[backbling, ['Back Bling', 'Pet'], 'Back Bling'],
+		[harvestingtool, ['Harvesting Tool'], 'Pickaxe'],
+		[glider, ['Glider'], 'Glider']
+	];
+	args.forEach(arg => handleVariants(...arg));
+
 	if (components.length > 0) {
 		components.push(
 			new ActionRowBuilder({
