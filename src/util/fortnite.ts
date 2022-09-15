@@ -166,57 +166,65 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-	if (links.Outfit) {
-		const outfitImg = await Canvas.loadImage(links.Outfit);
-		ctx.drawImage(outfitImg, (background.width - (background.height * outfitImg.width / outfitImg.height)) / 2, 0, background.height * outfitImg.width / outfitImg.height, background.height);
-	}
-	else if (outfit) {
-		const o = cosmetics.find(e => e.type.displayValue === 'Outfit' && noPunc(e.name.toLowerCase().replace(/ /g, '')) === noPunc(outfit));
-		if (!o) {
-			return 'Invalid outfit name provided.';
-		}
-		const outfitImg = await Canvas.loadImage(o.images.featured ?? o.images.icon);
-		ctx.drawImage(outfitImg, (background.width - (background.height * outfitImg.width / outfitImg.height)) / 2, 0, background.height * outfitImg.width / outfitImg.height, background.height);
+	type Link = keyof typeof links;
+	type Dimensions = { [K in Link]: [number, number, number, number] };
 
-	}
+	const handleImage = async (input: StringOption, displayType: keyof typeof links, displayValues: string[]) => {
+		let image: Canvas.Image | null = null;
+		const link = links[displayType];
 
-	if (links['Back Bling']) {
-		const bb = await Canvas.loadImage(links['Back Bling']);
-		ctx.drawImage(bb, 0, 0, background.height * bb.width / bb.height / 2, background.height / 2);
-	}
-	else if (backbling) {
-		const bi = cosmetics.find(o => ['Back Bling', 'Pet'].some(value => o.type.displayValue === value) && noPunc(o.name.toLowerCase().replace(/ /g, '')) === noPunc(backbling));
-		if (!bi) {
-			return 'Invalid back bling name provided.';
-		}
-		const bb = await Canvas.loadImage(bi.images.featured ?? bi.images.icon);
-		ctx.drawImage(bb, 0, 0, background.height * bb.width / bb.height / 2, background.height / 2);
-	}
+		const drawImage = (img: Canvas.Image) => {
+			const dimensions: Dimensions = {
+				Outfit: [
+					(background.width - (background.height * img.width / img.height)) / 2,
+					0,
+					background.height * img.width / img.height,
+					background.height
+				],
+				'Back Bling': [
+					0,
+					0,
+					background.height * img.width / img.height / 2,
+					background.height / 2
+				],
+				'Harvesting Tool': [
+					0,
+					background.height / 2,
+					background.height * img.width / img.height / 2,
+					background.height / 2
+				],
+				Glider: [
+					background.width - (background.height * img.width / img.height / 2),
+					0,
+					background.height * img.width / img.height / 2,
+					background.height / 2
+				]
+			};
+			ctx.drawImage(img, ...dimensions[displayType]);
+		};
 
-	if (links['Harvesting Tool']) {
-		const ht = await Canvas.loadImage(links['Harvesting Tool']);
-		ctx.drawImage(ht, 0, background.height / 2, background.height * ht.width / ht.height / 2, background.height / 2);
-	}
-	else if (harvestingtool) {
-		const hi = cosmetics.find(o => o.type.displayValue === 'Harvesting Tool' && noPunc(o.name.toLowerCase().replace(/ /g, '')) === noPunc(harvestingtool));
-		if (!hi) {
-			return 'Invalid harvesting tool name provided.';
+		if (link !== undefined) {
+			image = await Canvas.loadImage(link);
 		}
-		const ht = await Canvas.loadImage(hi.images.featured ?? hi.images.icon);
-		ctx.drawImage(ht, 0, background.height / 2, background.height * ht.width / ht.height / 2, background.height / 2);
-	}
+		else if (input !== null) {
+			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && noPunc(e.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
+			if (cosmetic === undefined) {
+				throw new Error(`Invalid ${displayType} name provided.`);
+			}
+			image = await Canvas.loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
+		}
 
-	if (links.Glider) {
-		const gliderImg = await Canvas.loadImage(links.Glider);
-		ctx.drawImage(gliderImg, background.width - (background.height * gliderImg.width / gliderImg.height / 2), 0, background.height * gliderImg.width / gliderImg.height / 2, background.height / 2);
-	}
-	else if (glider) {
-		const gi = cosmetics.find(o => o.type.displayValue === 'Glider' && noPunc(o.name.toLowerCase().replace(/ /g, '')) === noPunc(glider));
-		if (!gi) {
-			return 'Invalid glider name provided.';
-		}
-		const gliderImg = await Canvas.loadImage(gi.images.featured ?? gi.images.icon);
-		ctx.drawImage(gliderImg, background.width - (background.height * gliderImg.width / gliderImg.height / 2), 0, background.height * gliderImg.width / gliderImg.height / 2, background.height / 2);
+		if (image !== null) drawImage(image);
+	};
+
+	const args: [StringOption, keyof typeof links, string[]][] = [
+		[outfit, 'Outfit', ['Outfit']],
+		[backbling, 'Back Bling', ['Back Bling', 'Pet']],
+		[harvestingtool, 'Harvesting Tool', ['Harvesting Tool']],
+		[glider, 'Glider', ['Glider']]
+	];
+	for (const arg of args) {
+		await handleImage(...arg);
 	}
 
 	if (wrap) {
