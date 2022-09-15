@@ -169,7 +169,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	type Link = keyof typeof links;
 	type Dimensions = { [K in Link]: [number, number, number, number] };
 
-	const handleImage = async (input: StringOption, displayType: keyof typeof links, displayValues: string[]) => {
+	const handleImage = async (input: StringOption, displayType: Link, displayValues: string[]) => {
 		let image: Canvas.Image | null = null;
 		const link = links[displayType];
 
@@ -217,7 +217,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		if (image !== null) drawImage(image);
 	};
 
-	const args: [StringOption, keyof typeof links, string[]][] = [
+	const args: [StringOption, Link, string[]][] = [
 		[outfit, 'Outfit', ['Outfit']],
 		[backbling, 'Back Bling', ['Back Bling', 'Pet']],
 		[harvestingtool, 'Harvesting Tool', ['Harvesting Tool']],
