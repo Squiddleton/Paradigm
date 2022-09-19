@@ -3,30 +3,30 @@ import { Client } from '../clients/discord.js';
 
 export type Scope = 'Dev' | 'Exclusive' | 'Global' | 'Guild';
 
-export interface CommandData {
+export interface BaseCommandData {
 	name: string;
 	permissions?: PermissionResolvable[];
 	scope: Scope;
 }
 
-export class Command {
+export abstract class BaseCommand {
 	name: string;
 	permissions: PermissionResolvable | null;
 	scope: Scope;
-	constructor(data: CommandData) {
+	constructor(data: BaseCommandData) {
 		this.name = data.name;
 		this.permissions = data.permissions ?? null;
 		this.scope = data.scope;
 	}
 }
 
-export interface SlashCommandData extends CommandData {
+export interface SlashCommandData extends BaseCommandData {
 	description: string;
 	options?: ApplicationCommandOptionData[];
 	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
 }
 
-export class SlashCommand extends Command {
+export class SlashCommand extends BaseCommand {
 	description: string;
 	options: ApplicationCommandOptionData[] = [];
 	execute: (interaction: ChatInputCommandInteraction, client: Client<true>) => Awaitable<void>;
@@ -50,14 +50,14 @@ export class SlashCommand extends Command {
 
 export type ContextMenuType = Exclude<ApplicationCommandType, ApplicationCommandType.ChatInput>;
 
-export interface ContextMenuData<Type extends ContextMenuType> extends CommandData {
+export interface ContextMenuData<Type extends ContextMenuType> extends BaseCommandData {
 	type: Type;
 	execute: Type extends ApplicationCommandType.Message
 		? (interaction: MessageContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>
 		: (interaction: UserContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>;
 }
 
-export class ContextMenu<Type extends ContextMenuType> extends Command {
+export class ContextMenu<Type extends ContextMenuType> extends BaseCommand {
 	type: Type;
 	execute: Type extends ApplicationCommandType.Message
 		? (interaction: MessageContextMenuCommandInteraction, client: Client<true>) => Awaitable<void>
