@@ -82,7 +82,7 @@ export default new SlashCommand({
 		}
 	],
 	scope: 'Guild',
-	permissions: [PermissionFlagsBits.ManageGuild],
+	permissions: PermissionFlagsBits.ManageGuild,
 	async execute(interaction) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
 

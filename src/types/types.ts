@@ -5,7 +5,7 @@ export type Scope = 'Dev' | 'Exclusive' | 'Global' | 'Guild';
 
 export interface BaseCommandData {
 	name: string;
-	permissions?: PermissionResolvable[];
+	permissions?: PermissionResolvable;
 	scope: Scope;
 }
 

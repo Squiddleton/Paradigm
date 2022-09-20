@@ -25,7 +25,7 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.Subcommand
 		}
 	],
-	permissions: [PermissionFlagsBits.ManageGuild],
+	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
 	async execute(interaction, client) {
 		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
