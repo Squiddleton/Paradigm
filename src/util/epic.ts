@@ -22,7 +22,7 @@ enum Endpoints {
 const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 
 const seasons = Array.from({
-	length: 21 // Increment this value every season
+	length: 22 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 type AnyObject = Record<string, unknown>;
