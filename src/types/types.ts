@@ -101,7 +101,7 @@ export class Event<T extends keyof ClientEvents> implements EventData<T> {
 	}
 }
 
-export const LanguageChoices: ApplicationCommandOptionChoiceData[] = Object.entries({
+export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
 	de: 'Deutsch',
 	en: 'English',
