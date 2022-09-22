@@ -8,11 +8,11 @@ const handleError = async (interaction: ChatInputCommandInteraction, error: unkn
 	if (!(error instanceof FortniteAPIError)) throw error;
 	switch (error.code) {
 		case 403: {
-			await interaction.reply({ content: 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.', ephemeral: true });
+			await interaction.editReply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
 			break;
 		}
 		case 404: {
-			await interaction.reply({ content: 'No account was found with that username on that platform.', ephemeral: true });
+			await interaction.editReply('No account was found with that username on that platform.');
 			break;
 		}
 	}
@@ -65,6 +65,7 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
+		await interaction.deferReply();
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn';
 		const input = (interaction.options.getString('input') ?? 'all') as 'all' | 'keyboardMouse' | 'gamepad' | 'touch';
@@ -73,13 +74,13 @@ export default new SlashCommand({
 		if (accountName === null) {
 			const user = await users.findById(interaction.user.id);
 			if (user === null || user.epicAccountId === null) {
-				await interaction.reply({ content: `No player username was provided, and you have not linked your account with ${interaction.client.user!.username}.`, ephemeral: true });
+				await interaction.editReply(`No player username was provided, and you have not linked your account with ${interaction.client.user!.username}.`);
 				return;
 			}
 
 			try {
 				const { image } = await FortniteAPI.stats({ id: user.epicAccountId, image: input, timeWindow });
-				await interaction.reply({ files: [image] });
+				await interaction.editReply({ files: [image] });
 			}
 			catch (error) {
 				await handleError(interaction, error);
@@ -88,7 +89,7 @@ export default new SlashCommand({
 		else {
 			try {
 				const { image, account } = await FortniteAPI.stats({ name: accountName, accountType, image: input, timeWindow });
-				await interaction.reply({ files: [image] });
+				await interaction.editReply({ files: [image] });
 
 				if (interaction.options.getBoolean('link')) {
 					await users.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
