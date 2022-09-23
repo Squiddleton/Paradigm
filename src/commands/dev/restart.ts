@@ -1,4 +1,4 @@
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'restart',

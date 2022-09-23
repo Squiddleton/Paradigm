@@ -1,16 +1,16 @@
 import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction, InteractionReplyOptions } from 'discord.js';
 import { findBestMatch, Rating } from 'string-similarity';
 
-import client from '../clients/discord.js';
 import guildSchema from'../schemas/guilds.js';
 import giveawayusers from'../schemas/giveawayusers.js';
 import behavior from'../schemas/behavior.js';
 import { noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
-import { ContextMenu, Event, SlashCommand } from '../types/types.js';
 import FortniteAPI from '../clients/fortnite.js';
 import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
+import { Client } from '../clients/discord.js';
+import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 
@@ -40,11 +40,13 @@ const shopCosmeticNames = itemShopCosmetics.map(mapByName);
 
 const playlists = [...new Set((await FortniteAPI.playlists()).map(mapByName))];
 
-export default new Event({
+export default new ClientEvent({
 	name: 'interactionCreate',
 	async execute(interaction) {
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
+		const { client } = interaction;
+		if (!(client instanceof Client) || !client.isReady()) throw new Error();
 		const { owner } = client.application;
 		if (!(owner instanceof User)) throw new Error('The owner is not a User instance.');
 
@@ -177,7 +179,7 @@ export default new Event({
 				return;
 			}
 
-			if (interaction.guildId === client.exclusiveGuild.id) {
+			if (interaction.guildId === client.exclusiveGuildId) {
 				const behaviorResult = await behavior.findById(interaction.guildId);
 				if (behaviorResult === null) throw new Error(`No behavior document was found for the guild with the id "${interaction.guildId}"`);
 				if (behaviorResult.behaviors[0][userId]) {

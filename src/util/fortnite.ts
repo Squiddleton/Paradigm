@@ -1,12 +1,14 @@
 // eslint-disable-next-line no-unused-vars
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
-import { noPunc, randomFromArray, validateChannel } from './functions.js';
+import { noPunc, randomFromArray } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
 import FortniteAPI from '../clients/fortnite.js';
+import { validateChannel } from '@squiddleton/discordjs-util';
+
 type StringOption = string | null;
 
 const backgrounds = {
@@ -89,7 +91,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				if (msgs.length !== 1 && g.wishlistChannelId !== null) {
 					msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
 					try {
-						const wishlistChannel = validateChannel(client, g.wishlistChannelId, `Guild (${guild.id}) wishlist channel`);
+						const wishlistChannel = validateChannel(client, g.wishlistChannelId);
 						if (wishlistChannel.type !== ChannelType.DM) {
 							const permissions = wishlistChannel.permissionsFor(client.user);
 							if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${wishlistChannel.id}"`);

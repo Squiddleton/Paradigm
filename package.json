@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@rmp135/imgur": "^0.6.0",
+    "@squiddleton/discordjs-util": "^1.0.0",
     "@squiddleton/fortnite-api": "^0.3.0",
     "canvas": "^2.9.3",
     "discord.js": "^14.1.1",

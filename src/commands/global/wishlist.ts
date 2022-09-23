@@ -3,7 +3,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, Embe
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import guilds from '../../schemas/guilds.js';
 
 interface UserProperties {

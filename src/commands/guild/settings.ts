@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 
 export default new SlashCommand({

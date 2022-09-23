@@ -1,24 +1,8 @@
-import { ClientEvents } from 'discord.js';
 import mongoose from 'mongoose';
 import { CommentStream, SubmissionStream } from 'snoostorm';
-import { readdirSync } from 'node:fs';
-
 import config from './config.js';
 import client from './clients/discord.js';
-import { Event } from './types/types.js';
 import snoowrap from './clients/snoowrap.js';
-
-const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
-for (const file of eventFiles) {
-	const f = await import(`./events/${file}`);
-	const event = f.default as Event<keyof ClientEvents>;
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	}
-	else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
-}
 
 client.login(config.token);
 mongoose.connect(config.mongoPath);

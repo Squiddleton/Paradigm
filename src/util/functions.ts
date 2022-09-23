@@ -1,10 +1,6 @@
-import { Client as BaseClient, codeBlock, Colors, CommandInteraction, EmbedBuilder, Guild, Snowflake, TextBasedChannel } from 'discord.js';
-import { inspect } from 'util';
-import { Client } from '../clients/discord.js';
+import { Colors, EmbedBuilder, Guild } from 'discord.js';
 import { IGiveaway } from '../schemas/guilds.js';
 import { Quantity } from '../types/types.js';
-
-const localScopes = ['Dev', 'Exclusive'];
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()
@@ -28,57 +24,6 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
-};
-
-export const deployCommands = async (client: Client<true>) => {
-	const application = await client.application.fetch();
-
-	await application.commands.set(client.commands
-		.filter(c => !localScopes.includes(c.scope))
-		.map(c => c.toJSON())
-	);
-
-	await client.devGuild.commands.set(client.commands
-		.filter(c => localScopes.includes(c.scope))
-		.map(c => c.toJSON())
-	);
-
-	await client.exclusiveGuild.commands.set(client.commands
-		.filter(c => c.scope === 'Exclusive')
-		.map(c => c.toJSON())
-	);
-};
-
-export const evalCommand = async (interaction: CommandInteraction, client: Client<true>, code: string, allowAsync: boolean) => {
-	if (interaction.user.id !== client.application.owner?.id) {
-		await interaction.reply({ content: 'Only the owner may use this command', ephemeral: true });
-		await client.devChannel.send(`${interaction.user} used the eval context menu with the argument "${code}" in ${interaction.channel} at <t:${Math.floor(Date.now() / 1000)}>`);
-		return;
-	}
-
-	await interaction.deferReply();
-
-	try {
-		const evaled = await eval(allowAsync ? `(async () => {${code}})();` : code);
-
-		switch (typeof evaled) {
-			case 'undefined': {
-				await interaction.editReply('No returned output to print.');
-				break;
-			}
-			case 'string': {
-				await interaction.editReply(evaled.slice(0, 2000));
-				break;
-			}
-			default: {
-				const isJSON = evaled !== null && typeof evaled === 'object' && evaled.constructor.name === 'Object';
-				await interaction.editReply(codeBlock(isJSON ? 'json' : 'js', (isJSON ? JSON.stringify(evaled, null, 2) : inspect(evaled)).slice(0, 1987)));
-			}
-		}
-	}
-	catch (error) {
-		await interaction.editReply(`\`ERROR\` ${codeBlock('xl', inspect(error))}`);
-	}
 };
 
 type noPuncOverload = {
@@ -111,10 +56,3 @@ export const quantity = (arr: string[]) => {
 };
 
 export const randomFromArray = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-
-export const validateChannel = (client: BaseClient, channelId: Snowflake, channelName: string): TextBasedChannel => {
-	const channel = client.channels.cache.get(channelId);
-	if (channel === undefined) throw new Error(`${channelName} is not cached, or the provided id "${channelId}" is incorrect`);
-	if (!channel.isTextBased()) throw new Error(`${channelName} is not text-based; received type "${channel.type}"`);
-	return channel;
-};

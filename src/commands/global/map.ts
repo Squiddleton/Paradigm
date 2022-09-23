@@ -1,6 +1,6 @@
 import { EmbedBuilder } from 'discord.js';
 import FortniteAPI from '../../clients/fortnite.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'map',

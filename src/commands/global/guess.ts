@@ -1,6 +1,6 @@
 import Canvas from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { cosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
 

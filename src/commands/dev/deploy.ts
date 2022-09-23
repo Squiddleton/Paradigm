@@ -1,5 +1,4 @@
-import { SlashCommand } from '../../types/types.js';
-import { deployCommands } from '../../util/functions.js';
+import { Client, SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'deploy',
@@ -8,7 +7,8 @@ export default new SlashCommand({
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
 
-		await deployCommands(client);
+		if (!(client instanceof Client)) throw new Error();
+		await client.deploy();
 
 		await interaction.editReply('Deployed all application commands.');
 		return;

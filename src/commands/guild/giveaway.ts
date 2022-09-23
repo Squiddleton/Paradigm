@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
-import { randomFromArray, quantity, validateChannel, createGiveawayEmbed } from '../../util/functions.js';
+import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 
 const unitToMS = {
 	minutes: 60,
@@ -224,7 +224,7 @@ export default new SlashCommand({
 				}
 
 				try {
-					const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
+					const giveawayChannel = validateChannel(client, giveaway.channelId);
 					try {
 						const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
@@ -306,7 +306,7 @@ export default new SlashCommand({
 				}
 
 				const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
-				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
+				const giveawayChannel = validateChannel(client, giveaway.channelId);
 				const message = await giveawayChannel.messages.fetch(messageId);
 				await message.reply(`This giveaway has been rerolled, so congratulations to the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
 
@@ -332,7 +332,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const giveawayChannel = validateChannel(client, giveaway.channelId, 'Giveaway channel');
+				const giveawayChannel = validateChannel(client, giveaway.channelId);
 				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
 				const quantities = quantity(giveaway.entrants);

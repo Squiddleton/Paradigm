@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { grantMilestone, isRarity, rarityOrdering } from '../../util/fortnite.js';
 
 export default new SlashCommand({

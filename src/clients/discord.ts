@@ -1,44 +1,31 @@
-import { ActivityType, ChannelType, Client as BaseClient, ClientOptions, Collection, GatewayIntentBits, Options, Partials } from 'discord.js';
+import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
-import { ContextMenu, ContextMenuType, SlashCommand } from '../types/types.js';
+import { Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 
-export class Client<Ready extends boolean = true> extends BaseClient<Ready> {
-	commands: Collection<string, ContextMenu<ContextMenuType> | SlashCommand>;
-	get devChannel() {
-		const channel = this.channels.cache.get(config.devChannelId);
-		if (channel === undefined) throw new Error(`Client#devChannel is not cached, or the provided id "${config.devChannelId}" is incorrect`);
-		if (channel.type === ChannelType.GuildText) return channel;
-		throw new Error('Client#devChannel did not return a TextChannel');
-	}
-	get devGuild() {
-		const guild = this.guilds.cache.get(config.devGuildId);
-		if (guild === undefined) throw new Error(`Client#devGuild is not cached, or the provided id "${config.devGuildId}" is incorrect`);
-		return guild;
-	}
-	get exclusiveGuild() {
-		const guild = this.guilds.cache.get(config.exclusiveGuildId);
-		if (guild === undefined) throw new Error(`Client#exclusiveGuild is not cached, or the provided id "${config.exclusiveGuildId}" is incorrect`);
-		return guild;
-	}
-	constructor(options: ClientOptions) {
-		super(options);
-		this.commands = new Collection();
-		for (const folder of readdirSync('./dist/commands')) {
-			const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
-			for (const file of commandFiles) {
-				import(`../commands/${folder}/${file}`).then(({ default: command }) => {
-					if (command instanceof ContextMenu || command instanceof SlashCommand) this.commands.set(command.name, command);
-				});
-			}
-		}
+const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
+for (const folder of readdirSync('./dist/commands')) {
+	const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const { default: command } = await import(`../commands/${folder}/${file}`);
+		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
 	}
 }
 
-export default new Client<true>({
+export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
+	get devChannel() {
+		if (!this.isReady()) throw new Error('The devChannel property cannot be accessed until the Client is ready');
+		return validateChannel(this, config.devChannelId);
+	}
+}
+
+const client = new Client({
 	allowedMentions: {
 		parse: ['users']
 	},
+	commands,
+	devGuildId: config.devGuildId,
+	exclusiveGuildId: config.exclusiveGuildId,
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMessageReactions,
@@ -67,3 +54,19 @@ export default new Client<true>({
 		}]
 	}
 });
+
+const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+	import(`../events/${file}`).then(({ default: event }) => {
+		if (event instanceof ClientEvent) {
+			if (event.once) {
+				client.once(event.name, event.execute);
+			}
+			else {
+				client.on(event.name, event.execute);
+			}
+		}
+	});
+}
+
+export default client;

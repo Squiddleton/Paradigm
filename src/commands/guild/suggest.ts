@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionType, Message } from 'discord.js';
 import Canvas from 'canvas';
-import { SlashCommand } from '../../types/types.js';
-import { validateChannel } from '../../util/functions.js';
+import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'suggest',
@@ -47,7 +46,7 @@ export default new SlashCommand({
 
 		const submissionName = interaction.options.getString('name');
 		const type = interaction.options.getString('type');
-		const submissionChannel = validateChannel(client, '895024792439251064', 'Submission channel');
+		const submissionChannel = validateChannel(client, '895024792439251064');
 
 		let message: Message;
 		try {

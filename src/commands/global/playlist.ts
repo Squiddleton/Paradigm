@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import FortniteAPI from '../../clients/fortnite.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { noPunc } from '../../util/functions.js';
 
 export default new SlashCommand({

@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
-import { ApplicationCommandOptionType, Formatters } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { ApplicationCommandOptionType, codeBlock } from 'discord.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'terminal',
@@ -17,7 +17,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		exec(interaction.options.getString('command', true), { encoding: 'utf8' }, async (error, stdout, stderr) => {
-			await interaction.editReply(Formatters.codeBlock('js', error ? stderr : stdout));
+			await interaction.editReply(codeBlock('js', error ? stderr : stdout));
 		});
 	}
 });

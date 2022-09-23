@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 
 export default new SlashCommand({

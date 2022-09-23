@@ -1,8 +1,9 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
-import { LanguageChoices, SlashCommand } from '../../types/types.js';
+import { LanguageChoices } from '../../types/types.js';
 import FortniteAPI from '../../clients/fortnite.js';
 import { Language } from '@squiddleton/fortnite-api';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'cosmetic',

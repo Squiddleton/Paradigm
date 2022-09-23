@@ -2,7 +2,7 @@ import { FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import FortniteAPI from '../../clients/fortnite.js';
 import users from '../../schemas/users.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
 
 const formatLevels = (levels: Record<string, number>, name?: string) => {

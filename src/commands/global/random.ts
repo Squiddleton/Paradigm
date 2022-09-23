@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'd
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { cosmetics, createCosmeticEmbed } from '../../util/fortnite.js';
 import Canvas from 'canvas';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'random',

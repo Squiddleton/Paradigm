@@ -2,7 +2,7 @@ import { FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
 import FortniteAPI from '../../clients/fortnite.js';
 import users from '../../schemas/users.js';
-import { SlashCommand } from '../../types/types.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 
 const handleError = async (interaction: ChatInputCommandInteraction, error: unknown) => {
 	if (!(error instanceof FortniteAPIError)) throw error;

@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import { SlashCommand } from '../../types/types.js';
-import { evalCommand } from '../../util/functions.js';
+import { evalCommand, SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
 	name: 'eval',
@@ -14,7 +13,7 @@ export default new SlashCommand({
 		}
 	],
 	scope: 'Dev',
-	async execute(interaction, client) {
-		await evalCommand(interaction, client, interaction.options.getString('code', true), false);
+	async execute(interaction) {
+		await evalCommand(interaction, interaction.options.getString('code', true), false);
 	}
 });
