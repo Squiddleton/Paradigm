@@ -346,14 +346,8 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-export const grantMilestone = async (userId: Snowflake, guildId: Snowflake, milestoneName: string) => {
-	const oldUserMilestones = await milestoneUserSchema.findOne({ userId, guildId, milestones: milestoneName });
-	if (oldUserMilestones?.milestones.includes(milestoneName)) return false;
-
-	await milestoneUserSchema.updateOne(
-		{ userId, guildId },
-		{ $push: { milestones: milestoneName } },
-		{ upsert: true }
-	);
-	return true;
-};
+export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => milestoneUserSchema.updateOne(
+	{ userId, guildId },
+	{ $addToSet: { milestones: milestoneName } },
+	{ upsert: true }
+);
