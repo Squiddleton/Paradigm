@@ -328,7 +328,8 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 						if (menu instanceof SelectMenuBuilder) {
 							menu.setOptions(value.startsWith('truedefault')
 								? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)]
-								: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(variant => ({ label: variant.name, value: variant.tag, default: variant.tag === value })).slice(0, 24)]);
+								: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(variant => ({ label: variant.name, value: variant.tag, default: variant.tag === value })).slice(0, 24)]
+							);
 						}
 						return row.setComponents([menu]);
 					});
