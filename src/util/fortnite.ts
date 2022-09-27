@@ -101,7 +101,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 									console.log(fullMsg);
 								}
 								else {
-									for (const message of fullMsg.match(/.{1,2000}/g) ?? []) {
+									for (const message of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
 										await wishlistChannel.send(message);
 									}
 								}
