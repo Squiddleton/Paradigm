@@ -143,11 +143,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const granted = await grantMilestone(member.id, guildId, milestoneName);
-				if (!granted) {
-					await interaction.reply({ content: `${member.displayName} already has the milestone \`${milestoneName}\`.`, ephemeral: true });
-					return;
-				}
+				await grantMilestone(member.id, guildId, milestoneName);
 				await interaction.reply(`You granted ${member.displayName} the following milestone: \`${milestoneName}\`.`);
 				return;
 			}
