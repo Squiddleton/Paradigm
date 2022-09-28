@@ -12,6 +12,9 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended"
   ],
+  "ignorePatterns": [
+    "dist"
+  ],
   "rules": {
     "@typescript-eslint/ban-types": "error",
     "brace-style": ["error", "stroustrup", { "allowSingleLine": true }],
