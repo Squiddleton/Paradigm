@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import giveawayUserSchema from '../../schemas/giveawayusers.js';
+import giveawayUserSchema, { IMessage } from '../../schemas/giveawayusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
@@ -35,7 +35,7 @@ export default new SlashCommand({
 		const max = interaction.options.getInteger('max') ?? 10;
 		const messages = await giveawayUserSchema.find();
 
-		const combineMsgs = (msgs: { day: number; msgs: number }[]): number => msgs
+		const combineMsgs = (msgs: IMessage[]): number => msgs
 			.filter(m => (31 - m.day) <= time)
 			.reduce((acc, msg) => acc + msg.msgs, 0);
 
