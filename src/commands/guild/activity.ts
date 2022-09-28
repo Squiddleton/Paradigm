@@ -27,7 +27,7 @@ export default new SlashCommand({
 			maxValue: 25
 		}
 	],
-	scope: 'Guild',
+	scope: 'Exclusive',
 	async execute(interaction, client) {
 		await interaction.deferReply();
 
