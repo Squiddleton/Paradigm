@@ -8,7 +8,7 @@ A Fortnite-themed Discord bot with a variety of commands.
 
 The developer-hosted invite link can be found [here](https://discord.com/api/oauth2/authorize?client_id=710314063892054016&permissions=274878024704&scope=applications.commands%20bot).
 
-For self-hosting with all features, the bot's `config.ts` file should be of the following structure (filing out all the strings as needed):
+For self-hosting with all features, the bot's `src/config.ts` file should be of the following structure (filing out all the strings as needed):
 
 ```ts
 export default {
