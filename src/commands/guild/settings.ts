@@ -15,7 +15,7 @@ export default new SlashCommand({
 					name: 'wishlistchannel',
 					description: 'The channel to send wishlist notifications in',
 					type: ApplicationCommandOptionType.Channel,
-					channelTypes: [ChannelType.GuildNews, ChannelType.GuildText, ChannelType.GuildVoice]
+					channelTypes: [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice]
 				}
 			]
 		},
