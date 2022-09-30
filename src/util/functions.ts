@@ -31,7 +31,6 @@ type noPuncOverload = {
 	(str: null | undefined): null;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const noPunc: noPuncOverload = (str: any) => {
 	if (!str) return null;
 	return str
