@@ -44,6 +44,7 @@
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/prefer-nullish-coalescing": "error",
     "@typescript-eslint/quotes": ["error", "single"],
+    "require-await": "error",
     "semi": "off",
     "@typescript-eslint/semi": ["error", "always"],
     "space-before-blocks": "off",

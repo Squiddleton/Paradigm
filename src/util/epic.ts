@@ -231,9 +231,9 @@ export const getAccount = async (nameOrId: string | string[], isId = false) => {
 	return epicFetch<EpicAccount[]>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
 };
 
-export const getBlockList = async (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
+export const getBlockList = (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
 
-export const getFriends = async (accountId: string) => epicFetch<Friend[]>(Endpoints.Friends.replace('{accountId}', accountId));
+export const getFriends = (accountId: string) => epicFetch<Friend[]>(Endpoints.Friends.replace('{accountId}', accountId));
 
 export const getLevels = async (accountId: string, accessToken?: string) => {
 	if (accessToken === undefined) {
@@ -255,9 +255,9 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 	return levels[0].stats;
 };
 
-export const getStats = async (accountId: string) => epicFetch<Stats>(Endpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
+export const getStats = (accountId: string) => epicFetch<Stats>(Endpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
 
-export const getTimeline = async () => epicFetch(Endpoints.Timeline);
+export const getTimeline = () => epicFetch(Endpoints.Timeline);
 
 export const mcpRequest = async (operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => {
 	const accessTokenAndId = await getAccessToken();
@@ -271,6 +271,6 @@ export const mcpRequest = async (operation: string, profile: 'common_public' | '
 	);
 };
 
-export const claimLoginReward = async () => mcpRequest('ClaimLoginReward', 'campaign');
+export const claimLoginReward = () => mcpRequest('ClaimLoginReward', 'campaign');
 
-export const setHomebaseName = async (homebaseName: string) => mcpRequest('SetHomebaseName', 'common_public', { homebaseName });
+export const setHomebaseName = (homebaseName: string) => mcpRequest('SetHomebaseName', 'common_public', { homebaseName });
