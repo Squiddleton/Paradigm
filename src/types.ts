@@ -1,5 +1,5 @@
 import type { ApplicationCommandOptionChoiceData } from 'discord.js';
-import type { DeviceAuth } from '../util/epic';
+import type { DeviceAuth } from './util/epic.js';
 
 export interface Config {
 	token: string;

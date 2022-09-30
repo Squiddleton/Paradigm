@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder, Guild } from 'discord.js';
-import { IGiveaway } from '../schemas/guilds.js';
-import { Quantity } from '../types/types.js';
+import type { IGiveaway } from '../schemas/guilds.js';
+import type { Quantity } from '../types.js';
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()
