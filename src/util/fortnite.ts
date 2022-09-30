@@ -119,13 +119,13 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	const color = {
-		'Common': 0xbebdb7,
-		'Uncommon': 0x1edd1d,
-		'Rare': 0x4e5afe,
-		'Epic': 0xa745cf,
-		'Legendary': 0xf76b11,
-		'Mythic': 0xfadb4b,
-		'Exotic': 0x7afff4,
+		Common: 0xbebdb7,
+		Uncommon: 0x1edd1d,
+		Rare: 0x4e5afe,
+		Epic: 0xa745cf,
+		Legendary: 0xf76b11,
+		Mythic: 0xfadb4b,
+		Exotic: 0x7afff4,
 		'Icon Series': 0x10626f,
 		'MARVEL SERIES': 0x630303,
 		'DC SERIES': 0x101b2a,

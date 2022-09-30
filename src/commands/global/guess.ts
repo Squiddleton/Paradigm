@@ -39,13 +39,13 @@ export default new SlashCommand({
 		);
 
 		const color = {
-			'Common': 0xbebdb7,
-			'Uncommon': 0x1edd1d,
-			'Rare': 0x4e5afe,
-			'Epic': 0xa745cf,
-			'Legendary': 0xf76b11,
-			'Mythic': 0xfadb4b,
-			'Exotic': 0x7afff4
+			Common: 0xbebdb7,
+			Uncommon: 0x1edd1d,
+			Rare: 0x4e5afe,
+			Epic: 0xa745cf,
+			Legendary: 0xf76b11,
+			Mythic: 0xfadb4b,
+			Exotic: 0x7afff4
 		}[cosmetic.rarity.displayValue];
 
 		const embed = new EmbedBuilder()
