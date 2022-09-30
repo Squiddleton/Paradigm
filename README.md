@@ -2,7 +2,7 @@
 
 ## About
 
-A Fortnite-themed Discord bot with a variety of commands.
+A Fortnite-themed Discord bot with a variety of commands. Its official support server can be found [here](https://discord.gg/7m62WmKFCp).
 
 ## Setup
 
