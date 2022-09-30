@@ -8,35 +8,18 @@ A Fortnite-themed Discord bot with a variety of commands.
 
 The developer-hosted invite link can be found [here](https://discord.com/api/oauth2/authorize?client_id=710314063892054016&permissions=274878024704&scope=applications.commands%20bot).
 
-For self-hosting with all features, the bot's `src/config.ts` file should be of the following structure (filing out all the strings as needed):
+For self-hosting with all features, the bot's `src/config.ts` file should be of the following structure (filing out all properties as needed):
 
 ```ts
-export default {
-    token: '',
-    devChannelId: '',
-    devGuildId: '',
-    exclusiveGuildId: '',
-    epicDeviceAuth: {
-        main: {
-            grant_type: 'device_auth' as const,
-            account_id: '',
-            device_id: '',
-            secret: ''
-        }
-    },
-    fortniteAPIKey: '',
-    imgurClientId: '',
-    mongoPath: '',
-    snoowrap: {
-        clientId: '',
-        clientSecret: '',
-        refreshToken: '',
-        userAgent: ''
-    }
-};
+import type { Config } from './types.js';
+
+const config: Config = { ... }; // Make object based on the Config interface
+
+export default config;
 ```
 
 The bot also relies on/makes use of the following permissions:
+
 * View Channels
 * Send Messages
 * Send Messages in Threads
