@@ -1,4 +1,25 @@
-import { ApplicationCommandOptionChoiceData } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData } from 'discord.js';
+import type { DeviceAuth } from '../util/epic';
+
+export interface Config {
+	token: string;
+	devChannelId: string;
+	devGuildId: string;
+	exclusiveGuildId: string;
+	epicDeviceAuth: {
+		main: DeviceAuth;
+		alt?: DeviceAuth;
+	};
+	fortniteAPIKey: string;
+	imgurClientId: string;
+	mongoPath: string;
+	snoowrap: {
+		clientId: string;
+		clientSecret: string;
+		refreshToken: string;
+		userAgent: string;
+	};
+}
 
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',

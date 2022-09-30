@@ -83,7 +83,7 @@ interface DeviceAuthResponse {
 	};
 }
 
-interface DeviceAuth {
+export interface DeviceAuth {
 	grant_type: 'device_auth';
 	account_id: string;
 	device_id: string;
