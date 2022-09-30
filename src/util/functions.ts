@@ -41,7 +41,12 @@ export const noPunc = (str: string) => str
 export const quantity = (arr: string[]) => {
 	const counts: Quantity = {};
 	for (const item of arr) {
-		counts[item] = 1 + (counts[item] || 0);
+		if (item in counts) {
+			counts[item]++;
+		}
+		else {
+			counts[item] = 1;
+		}
 	}
 	return counts;
 };
