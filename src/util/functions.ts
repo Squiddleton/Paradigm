@@ -26,20 +26,12 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 	return embed;
 };
 
-type noPuncOverload = {
-	(str: string): string;
-	(str: null | undefined): null;
-};
-
-export const noPunc: noPuncOverload = (str: any) => {
-	if (!str) return null;
-	return str
-		.toLowerCase()
-		.normalize('NFD')
-		.replace(/\p{Diacritic}/gu, '')
-		.replaceAll('&', 'and')
-		.replace(/[^0-9a-z]/gi, '');
-};
+export const noPunc = (str: string) => str
+	.toLowerCase()
+	.normalize('NFD')
+	.replace(/\p{Diacritic}/gu, '')
+	.replaceAll('&', 'and')
+	.replace(/[^0-9a-z]/gi, '');
 
 /**
  *
