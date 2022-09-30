@@ -132,7 +132,7 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	body
 });
 
-const checkError = async <Res = unknown>(raw: Response): Promise<Res> => {
+const checkError = async <Res>(raw: Response): Promise<Res> => {
 	const res = await raw.json() as Res | RawEpicError;
 	if (isError(res)) {
 		throw new EpicError(res);
