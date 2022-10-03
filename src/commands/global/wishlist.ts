@@ -120,8 +120,14 @@ export default new SlashCommand({
 					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
 
 				if (interaction.inCachedGuild()) {
-					const guild = await guilds.findById(interaction.guild.id);
-					if (guild === null || guild.wishlistChannelId === null) await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one up.', ephemeral: true });
+					const guild = await guilds.findById(interaction.guildId);
+					if (guild === null || guild.wishlistChannelId === null) {
+						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one.', ephemeral: true });
+					}
+					else if (interaction.guild.channels.cache.get(guild.wishlistChannelId) === undefined) {
+						await guilds.findByIdAndUpdate(interaction.guildId, { wishlistChannelId: null });
+						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. Members with the Manage Server permission can use `/settings edit` to set a new one.', ephemeral: true });
+					}
 				}
 				break;
 			}
