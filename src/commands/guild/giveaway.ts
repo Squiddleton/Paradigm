@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
+import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
 import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
@@ -198,7 +198,7 @@ export default new SlashCommand({
 			case 'edit': {
 				const messageId = interaction.options.getString('message', true);
 				const text = interaction.options.getString('text');
-				const time = interaction.options.getInteger('time');
+				const giveawayTime = interaction.options.getInteger('time');
 				const units = interaction.options.getString('unit');
 				const winners = interaction.options.getInteger('winners');
 				const messages = interaction.options.getInteger('messages');
@@ -234,11 +234,11 @@ export default new SlashCommand({
 						if (winners !== null) {
 							giveaway.winnerNumber = winners;
 						}
-						if (time !== null && units !== null && isUnit(units)) {
-							const endTime = giveaway.startTime + (time * unitToMS[units]);
+						if (giveawayTime !== null && units !== null && isUnit(units)) {
+							const endTime = giveaway.startTime + (giveawayTime * unitToMS[units]);
 							giveaway.endTime = endTime;
 						}
-						else if ((time !== null && units === null) || (time === null && units !== null)) {
+						else if ((giveawayTime !== null && units === null) || (giveawayTime === null && units !== null)) {
 							await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
 							return;
 						}
@@ -344,16 +344,15 @@ export default new SlashCommand({
 					.setThumbnail(interaction.guild.iconURL())
 					.setColor('Blue')
 					.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(0, inc).join('\n') || 'None'}`)
+					.setFields([
+						{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
+						{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
+						{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
+						{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
+						{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
+						{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
+					])
 					.setTimestamp();
-
-				embed.setFields([
-					{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
-					{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
-					{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
-					{ name: 'Time', value: `<t:${giveaway.startTime}> - <t:${giveaway.endTime}> `, inline: true },
-					{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
-					{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
-				]);
 
 				const willUseButtons = entrants.length > inc;
 				const firstButton = new ButtonBuilder()
@@ -462,7 +461,7 @@ export default new SlashCommand({
 				const messages = interaction.options.getInteger('messages') ?? 0;
 				const channel = interaction.options.getChannel('channel', true);
 				if (!channel.isTextBased()) return;
-				const time = interaction.options.getInteger('time', true);
+				const giveawayTime = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
 				const role1 = interaction.options.getRole('bonusrole1');
 				const role2 = interaction.options.getRole('bonusrole2');
@@ -476,7 +475,7 @@ export default new SlashCommand({
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
 				if (!isUnit(units)) throw new Error(`The unit "${units}" is not a valid unit`);
-				const endTime = startTime + (time * unitToMS[units]);
+				const endTime = startTime + (giveawayTime * unitToMS[units]);
 
 				const permissions = channel.permissionsFor(client.user);
 				if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${channel.id}"`);

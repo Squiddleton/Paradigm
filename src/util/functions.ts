@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, Guild } from 'discord.js';
+import { Colors, EmbedBuilder, Guild, time } from 'discord.js';
 import type { IGiveaway } from '../schemas/guilds.js';
 import type { Quantity } from '../types.js';
 
@@ -12,12 +12,12 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 				?
 				[
 					{ name: 'Winners', value: giveaway.winners.length === 0 ? 'None' : giveaway.winners.map((id, i) => `${i + 1}. <@${id}> (${id})`).join('\n'), inline: true },
-					{ name: 'Time', value: `Started <t:${giveaway.startTime}:R>\nEnded <t:${giveaway.endTime}:R>`, inline: true }
+					{ name: 'Time', value: `Started ${time(giveaway.startTime, 'R')}\nEnded ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
 				:
 				[
 					{ name: 'Winner Amount', value: giveaway.winnerNumber.toString(), inline: true },
-					{ name: 'Time', value: `Ends <t:${giveaway.endTime}:R>`, inline: true }
+					{ name: 'Time', value: `Ends ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
 		)
 		.setTimestamp();
