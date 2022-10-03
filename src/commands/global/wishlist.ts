@@ -122,11 +122,11 @@ export default new SlashCommand({
 				if (interaction.inCachedGuild()) {
 					const guild = await guilds.findById(interaction.guildId);
 					if (guild === null || guild.wishlistChannelId === null) {
-						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. Members with the Manage Server permission can use `/settings edit` to set one.', ephemeral: true });
+						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use `/settings edit` to set one.', ephemeral: true });
 					}
 					else if (interaction.guild.channels.cache.get(guild.wishlistChannelId) === undefined) {
 						await guilds.findByIdAndUpdate(interaction.guildId, { wishlistChannelId: null });
-						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. Members with the Manage Server permission can use `/settings edit` to set a new one.', ephemeral: true });
+						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use `/settings edit` to set a new one.', ephemeral: true });
 					}
 				}
 				break;
