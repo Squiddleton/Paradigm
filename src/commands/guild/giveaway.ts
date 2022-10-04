@@ -377,7 +377,7 @@ export default new SlashCommand({
 					.setCustomId('cancel')
 					.setLabel('Cancel')
 					.setStyle(ButtonStyle.Danger);
-				const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder({ components: [firstButton, backButton, forwardButton, lastButton, cancelButton] });
+				const row = new ActionRowBuilder<ButtonBuilder>({ components: [firstButton, backButton, forwardButton, lastButton, cancelButton] });
 
 				const msg: Message = await interaction.reply({ components: willUseButtons ? [row] : [], embeds: [embed], fetchReply: true });
 
@@ -501,7 +501,7 @@ export default new SlashCommand({
 					winners: []
 				};
 
-				const row: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder({ components: [
+				const row = new ActionRowBuilder<ButtonBuilder>({ components: [
 					new ButtonBuilder()
 						.setLabel('Enter')
 						.setCustomId('giveaway')
