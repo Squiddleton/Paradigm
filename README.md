@@ -29,7 +29,7 @@ The bot also relies on/makes use of the following permissions:
 
 ## Commands
 
-This is a non-exhaustive list of the bots' more unique commands that may require further explanation.
+This is a non-exhaustive list of the bot's more unique commands that may require further explanation.
 
 ### /milestone
 
