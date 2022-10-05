@@ -85,4 +85,4 @@ Remove a cosmetic from your wishlist. You can re-add cosmetics your wishlist at 
 
 ## Credits
 
-Epic Games, Inc. retains all of the rights to the Fortnite intellectual property. This package makes use of Fortnite-API and other external libraries listed in the `package.json` file.
+Epic Games, Inc. retains all of the rights to the Fortnite intellectual property. This package makes use of Fortnite-API and other external libraries listed in the [package.json](package.json) file.
