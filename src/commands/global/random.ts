@@ -144,7 +144,8 @@ export default new SlashCommand({
 					value: wrap.name,
 					inline: true
 				}
-			]);
+			])
+			.setTimestamp();
 		await interaction.editReply({ embeds: [embed], files: [attachment] });
 	}
 });

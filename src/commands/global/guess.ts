@@ -51,7 +51,8 @@ export default new SlashCommand({
 		const embed = new EmbedBuilder()
 			.setTitle('What is this Outfit?')
 			.setImage('attachment://outfit.png')
-			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);
+			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null)
+			.setTimestamp();
 
 		const message = await interaction.reply({ components: [row], embeds: [embed], files: [silhouette] });
 

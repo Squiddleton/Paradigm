@@ -18,6 +18,7 @@ export default new SlashCommand({
 					{ name: 'Landmarks', value: map.pois.filter(poi => poi.id.includes('UnNamedPOI')).length.toString(), inline: true }
 				])
 				.setColor('Blue')
+				.setTimestamp()
 		] });
 	}
 });

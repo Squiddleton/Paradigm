@@ -38,6 +38,7 @@ export default new SlashCommand({
 					{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
 				])
 				.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })
+				.setTimestamp()
 		] });
 	}
 });

@@ -157,8 +157,8 @@ export default new SlashCommand({
 						})
 						.join('\n'))
 					.setThumbnail(user.avatar)
-					.setTimestamp()
-					.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`);
+					.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
+					.setTimestamp();
 				await interaction.reply({ embeds: [embed], ephemeral: !user.same });
 				break;
 			}
