@@ -6,7 +6,7 @@ import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
-import FortniteAPI from '../clients/fortnite.js';
+import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
 
 type StringOption = string | null;
@@ -30,7 +30,7 @@ export const rarityOrdering = {
 };
 export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
 
-export const cosmetics = await FortniteAPI.listCosmetics();
+export const cosmetics = await fortniteAPI.listCosmetics();
 
 export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 	if (cosmetic.shopHistory?.length) return true;
@@ -53,7 +53,7 @@ export const findCosmetic = (input: string, itemShop = false) => {
 };
 
 export const fetchItemShop = async () => {
-	const rawAPI = await FortniteAPI.shop({ combined: true });
+	const rawAPI = await fortniteAPI.shop({ combined: true });
 
 	const withoutDupes: Cosmetic[] = [];
 	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(entry => entry.items).flat();

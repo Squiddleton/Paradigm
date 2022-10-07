@@ -1,6 +1,6 @@
 import { FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
-import FortniteAPI from '../../clients/fortnite.js';
+import fortniteAPI from '../../clients/fortnite.js';
 import users from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
@@ -78,7 +78,7 @@ export default new SlashCommand({
 		}
 		else {
 			try {
-				const { account } = await FortniteAPI.stats({ name: accountName, accountType });
+				const { account } = await fortniteAPI.stats({ name: accountName, accountType });
 				const levels = await getLevels(account.id);
 				await interaction.reply(formatLevels(levels, account.name));
 

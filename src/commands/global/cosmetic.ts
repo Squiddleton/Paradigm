@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
 import { LanguageChoices } from '../../types.js';
-import FortniteAPI from '../../clients/fortnite.js';
+import fortniteAPI from '../../clients/fortnite.js';
 import { Language } from '@squiddleton/fortnite-api';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 
@@ -34,7 +34,7 @@ export default new SlashCommand({
 			await interaction.editReply('No cosmetic matches your query.');
 		}
 		else {
-			await interaction.editReply({ embeds: [createCosmeticEmbed(language === null ? item : await FortniteAPI.findCosmetic({ id: item.id, language }))] });
+			await interaction.editReply({ embeds: [createCosmeticEmbed(language === null ? item : await fortniteAPI.findCosmetic({ id: item.id, language }))] });
 		}
 	}
 });

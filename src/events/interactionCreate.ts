@@ -7,7 +7,7 @@ import behavior from'../schemas/behavior.js';
 import { isReadyClient, noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
-import FortniteAPI from '../clients/fortnite.js';
+import fortniteAPI from '../clients/fortnite.js';
 import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 
@@ -37,7 +37,7 @@ const filterCosmetics = async (interaction: AutocompleteInteraction, input: stri
 const cosmeticNames = cosmetics.map(mapByName);
 const shopCosmeticNames = itemShopCosmetics.map(mapByName);
 
-const playlists = [...new Set((await FortniteAPI.playlists()).map(mapByName))];
+const playlists = [...new Set((await fortniteAPI.playlists()).map(mapByName))];
 
 export default new ClientEvent({
 	name: 'interactionCreate',

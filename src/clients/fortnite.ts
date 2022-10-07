@@ -1,6 +1,5 @@
-import { Client } from '@squiddleton/fortnite-api';
+import { Client as FortniteAPIClient } from '@squiddleton/fortnite-api';
 import config from '../config.js';
 
-const FortniteAPI = new Client({ key: config.fortniteAPIKey });
-
-export default FortniteAPI;
+const fortniteAPI = new FortniteAPIClient({ key: config.fortniteAPIKey });
+export default fortniteAPI;

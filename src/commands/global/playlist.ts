@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import FortniteAPI from '../../clients/fortnite.js';
+import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { noPunc } from '../../util/functions.js';
 
@@ -20,7 +20,7 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const input = interaction.options.getString('playlist', true);
-		const playlists = await FortniteAPI.playlists();
+		const playlists = await fortniteAPI.playlists();
 
 		const playlist = playlists.find(mode => [mode.name, mode.id].some(keyword => noPunc(keyword) === noPunc(input)));
 		if (playlist === undefined) {

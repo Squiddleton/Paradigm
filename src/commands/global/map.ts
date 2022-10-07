@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import FortniteAPI from '../../clients/fortnite.js';
+import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
@@ -7,7 +7,7 @@ export default new SlashCommand({
 	description: 'Display info about the current Fortnite island',
 	scope: 'Global',
 	async execute(interaction) {
-		const map = await FortniteAPI.map();
+		const map = await fortniteAPI.map();
 
 		await interaction.reply({ embeds: [
 			new EmbedBuilder()

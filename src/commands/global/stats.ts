@@ -1,6 +1,6 @@
 import { FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'discord.js';
-import FortniteAPI from '../../clients/fortnite.js';
+import fortniteAPI from '../../clients/fortnite.js';
 import users from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 
@@ -79,7 +79,7 @@ export default new SlashCommand({
 			}
 
 			try {
-				const { image } = await FortniteAPI.stats({ id: user.epicAccountId, image: input, timeWindow });
+				const { image } = await fortniteAPI.stats({ id: user.epicAccountId, image: input, timeWindow });
 				await interaction.editReply({ files: [image] });
 			}
 			catch (error) {
@@ -88,7 +88,7 @@ export default new SlashCommand({
 		}
 		else {
 			try {
-				const { image, account } = await FortniteAPI.stats({ name: accountName, accountType, image: input, timeWindow });
+				const { image, account } = await fortniteAPI.stats({ name: accountName, accountType, image: input, timeWindow });
 				await interaction.editReply({ files: [image] });
 
 				if (interaction.options.getBoolean('link')) {

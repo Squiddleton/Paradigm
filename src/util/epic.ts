@@ -1,6 +1,6 @@
 import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
-import FortniteAPI from '../clients/fortnite.js';
+import fortniteAPI from '../clients/fortnite.js';
 import type { DateString } from '@squiddleton/fortnite-api';
 
 enum Endpoints {
@@ -184,7 +184,7 @@ export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) 
  * @returns Device auth credentials
  */
 export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {
-	const stats = await FortniteAPI.stats({ name: accountName });
+	const stats = await fortniteAPI.stats({ name: accountName });
 	const accountId = stats.account.id;
 
 	const { access_token } = await epicFetch<AuthorizationCodeResponse>(Endpoints.AccessToken, {

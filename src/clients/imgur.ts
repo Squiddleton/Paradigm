@@ -1,4 +1,5 @@
-import { Client } from '@rmp135/imgur';
+import { Client as ImgurClient } from '@rmp135/imgur';
 import config from '../config.js';
 
-export default new Client(config.imgurClientId);
+const imgur = new ImgurClient(config.imgurClientId);
+export default imgur;
