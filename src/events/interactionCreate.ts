@@ -4,12 +4,11 @@ import { findBestMatch, Rating } from 'string-similarity';
 import guildSchema from'../schemas/guilds.js';
 import giveawayusers from'../schemas/giveawayusers.js';
 import behavior from'../schemas/behavior.js';
-import { noPunc } from'../util/functions.js';
+import { isReadyClient, noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import FortniteAPI from '../clients/fortnite.js';
 import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
-import { Client } from '../clients/discord.js';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
@@ -46,7 +45,7 @@ export default new ClientEvent({
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
-		if (!(client instanceof Client) || !client.isReady()) throw new Error();
+		if (!isReadyClient(client)) throw new Error();
 		const { owner } = client.application;
 		if (!(owner instanceof User)) throw new Error('The owner is not a User instance.');
 

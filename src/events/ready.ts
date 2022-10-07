@@ -1,11 +1,10 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
-import { createGiveawayEmbed, randomFromArray } from '../util/functions.js';
+import { createGiveawayEmbed, isReadyClient, randomFromArray } from '../util/functions.js';
 import behaviorSchema from '../schemas/behavior.js';
 import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
-import { Client } from '../clients/discord.js';
 import { ClientEvent, validateChannel } from '@squiddleton/discordjs-util';
 
 export default new ClientEvent({
@@ -15,7 +14,7 @@ export default new ClientEvent({
 		await client.application.fetch();
 
 		const readyMessage = `${client.user.username} is ready!`;
-		if (!(client instanceof Client) || !client.isReady()) throw new Error();
+		if (!isReadyClient(client)) throw new Error();
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
