@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionChoiceData } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ColorResolvable } from 'discord.js';
 
 export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = [
 	'Gold',
@@ -7,6 +7,14 @@ export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = [
 	'Blue',
 	'Green'
 ].map(background => ({ name: background, value: background.toLowerCase() }));
+
+export const BackgroundURLs = {
+	gold: 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
+	orange: 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
+	purple: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
+	blue: 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
+	green: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
+};
 
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
@@ -26,6 +34,27 @@ export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Obj
 	'zh-Hant': '官話'
 }).map(([key, value]) => ({ name: value, value: key }));
 
+export const Rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+
+export const RarityColors: Record<string, ColorResolvable> = {
+	Common: 0xbebdb7,
+	Uncommon: 0x1edd1d,
+	Rare: 0x4e5afe,
+	Epic: 0xa745cf,
+	Legendary: 0xf76b11,
+	Mythic: 0xfadb4b,
+	Exotic: 0x7afff4,
+	'Icon Series': 0x10626f,
+	'MARVEL SERIES': 0x630303,
+	'DC SERIES': 0x101b2a,
+	'Star Wars Series': 0x000201,
+	'DARK SERIES': 0x25053d,
+	'Frozen Series': 0x93c3e0,
+	'Lava Series': 0x7c2921,
+	'Shadow Series': 0x0f0f0f,
+	'Slurp Series': 0x1ac1a4,
+	'Gaming Legends Series': 0x1f0937
+};
 
 export const RarityOrdering = {
 	Common: 0,
@@ -34,4 +63,10 @@ export const RarityOrdering = {
 	Epic: 3,
 	Legendary: 4,
 	Mythic: 5
+};
+
+export const UnitsToMS = {
+	minutes: 60,
+	hours: 3600,
+	days: 86400
 };

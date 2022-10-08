@@ -3,6 +3,7 @@ import { noPunc, randomFromArray } from '../../util/functions.js';
 import { cosmetics, createCosmeticEmbed } from '../../util/fortnite.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { BackgroundURLs } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'random',
@@ -92,8 +93,7 @@ export default new SlashCommand({
 		const outfits = cosmetics.filter(i => i.type.displayValue === 'Outfit');
 		const outfit = randomFromArray(outfits);
 
-		const bgs = ['https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg', 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg', 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg', 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg', 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'];
-		const background = await Canvas.loadImage(randomFromArray(bgs));
+		const background = await Canvas.loadImage(randomFromArray(Object.values(BackgroundURLs)));
 		const canvas = Canvas.createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);

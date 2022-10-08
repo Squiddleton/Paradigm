@@ -8,18 +8,12 @@ import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { RarityOrdering } from '../constants.js';
+import { BackgroundURLs, RarityColors, RarityOrdering } from '../constants.js';
 
 type StringOption = string | null;
 
-const backgrounds = {
-	gold: 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
-	orange: 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
-	purple: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
-	blue: 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
-	green: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
-};
-const isBackground = (str: string): str is keyof typeof backgrounds => str in backgrounds;
+
+const isBackground = (str: string): str is keyof typeof BackgroundURLs => str in BackgroundURLs;
 
 export const isRarity = (rarity: string): rarity is keyof typeof RarityOrdering => rarity in RarityOrdering;
 
@@ -111,25 +105,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 };
 
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
-	const color = {
-		Common: 0xbebdb7,
-		Uncommon: 0x1edd1d,
-		Rare: 0x4e5afe,
-		Epic: 0xa745cf,
-		Legendary: 0xf76b11,
-		Mythic: 0xfadb4b,
-		Exotic: 0x7afff4,
-		'Icon Series': 0x10626f,
-		'MARVEL SERIES': 0x630303,
-		'DC SERIES': 0x101b2a,
-		'Star Wars Series': 0x000201,
-		'DARK SERIES': 0x25053d,
-		'Frozen Series': 0x93c3e0,
-		'Lava Series': 0x7c2921,
-		'Shadow Series': 0x0f0f0f,
-		'Slurp Series': 0x1ac1a4,
-		'Gaming Legends Series': 0x1f0937
-	}[cosmetic.rarity.displayValue] ?? 'Random';
+	const color = RarityColors[cosmetic.rarity.displayValue] ?? 'Random';
 
 	const embed = new EmbedBuilder()
 		.setTitle(cosmetic.name)
@@ -156,7 +132,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
-	const rawBackground = noBackground ? randomFromArray(Object.values(backgrounds)) : backgrounds[chosenBackground];
+	const rawBackground = noBackground ? randomFromArray(Object.values(BackgroundURLs)) : BackgroundURLs[chosenBackground];
 	const background = await Canvas.loadImage(rawBackground);
 	const canvas = Canvas.createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');

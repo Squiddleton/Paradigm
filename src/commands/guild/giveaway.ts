@@ -2,13 +2,10 @@ import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBu
 import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { UnitsToMS } from '../../constants.js';
 
-const unitToMS = {
-	minutes: 60,
-	hours: 3600,
-	days: 86400
-};
-const isUnit = (unit: string): unit is keyof typeof unitToMS => unit in unitToMS;
+
+const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
 
 export default new SlashCommand({
 	name: 'giveaway',
@@ -235,7 +232,7 @@ export default new SlashCommand({
 							giveaway.winnerNumber = winners;
 						}
 						if (giveawayTime !== null && units !== null && isUnit(units)) {
-							const endTime = giveaway.startTime + (giveawayTime * unitToMS[units]);
+							const endTime = giveaway.startTime + (giveawayTime * UnitsToMS[units]);
 							giveaway.endTime = endTime;
 						}
 						else if ((giveawayTime !== null && units === null) || (giveawayTime === null && units !== null)) {
@@ -475,7 +472,7 @@ export default new SlashCommand({
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
 				if (!isUnit(units)) throw new Error(`The unit "${units}" is not a valid unit`);
-				const endTime = startTime + (giveawayTime * unitToMS[units]);
+				const endTime = startTime + (giveawayTime * UnitsToMS[units]);
 
 				const permissions = channel.permissionsFor(client.user);
 				if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${channel.id}"`);

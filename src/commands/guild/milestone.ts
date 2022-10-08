@@ -3,7 +3,7 @@ import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { grantMilestone, isRarity } from '../../util/fortnite.js';
-import { RarityOrdering } from '../../constants.js';
+import { Rarities, RarityOrdering } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'milestone',
@@ -31,14 +31,7 @@ export default new SlashCommand({
 					description: 'The milestone\'s rarity',
 					type: ApplicationCommandOptionType.String,
 					required: true,
-					choices: [
-						{ name: 'Common', value: 'Common' },
-						{ name: 'Uncommon', value: 'Uncommon' },
-						{ name: 'Rare', value: 'Rare' },
-						{ name: 'Epic', value: 'Epic' },
-						{ name: 'Legendary', value: 'Legendary' },
-						{ name: 'Mythic', value: 'Mythic' }
-					]
+					choices: Rarities.map(rarity => ({ name: rarity, value: rarity }))
 				}
 			]
 		},

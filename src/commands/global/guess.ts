@@ -3,6 +3,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorR
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { cosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
+import { RarityColors } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'guess',
@@ -38,15 +39,7 @@ export default new SlashCommand({
 				.setCustomId('guess')
 		);
 
-		const color = {
-			Common: 0xbebdb7,
-			Uncommon: 0x1edd1d,
-			Rare: 0x4e5afe,
-			Epic: 0xa745cf,
-			Legendary: 0xf76b11,
-			Mythic: 0xfadb4b,
-			Exotic: 0x7afff4
-		}[cosmetic.rarity.displayValue];
+		const color = RarityColors[cosmetic.rarity.displayValue];
 
 		const embed = new EmbedBuilder()
 			.setTitle('What is this Outfit?')
