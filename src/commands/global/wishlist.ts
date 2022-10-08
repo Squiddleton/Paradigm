@@ -1,19 +1,13 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder, Snowflake } from 'discord.js';
+import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder } from 'discord.js';
 
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guilds from '../../schemas/guilds.js';
+import type { DisplayUserProperties } from '../../types.js';
 
-interface UserProperties {
-	id: Snowflake;
-	username: string;
-	color: number;
-	avatar: string;
-	same: boolean;
-}
-const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<UserProperties> => {
+const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<DisplayUserProperties> => {
 	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
 	// Users must be force-fetched to retrieve banners
 	const user = await unfetchedUser.fetch();

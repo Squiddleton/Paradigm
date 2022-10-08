@@ -1,7 +1,7 @@
 import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
-import type { DateString } from '@squiddleton/fortnite-api';
+import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from '../types.js';
 
 enum Endpoints {
 	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
@@ -25,104 +25,6 @@ const seasons = Array.from({
 	length: 22 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
-type AnyObject = Record<string, unknown>;
-
-interface RawEpicError {
-	errorCode: string;
-	errorMessage: string;
-	messageVars: string[];
-	numericErrorCode: number;
-	originatingService: string;
-	intent: string;
-}
-
-export class EpicError extends Error {
-	constructor(error: RawEpicError) {
-		super(error.errorMessage);
-		Object.assign(this, error);
-	}
-}
-
-const isError = (obj: any): obj is RawEpicError => 'errorCode' in obj;
-
-interface AccessTokenResponse {
-	access_token: string;
-	expires_in: number;
-	expires_at: DateString;
-	token_type: string;
-	refresh_token: string;
-	refresh_expires: number;
-	refresh_expires_at: DateString;
-	account_id: string;
-	client_id: string;
-	internal_client: boolean;
-	client_service: string;
-	displayName: string;
-	app: string;
-	in_app_id: string;
-	device_id: string;
-}
-
-interface AuthorizationCodeResponse extends AccessTokenResponse {
-	scope: unknown[];
-	ext_auth_id: string;
-	ext_auth_type: string;
-	ext_auth_method: string;
-	ext_auth_display_name: string;
-}
-
-interface DeviceAuthResponse {
-	deviceId: string;
-	accountId: string;
-	secret: string;
-	userAgent: string;
-	created: {
-		location: string;
-		ipAddress: string;
-		dateTime: DateString;
-	};
-}
-
-export interface DeviceAuth {
-	grant_type: 'device_auth';
-	account_id: string;
-	device_id: string;
-	secret: string;
-}
-
-interface AccessTokenAndId {
-	accessToken: string;
-	accountId: string;
-}
-
-interface EpicAccount {
-	id: string;
-	displayName: string;
-	passwordResetRequired?: boolean;
-	links?: AnyObject;
-	externalAuths: Record<string, AnyObject>;
-}
-
-interface BlockList {
-	blockedUsers: string[];
-}
-
-interface Friend {
-	accountId: string;
-	status: string;
-	direction: string;
-	alias?: string;
-	created: DateString;
-	favorite: boolean;
-}
-
-interface Stats {
-	startTime: number;
-	endTime: number;
-	stats: Record<string, number>;
-	accountId: string;
-}
-
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	method: 'post',
 	headers: {
@@ -131,6 +33,15 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	},
 	body
 });
+
+const isError = (obj: any): obj is RawEpicError => 'errorCode' in obj;
+
+export class EpicError extends Error {
+	constructor(error: RawEpicError) {
+		super(error.errorMessage);
+		Object.assign(this, error);
+	}
+}
 
 const checkError = async <Res>(raw: Response): Promise<Res> => {
 	const res = await raw.json() as Res | RawEpicError;

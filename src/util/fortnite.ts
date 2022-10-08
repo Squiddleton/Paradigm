@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
 import { noPunc, randomFromArray } from './functions.js';
@@ -9,9 +8,7 @@ import { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
 import { BackgroundURLs, RarityColors, RarityOrdering } from '../constants.js';
-
-type StringOption = string | null;
-
+import type { StringOption } from '../types.js';
 
 const isBackground = (str: string): str is keyof typeof BackgroundURLs => str in BackgroundURLs;
 

@@ -1,38 +1,7 @@
 import mongoose from 'mongoose';
+import type { IBonusRole, IGiveaway, IGuild, IMilestone } from '../types.js';
 
-export interface BonusRole {
-	id: string;
-	amount: number;
-}
-
-export interface IGiveaway {
-	messageId: string;
-	channelId: string;
-	text: string;
-	startTime: number;
-	endTime: number;
-	completed: boolean;
-	messages: number;
-	bonusRoles: BonusRole[];
-	winnerNumber: number;
-	entrants: string[];
-	winners: string[];
-}
-
-interface IMilestone {
-	name: string;
-	description: string;
-	rarity: string;
-}
-
-interface IGuild {
-	_id: string;
-	giveaways: IGiveaway[];
-	milestones: IMilestone[];
-	wishlistChannelId: string | null;
-}
-
-const bonusRoleSchema = new mongoose.Schema<BonusRole>({
+const bonusRoleSchema = new mongoose.Schema<IBonusRole>({
 	id: {
 		type: String,
 		required: true
