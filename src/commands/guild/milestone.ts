@@ -2,7 +2,8 @@ import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 
 import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { grantMilestone, isRarity, rarityOrdering } from '../../util/fortnite.js';
+import { grantMilestone, isRarity } from '../../util/fortnite.js';
+import { RarityOrdering } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'milestone',
@@ -163,7 +164,7 @@ export default new SlashCommand({
 					let i = 0;
 					for (const milestone of milestones.sort((a, b) => {
 						if (!isRarity(a.rarity) || !isRarity(b.rarity)) throw new Error(`The rarity of a milestone in the guild with the id of "${guildId}" is not a valid rarity.`);
-						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : rarityOrdering[a.rarity] - rarityOrdering[b.rarity];
+						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : RarityOrdering[a.rarity] - RarityOrdering[b.rarity];
 					})) {
 						if (i < 25) embed.addFields([{ name: milestone.name, value: milestone.description, inline: true }]);
 						i++;

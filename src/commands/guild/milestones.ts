@@ -2,7 +2,8 @@ import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { isRarity, rarityOrdering } from '../../util/fortnite.js';
+import { isRarity } from '../../util/fortnite.js';
+import { RarityOrdering } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'milestones',
@@ -53,7 +54,7 @@ export default new SlashCommand({
 				if (!isRarity(fullA.rarity)) throw new Error(`"${fullA.rarity} is not a valid rarity`);
 				if (!isRarity(fullB.rarity)) throw new Error(`"${fullB.rarity} is not a valid rarity`);
 
-				return fullA.rarity === fullB.rarity ? fullA.name > fullB.name ? 1 : -1 : rarityOrdering[fullA.rarity] - rarityOrdering[fullB.rarity];
+				return fullA.rarity === fullB.rarity ? fullA.name > fullB.name ? 1 : -1 : RarityOrdering[fullA.rarity] - RarityOrdering[fullB.rarity];
 			})) {
 				const milestoneWithDescription = milestones.find(m => m.name === milestone);
 				if (milestoneWithDescription === undefined) throw new Error(`No milestone matches the name "${milestone}"`);

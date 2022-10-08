@@ -8,6 +8,7 @@ import userSchema from '../schemas/users.js';
 import { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
+import { RarityOrdering } from '../constants.js';
 
 type StringOption = string | null;
 
@@ -20,15 +21,7 @@ const backgrounds = {
 };
 const isBackground = (str: string): str is keyof typeof backgrounds => str in backgrounds;
 
-export const rarityOrdering = {
-	Common: 0,
-	Uncommon: 1,
-	Rare: 2,
-	Epic: 3,
-	Legendary: 4,
-	Mythic: 5
-};
-export const isRarity = (rarity: string): rarity is keyof typeof rarityOrdering => rarity in rarityOrdering;
+export const isRarity = (rarity: string): rarity is keyof typeof RarityOrdering => rarity in RarityOrdering;
 
 export const cosmetics = await fortniteAPI.listCosmetics();
 
