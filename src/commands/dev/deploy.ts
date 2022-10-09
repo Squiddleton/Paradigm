@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { isReadyClient } from '../../util/functions';
+import { isReadyClient } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'deploy',
