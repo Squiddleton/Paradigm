@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBu
 import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
-import { UnitsToMS } from '../../constants.js';
+import { UnitChoices, UnitsToMS } from '../../constants.js';
 import type { IGiveaway } from '../../types.js';
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
@@ -36,11 +36,7 @@ export default new SlashCommand({
 					name: 'unit',
 					description: 'The updated unit of time to host the giveaway',
 					type: ApplicationCommandOptionType.String,
-					choices: [
-						{ name: 'Minutes', value: 'minutes' },
-						{ name: 'Hours', value: 'hours' },
-						{ name: 'Days', value: 'days' }
-					]
+					choices: UnitChoices
 				},
 				{
 					name: 'winners',
@@ -140,11 +136,7 @@ export default new SlashCommand({
 					description: 'Unit of time to host the giveaway',
 					type: ApplicationCommandOptionType.String,
 					required: true,
-					choices: [
-						{ name: 'Minutes', value: 'minutes' },
-						{ name: 'Hours', value: 'hours' },
-						{ name: 'Days', value: 'days' }
-					]
+					choices: UnitChoices
 				},
 				{
 					name: 'winners',

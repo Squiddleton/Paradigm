@@ -5,6 +5,7 @@ import userSchema from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
 import { EpicErrorCode } from '../../types.js';
+import { PlatformChoices } from '../../constants.js';
 
 const formatLevels = (levels: Record<string, number>, name?: string) => {
 	return `${name === undefined
@@ -55,11 +56,7 @@ export default new SlashCommand({
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
-			choices: [
-				{ name: 'Epic', value: 'epic' },
-				{ name: 'Xbox', value: 'xbl' },
-				{ name: 'PlayStation', value: 'psn' }
-			]
+			choices: PlatformChoices
 		},
 		{
 			name: 'link',

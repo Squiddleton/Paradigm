@@ -3,6 +3,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction } from 'disco
 import fortniteAPI from '../../clients/fortnite.js';
 import userSchema from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { PlatformChoices } from '../../constants.js';
 
 const handleError = async (interaction: ChatInputCommandInteraction, error: unknown) => {
 	if (!(error instanceof FortniteAPIError)) throw error;
@@ -31,11 +32,7 @@ export default new SlashCommand({
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
-			choices: [
-				{ name: 'Epic', value: 'epic' },
-				{ name: 'Xbox', value: 'xbl' },
-				{ name: 'PlayStation', value: 'psn' }
-			]
+			choices: PlatformChoices
 		},
 		{
 			name: 'input',

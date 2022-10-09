@@ -28,6 +28,12 @@ export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Obj
 	'zh-Hant': '官話'
 }).map(([key, value]) => ({ name: value, value: key }));
 
+export const PlatformChoices: ApplicationCommandOptionChoiceData<string>[] = [
+	{ name: 'Epic', value: 'epic' },
+	{ name: 'Xbox', value: 'xbl' },
+	{ name: 'PlayStation', value: 'psn' }
+];
+
 export const RarityColors: Record<string, ColorResolvable> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,
@@ -64,3 +70,5 @@ export enum UnitsToMS {
 	Hours = 3600,
 	Days = 86400
 }
+
+export const UnitChoices: ApplicationCommandOptionChoiceData<string>[] = Object.keys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
