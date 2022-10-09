@@ -2,8 +2,8 @@ import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoi
 import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
-import giveawayusers from'../schemas/giveawayusers.js';
-import behavior from'../schemas/behavior.js';
+import giveawayUserSchema from'../schemas/giveawayusers.js';
+import behaviorSchema from'../schemas/behavior.js';
 import { isReadyClient, noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
@@ -168,7 +168,7 @@ export default new ClientEvent({
 				return;
 			}
 
-			const userResult = await giveawayusers.findOneAndUpdate(
+			const userResult = await giveawayUserSchema.findOneAndUpdate(
 				{ userId, guildId: interaction.guildId },
 				{},
 				{ new: true, upsert: true }
@@ -179,7 +179,7 @@ export default new ClientEvent({
 			}
 
 			if (interaction.guildId === client.exclusiveGuildId) {
-				const behaviorResult = await behavior.findById(interaction.guildId);
+				const behaviorResult = await behaviorSchema.findById(interaction.guildId);
 				if (behaviorResult === null) throw new Error(`No behavior document was found for the guild with the id "${interaction.guildId}"`);
 				if (behaviorResult.behaviors[0][userId]) {
 					await interaction.editReply('Only users with no mutes or bans in the past 30 days may enter.');

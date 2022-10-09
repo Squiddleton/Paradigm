@@ -4,7 +4,7 @@ import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
 import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import guilds from '../../schemas/guilds.js';
+import guildSchema from '../../schemas/guilds.js';
 import type { DisplayUserProperties } from '../../types.js';
 
 const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<DisplayUserProperties> => {
@@ -114,12 +114,12 @@ export default new SlashCommand({
 					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
 
 				if (interaction.inCachedGuild()) {
-					const guild = await guilds.findById(interaction.guildId);
+					const guild = await guildSchema.findById(interaction.guildId);
 					if (guild === null || guild.wishlistChannelId === null) {
 						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use `/settings edit` to set one.', ephemeral: true });
 					}
 					else if (interaction.guild.channels.cache.get(guild.wishlistChannelId) === undefined) {
-						await guilds.findByIdAndUpdate(interaction.guildId, { wishlistChannelId: null });
+						await guildSchema.findByIdAndUpdate(interaction.guildId, { wishlistChannelId: null });
 						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use `/settings edit` to set a new one.', ephemeral: true });
 					}
 				}

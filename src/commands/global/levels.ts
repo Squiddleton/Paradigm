@@ -1,7 +1,7 @@
 import { FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
-import users from '../../schemas/users.js';
+import userSchema from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
 
@@ -62,7 +62,7 @@ export default new SlashCommand({
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn';
 
 		if (accountName === null) {
-			const user = await users.findById(interaction.user.id);
+			const user = await userSchema.findById(interaction.user.id);
 			if (user === null || user.epicAccountId === null) {
 				await interaction.reply({ content: `No player username was provided, and you have not linked your account with ${interaction.client.user!.username}.`, ephemeral: true });
 				return;
@@ -83,7 +83,7 @@ export default new SlashCommand({
 				await interaction.reply(formatLevels(levels, account.name));
 
 				if (interaction.options.getBoolean('link')) {
-					await users.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
+					await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
 					await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral: true });
 				}
 			}
