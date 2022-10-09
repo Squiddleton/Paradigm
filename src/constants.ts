@@ -8,7 +8,7 @@ export enum BackgroundURLs {
 	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 }
 
-export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
+export const BackgroundChoices: ApplicationCommandOptionChoiceData<string>[] = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
 
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',

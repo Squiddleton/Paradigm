@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
-import { BackgroundChioces } from '../../constants.js';
+import { BackgroundChoices } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'loadout',
@@ -41,7 +41,7 @@ export default new SlashCommand({
 			name: 'background',
 			type: ApplicationCommandOptionType.String,
 			description: 'Select a specific background color',
-			choices: BackgroundChioces
+			choices: BackgroundChoices
 		}
 	],
 	scope: 'Global',
