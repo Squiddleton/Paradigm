@@ -28,8 +28,6 @@ export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Obj
 	'zh-Hant': '官話'
 }).map(([key, value]) => ({ name: value, value: key }));
 
-export const Rarities = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Mythic'];
-
 export const RarityColors: Record<string, ColorResolvable> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,
@@ -50,17 +48,19 @@ export const RarityColors: Record<string, ColorResolvable> = {
 	'Gaming Legends Series': 0x1f0937
 };
 
-export const RarityOrdering = {
-	Common: 0,
-	Uncommon: 1,
-	Rare: 2,
-	Epic: 3,
-	Legendary: 4,
-	Mythic: 5
-};
+export enum RarityOrdering {
+	Common,
+	Uncommon,
+	Rare,
+	Epic,
+	Legendary,
+	Mythic
+}
 
-export const UnitsToMS = {
-	minutes: 60,
-	hours: 3600,
-	days: 86400
-};
+export const Rarities = Object.keys(RarityOrdering);
+
+export enum UnitsToMS {
+	Minutes = 60,
+	Hours = 3600,
+	Days = 86400
+}
