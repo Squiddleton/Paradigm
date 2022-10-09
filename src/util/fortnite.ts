@@ -4,7 +4,7 @@ import { noPunc, randomFromArray } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import userSchema from '../schemas/users.js';
-import { Cosmetic } from '@squiddleton/fortnite-api';
+import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
 import { BackgroundURLs, RarityColors, RarityOrdering } from '../constants.js';

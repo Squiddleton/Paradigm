@@ -7,7 +7,7 @@ import { isReadyClient, noPunc } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
-import { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
+import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';

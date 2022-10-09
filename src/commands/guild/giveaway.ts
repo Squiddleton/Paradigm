@@ -5,7 +5,6 @@ import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 import { UnitsToMS } from '../../constants.js';
 import type { IGiveaway } from '../../types.js';
 
-
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
 
 export default new SlashCommand({

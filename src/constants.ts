@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionChoiceData, ColorResolvable } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, ColorResolvable } from 'discord.js';
 
 export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = [
 	'Gold',
