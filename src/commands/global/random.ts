@@ -76,7 +76,7 @@ export default new SlashCommand({
 		const embed = new EmbedBuilder()
 			.setTitle('Randomly Generated Loadout')
 			.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
-			.addFields([
+			.setFields([
 				{ name: 'Outfit', value: outfit.name, inline: true },
 				{ name: 'Back Bling', value: bb.name, inline: true },
 				{ name: 'Harvesting Tool', value: ht.name, inline: true },

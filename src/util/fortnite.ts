@@ -110,12 +110,12 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
 		.setThumbnail(cosmetic.images.smallIcon)
 		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
-		.addFields(
+		.setFields([
 			{ name: 'Type', value: cosmetic.type.displayValue, inline: true },
 			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
 			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
-		)
+		])
 		.setTimestamp();
 		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
