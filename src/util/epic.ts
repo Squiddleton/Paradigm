@@ -1,7 +1,7 @@
 import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
-import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from '../types.js';
+import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, EpicErrorCode, Friend, RawEpicError, Stats } from '../types.js';
 
 enum Endpoints {
 	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
@@ -37,9 +37,24 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 const isError = (obj: any): obj is RawEpicError => 'errorCode' in obj;
 
 export class EpicError extends Error {
+	errorCode: string;
+	errorMessage: string;
+	messageVars: unknown[];
+	numericErrorCode: EpicErrorCode | number;
+	originatingService: string;
+	intent: string;
+	errorDescription: string | null;
+	error: string | null;
 	constructor(error: RawEpicError) {
 		super(error.errorMessage);
-		Object.assign(this, error);
+		this.errorCode = error.errorCode;
+		this.errorMessage = error.errorMessage;
+		this.messageVars = error.messageVars;
+		this.numericErrorCode = error.numericErrorCode;
+		this.originatingService = error.originatingService;
+		this.intent = error.intent;
+		this.errorDescription = error.error_description ?? null;
+		this.error = error.error ?? null;
 	}
 }
 

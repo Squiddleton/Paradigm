@@ -93,6 +93,10 @@ export interface EpicAccount {
 	externalAuths: Record<string, AnyObject>;
 }
 
+export enum EpicErrorCode {
+	INVALID_GRANT = 18031
+}
+
 export interface Friend {
 	accountId: string;
 	status: string;
@@ -151,9 +155,11 @@ export interface RawEpicError {
 	errorCode: string;
 	errorMessage: string;
 	messageVars: string[];
-	numericErrorCode: number;
+	numericErrorCode: EpicErrorCode | number;
 	originatingService: string;
 	intent: string;
+	error_description?: string;
+	error?: string;
 }
 
 export interface Stats {
