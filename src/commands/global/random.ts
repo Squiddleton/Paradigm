@@ -14,62 +14,20 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String,
 			description: 'A specific type of cosmetic to choose; defaults to a collection of multiple types',
 			choices: [
-				{
-					name: 'Outfit',
-					value: 'outfit'
-				},
-				{
-					name: 'Back Bling',
-					value: 'backpack'
-				},
-				{
-					name: 'Emote',
-					value: 'emote'
-				},
-				{
-					name: 'Glider',
-					value: 'glider'
-				},
-				{
-					name: 'Emoticon',
-					value: 'emoji'
-				},
-				{
-					name: 'Loading Screen',
-					value: 'loadingscreen'
-				},
-				{
-					name: 'Harvesting Tool',
-					value: 'pickaxe'
-				},
-				{
-					name: 'Contrail',
-					value: 'contrail'
-				},
-				{
-					name: 'Spray',
-					value: 'spray'
-				},
-				{
-					name: 'Toy',
-					value: 'toy'
-				},
-				{
-					name: 'Pet',
-					value: 'petcarrier'
-				},
-				{
-					name: 'Music',
-					value: 'music'
-				},
-				{
-					name: 'Wrap',
-					value: 'wrap'
-				},
-				{
-					name: 'Banner',
-					value: 'banner'
-				}
+				{ name: 'Outfit', value: 'outfit' },
+				{ name: 'Back Bling', value: 'backpack' },
+				{ name: 'Emote', value: 'emote' },
+				{ name: 'Glider', value: 'glider' },
+				{ name: 'Emoticon', value: 'emoji' },
+				{ name: 'Loading Screen', value: 'loadingscreen' },
+				{ name: 'Harvesting Tool', value: 'pickaxe' },
+				{ name: 'Contrail', value: 'contrail' },
+				{ name: 'Spray', value: 'spray' },
+				{ name: 'Toy', value: 'toy' },
+				{ name: 'Pet', value: 'petcarrier' },
+				{ name: 'Music', value: 'music' },
+				{ name: 'Wrap', value: 'wrap' },
+				{ name: 'Banner', value: 'banner' }
 			]
 		}
 	],
@@ -119,31 +77,11 @@ export default new SlashCommand({
 			.setTitle('Randomly Generated Loadout')
 			.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
 			.addFields([
-				{
-					name: 'Outfit',
-					value: outfit.name,
-					inline: true
-				},
-				{
-					name: 'Back Bling',
-					value: bb.name,
-					inline: true
-				},
-				{
-					name: 'Harvesting Tool',
-					value: ht.name,
-					inline: true
-				},
-				{
-					name: 'Glider',
-					value: glider.name,
-					inline: true
-				},
-				{
-					name: 'Wrap',
-					value: wrap.name,
-					inline: true
-				}
+				{ name: 'Outfit', value: outfit.name, inline: true },
+				{ name: 'Back Bling', value: bb.name, inline: true },
+				{ name: 'Harvesting Tool', value: ht.name, inline: true },
+				{ name: 'Glider', value: glider.name, inline: true },
+				{ name: 'Wrap', value: wrap.name, inline: true }
 			])
 			.setTimestamp();
 		await interaction.editReply({ embeds: [embed], files: [attachment] });
