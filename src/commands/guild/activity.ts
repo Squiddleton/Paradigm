@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import giveawayUserSchema, { IMessage } from '../../schemas/giveawayusers.js';
+import giveawayUserSchema from '../../schemas/giveawayusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import type { IMessage } from '../../types.js';
 
 export default new SlashCommand({
 	name: 'activity',

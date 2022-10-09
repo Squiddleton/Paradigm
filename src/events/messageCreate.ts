@@ -1,6 +1,7 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import behaviorSchema from '../schemas/behavior.js';
-import giveawayUsersSchema, { IMessage } from '../schemas/giveawayusers.js';
+import giveawayUsersSchema from '../schemas/giveawayusers.js';
+import { IMessage } from '../types.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { isReadyClient } from '../util/functions.js';
 

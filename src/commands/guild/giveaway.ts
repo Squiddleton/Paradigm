@@ -1,8 +1,9 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
 import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
-import guildSchema, { IGiveaway } from '../../schemas/guilds.js';
+import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 import { UnitsToMS } from '../../constants.js';
+import type { IGiveaway } from '../../types.js';
 
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
