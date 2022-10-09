@@ -1,20 +1,14 @@
 import type { ApplicationCommandOptionChoiceData, ColorResolvable } from 'discord.js';
 
-export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = [
-	'Gold',
-	'Orange',
-	'Purple',
-	'Blue',
-	'Green'
-].map(background => ({ name: background, value: background.toLowerCase() }));
+export enum BackgroundURLs {
+	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
+	Orange = 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
+	Purple = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
+	Blue = 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
+	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
+}
 
-export const BackgroundURLs = {
-	gold: 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
-	orange: 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
-	purple: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
-	blue: 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
-	green: 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
-};
+export const BackgroundChioces: ApplicationCommandOptionChoiceData<string>[] = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
 
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
