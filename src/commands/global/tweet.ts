@@ -68,7 +68,7 @@ export default new SlashCommand({
 		}
 
 		const embed = new EmbedBuilder()
-			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: 'https://pbs.twimg.com/profile_images/1371468883136286727/5TuH8hHa_400x400.jpg' })
+			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: 'https://pbs.twimg.com/profile_images/1571377748999913474/ffSqYla1_400x400.jpg' })
 			.setDescription(text === null ? `Grab the @${interaction.inCachedGuild() ? interaction.member.displayName : interaction.user.username} locker bundle for a limited time!` : `${text.slice(0, 4000)}`)
 			.setFields([
 				{ name: 'Retweets', value: '498', inline: true },
