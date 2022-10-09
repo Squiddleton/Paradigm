@@ -1,7 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import { createGiveawayEmbed, isReadyClient, randomFromArray } from '../util/functions.js';
-import behaviorSchema from '../schemas/behavior.js';
 import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
@@ -23,18 +22,6 @@ export default new ClientEvent({
 		}, { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', async () => {
-			const result = await behaviorSchema.findByIdAndUpdate('486932163636232193', {}, { new: true, upsert: true });
-			const behaviors = result.behaviors[0];
-			for (const b in behaviors) {
-				behaviors[b]--;
-				if (behaviors[b] === 0) delete behaviors[b];
-			}
-
-			await behaviorSchema.findByIdAndUpdate(
-				'486932163636232193',
-				{ behaviors: [behaviors], date: new Date().getDate() }
-			);
-
 			await giveawayUserSchema.updateMany({}, { $inc: { 'messages.$[].day': -1 } });
 			await giveawayUserSchema.updateMany({}, { $pull: { messages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });

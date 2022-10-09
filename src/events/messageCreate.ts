@@ -1,5 +1,4 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import behaviorSchema from '../schemas/behavior.js';
 import giveawayUserSchema from '../schemas/giveawayusers.js';
 import { IMessage } from '../types.js';
 import { checkWishlists } from '../util/fortnite.js';
@@ -50,23 +49,6 @@ export default new ClientEvent({
 				}
 				else if (message.channelId === '489836390759268353' && message.author.id === '848452706791981056' && message.mentions.roles.has('568590143640961037') && message.createdAt.getHours() !== 0) {
 					await checkWishlists(client);
-				}
-				else if (message.channelId === '487026329016074241' && message.author.id === '383777390851260426' && message.embeds.length > 0) {
-					const { fields } = message.embeds[0].toJSON();
-					if (fields?.some(field => field.value.startsWith('Timeout'))) {
-						const result = await behaviorSchema.findByIdAndUpdate(exclusiveGuildId, {}, { new: true, upsert: true });
-
-						const behaviors = result.behaviors[0];
-						const targetField = fields.find(field => field.name === 'Target User');
-						if (targetField !== undefined) {
-							behaviors[targetField.value.split('(')[1].split(')')[0]] = 30;
-
-							await behaviorSchema.updateMany(
-								{ _id: exclusiveGuildId },
-								{ behaviors: [behaviors] }
-							);
-						}
-					}
 				}
 			}
 		}
