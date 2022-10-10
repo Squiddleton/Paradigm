@@ -6,6 +6,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
 import { EpicErrorCode } from '../../types.js';
 import { ChapterLengths, PlatformChoices } from '../../constants.js';
+import { sum } from '../../util/functions.js';
 
 const formatLevels = (levels: Record<string, number>, name?: string) => {
 	return `${
@@ -18,9 +19,9 @@ const formatLevels = (levels: Record<string, number>, name?: string) => {
 			.sort()
 			.map(([k, v]) => {
 				const overallSeason = parseInt(k.match(/\d+/)![0]);
-				const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce((l, acc) => l + acc, 0));
+				const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum, 0));
 				const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-				return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce((l, acc) => l + acc, 0)}: ${Math.floor(v / 100)}`;
+				return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum, 0)}: ${Math.floor(v / 100)}`;
 			})
 			.join('\n')}`;
 };

@@ -2,6 +2,7 @@ import { ApplicationCommandOptionType } from 'discord.js';
 import giveawayUserSchema from '../../schemas/giveawayusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { IMessage } from '../../types.js';
+import { sumMsgs } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'activity',
@@ -36,9 +37,9 @@ export default new SlashCommand({
 		const max = interaction.options.getInteger('max') ?? 10;
 		const messages = await giveawayUserSchema.find();
 
-		const combineMsgs = (msgs: IMessage[]): number => msgs
+		const combineMsgs = (msgs: IMessage[]) => msgs
 			.filter(m => (31 - m.day) <= time)
-			.reduce((acc, msg) => acc + msg.msgs, 0);
+			.reduce(sumMsgs, 0);
 
 		const sorted = messages.sort((a, b) => combineMsgs(b.messages) - combineMsgs(a.messages));
 		const users = await Promise.all(sorted.slice(0, max).map(m => client.users.fetch(m.userId)));

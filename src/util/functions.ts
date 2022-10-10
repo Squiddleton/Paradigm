@@ -1,6 +1,6 @@
 import { Client as BaseClient, Colors, EmbedBuilder, Guild, time } from 'discord.js';
 import type { Client } from '../clients/discord.js';
-import type { IGiveaway, Quantity } from '../types.js';
+import type { IGiveaway, IMessage, Quantity } from '../types.js';
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()
@@ -54,3 +54,7 @@ export const quantity = (arr: string[]) => {
 };
 
 export const randomFromArray = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+export const sum = (previous: number, current: number) => previous + current;
+
+export const sumMsgs = (previous: number, current: IMessage) => previous + current.msgs;

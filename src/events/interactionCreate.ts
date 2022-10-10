@@ -3,7 +3,7 @@ import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
 import giveawayUserSchema from'../schemas/giveawayusers.js';
-import { isReadyClient, noPunc } from'../util/functions.js';
+import { isReadyClient, noPunc, sumMsgs } from'../util/functions.js';
 import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -172,7 +172,7 @@ export default new ClientEvent({
 				{},
 				{ new: true, upsert: true }
 			);
-			if (userResult.messages.reduce((acc, msg) => acc + msg.msgs, 0) < giveawayResult.messages) {
+			if (userResult.messages.reduce(sumMsgs, 0) < giveawayResult.messages) {
 				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}
