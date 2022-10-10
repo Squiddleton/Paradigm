@@ -5,17 +5,24 @@ import userSchema from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
 import { EpicErrorCode } from '../../types.js';
-import { PlatformChoices } from '../../constants.js';
+import { ChapterLengths, PlatformChoices } from '../../constants.js';
 
 const formatLevels = (levels: Record<string, number>, name?: string) => {
-	return `${name === undefined
-		? '**Your**'
-		: `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}`} **Battle Pass Levels**\n\n${Object.entries(levels)
-		.sort()
-		.map(([k, v]) => {
-			return `Season ${k.match(/\d+/)![0]}: ${Math.floor(v / 100)}`;
-		})
-		.join('\n')}`;
+	return `${
+		name === undefined
+			? '**Your**'
+			: `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}`
+	} **Battle Pass Levels**\n\n${
+		Object
+			.entries(levels)
+			.sort()
+			.map(([k, v]) => {
+				const overallSeason = parseInt(k.match(/\d+/)![0]);
+				const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce((l, acc) => l + acc, 0));
+				const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+				return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce((l, acc) => l + acc, 0)}: ${Math.floor(v / 100)}`;
+			})
+			.join('\n')}`;
 };
 
 const handleError = (e: unknown) => {

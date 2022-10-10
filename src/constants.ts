@@ -10,6 +10,8 @@ export enum BackgroundURLs {
 
 export const BackgroundChoices: ApplicationCommandOptionChoiceData<string>[] = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
 
+export const ChapterLengths = [10, 8];
+
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
 	de: 'Deutsch',
