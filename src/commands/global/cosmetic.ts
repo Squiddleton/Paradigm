@@ -18,7 +18,7 @@ export default new SlashCommand({
 		},
 		{
 			name: 'language',
-			description: 'The language for the returned cosmetic',
+			description: 'The language for the returned info',
 			type: ApplicationCommandOptionType.String,
 			choices: LanguageChoices
 		}
