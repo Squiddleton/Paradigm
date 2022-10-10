@@ -11,8 +11,8 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'cosmetic',
-			type: ApplicationCommandOptionType.String,
 			description: 'The name of the cosmetic',
+			type: ApplicationCommandOptionType.String,
 			required: true,
 			autocomplete: true
 		},

@@ -7,8 +7,8 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'code',
-			type: ApplicationCommandOptionType.String,
 			description: 'Code to evaluate',
+			type: ApplicationCommandOptionType.String,
 			required: true
 		}
 	],

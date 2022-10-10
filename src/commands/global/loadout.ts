@@ -9,38 +9,38 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'outfit',
-			type: ApplicationCommandOptionType.String,
 			description: 'Any outfit in the game\'s files',
+			type: ApplicationCommandOptionType.String,
 			autocomplete: true
 		},
 		{
 			name: 'backbling',
-			type: ApplicationCommandOptionType.String,
 			description: 'Any back bling in the game\'s files',
+			type: ApplicationCommandOptionType.String,
 			autocomplete: true
 		},
 		{
 			name: 'harvestingtool',
-			type: ApplicationCommandOptionType.String,
 			description: 'Any harvesting tool in the game\'s files',
+			type: ApplicationCommandOptionType.String,
 			autocomplete: true
 		},
 		{
 			name: 'glider',
-			type: ApplicationCommandOptionType.String,
 			description: 'Any glider in the game\'s files',
+			type: ApplicationCommandOptionType.String,
 			autocomplete: true
 		},
 		{
 			name: 'wrap',
-			type: ApplicationCommandOptionType.String,
 			description: 'Any wrap in the game\'s files',
+			type: ApplicationCommandOptionType.String,
 			autocomplete: true
 		},
 		{
 			name: 'background',
-			type: ApplicationCommandOptionType.String,
 			description: 'Select a specific background color',
+			type: ApplicationCommandOptionType.String,
 			choices: BackgroundChoices
 		}
 	],

@@ -8,8 +8,8 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'command',
-			type: ApplicationCommandOptionType.String,
 			description: 'A terminal command to run',
+			type: ApplicationCommandOptionType.String,
 			required: true
 		}
 	],

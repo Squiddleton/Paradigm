@@ -11,8 +11,8 @@ export default new SlashCommand({
 	options: [
 		{
 			name: 'type',
-			type: ApplicationCommandOptionType.String,
 			description: 'A specific type of cosmetic to choose; defaults to a collection of multiple types',
+			type: ApplicationCommandOptionType.String,
 			choices: [
 				{ name: 'Outfit', value: 'outfit' },
 				{ name: 'Back Bling', value: 'backpack' },
