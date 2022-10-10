@@ -10,7 +10,7 @@ import { PlatformChoices } from '../../constants.js';
 const formatLevels = (levels: Record<string, number>, name?: string) => {
 	return `${name === undefined
 		? '**Your**'
-		: `\`${name}'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}\``} **Battle Pass Levels**\n\n${Object.entries(levels)
+		: `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}`} **Battle Pass Levels**\n\n${Object.entries(levels)
 		.sort()
 		.map(([k, v]) => {
 			return `Season ${k.match(/\d+/)![0]}: ${Math.floor(v / 100)}`;
