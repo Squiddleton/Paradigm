@@ -206,7 +206,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	return new AttachmentBuilder(canvas.toBuffer(), { name: 'loadout.png' });
 };
 
-export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]): Promise<void> => {
+export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]) => {
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];

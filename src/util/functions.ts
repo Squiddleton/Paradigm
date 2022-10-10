@@ -53,7 +53,7 @@ export const quantity = (arr: string[]) => {
 	return counts;
 };
 
-export const randomFromArray = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
 export const sum = (previous: number, current: number) => previous + current;
 

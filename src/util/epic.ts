@@ -58,7 +58,7 @@ export class EpicError extends Error {
 	}
 }
 
-const checkError = async <Res>(raw: Response): Promise<Res> => {
+const checkError = async <Res>(raw: Response) => {
 	const res = await raw.json() as Res | RawEpicError;
 	if (isError(res)) {
 		throw new EpicError(res);
