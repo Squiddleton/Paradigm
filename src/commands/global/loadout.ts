@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
-import { LoadoutImageOptions } from '../../constants.js';
+import { LoadoutImageOptions } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'loadout',

@@ -1,7 +1,7 @@
 import imgurClient from '../../clients/imgur.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { randomFromArray } from '../../util/functions.js';
-import { BorisAlbumIds } from '../../constants.js';
+import { BorisAlbumIds } from '../../util/constants.js';
 
 const data: string[] = (await Promise.all(BorisAlbumIds.map(album => imgurClient.Album.get(album))))
 	.map(album => album.data.images)

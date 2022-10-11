@@ -8,7 +8,7 @@ import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
-import { ErrorMessages } from '../constants.js';
+import { ErrorMessages } from '../util/constants.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 

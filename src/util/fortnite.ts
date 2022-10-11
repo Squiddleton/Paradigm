@@ -7,8 +7,8 @@ import userSchema from '../schemas/users.js';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { BackgroundURLs, ErrorMessages, RarityColors, RarityOrdering } from '../constants.js';
-import type { StringOption } from '../types.js';
+import { BackgroundURLs, ErrorMessages, RarityColors, RarityOrdering } from './constants.js';
+import type { StringOption } from './types.js';
 
 const isBackground = (str: string): str is keyof typeof BackgroundURLs => str in BackgroundURLs;
 

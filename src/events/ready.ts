@@ -5,7 +5,7 @@ import memberSchema from '../schemas/members.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { ClientEvent, validateChannel } from '@squiddleton/discordjs-util';
-import { ErrorMessages } from '../constants.js';
+import { ErrorMessages } from '../util/constants.js';
 
 export default new ClientEvent({
 	name: 'ready',

@@ -1,6 +1,6 @@
 import { Client as BaseClient, Colors, EmbedBuilder, Guild, time } from 'discord.js';
 import type { Client } from '../clients/discord.js';
-import type { IGiveaway, IMessage, Quantity } from '../types.js';
+import type { IGiveaway, IMessage, Quantity } from './types.js';
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()

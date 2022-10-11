@@ -1,7 +1,7 @@
 import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
-import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, EpicErrorCode, Friend, RawEpicError, Stats } from '../types.js';
+import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, EpicErrorCode, Friend, RawEpicError, Stats } from './types.js';
 
 enum Endpoints {
 	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',

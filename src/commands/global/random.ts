@@ -3,7 +3,7 @@ import { noPunc, randomFromArray } from '../../util/functions.js';
 import { cosmetics, createCosmeticEmbed } from '../../util/fortnite.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { BackgroundURLs } from '../../constants.js';
+import { BackgroundURLs } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'random',

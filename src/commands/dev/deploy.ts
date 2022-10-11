@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ErrorMessages } from '../../constants.js';
+import { ErrorMessages } from '../../util/constants.js';
 import { isReadyClient } from '../../util/functions.js';
 
 export default new SlashCommand({

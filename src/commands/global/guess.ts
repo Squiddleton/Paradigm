@@ -3,7 +3,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorR
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { cosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
-import { RarityColors } from '../../constants.js';
+import { RarityColors } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'guess',

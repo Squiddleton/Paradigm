@@ -5,8 +5,8 @@ import { noPunc } from '../../util/functions.js';
 import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
-import type { DisplayUserProperties } from '../../types.js';
-import { ErrorMessages } from '../../constants.js';
+import type { DisplayUserProperties } from '../../util/types.js';
+import { ErrorMessages } from '../../util/constants.js';
 
 const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<DisplayUserProperties> => {
 	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;

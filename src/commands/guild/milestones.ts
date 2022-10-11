@@ -3,7 +3,7 @@ import guildSchema from '../../schemas/guilds.js';
 import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { isRarity } from '../../util/fortnite.js';
-import { ErrorMessages, RarityOrdering } from '../../constants.js';
+import { ErrorMessages, RarityOrdering } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'milestones',

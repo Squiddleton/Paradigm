@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import type { IBonusRole, IGiveaway, IGuild, IMilestone } from '../types.js';
+import type { IBonusRole, IGiveaway, IGuild, IMilestone } from '../util/types.js';
 
 const bonusRoleSchema = new mongoose.Schema<IBonusRole>({
 	id: {
