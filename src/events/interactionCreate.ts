@@ -1,4 +1,4 @@
-import { User, InteractionType, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction, InteractionReplyOptions } from 'discord.js';
+import { User, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAPIError, AutocompleteInteraction, InteractionReplyOptions } from 'discord.js';
 import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
@@ -49,7 +49,7 @@ export default new ClientEvent({
 		const { owner } = client.application;
 		if (!(owner instanceof User)) throw new Error(ErrorMessages.NotUserOwned);
 
-		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
 			const input = value === '' ? 'a' : noPunc(value);
 
@@ -110,7 +110,7 @@ export default new ClientEvent({
 			}
 		}
 
-		else if (interaction.type === InteractionType.ApplicationCommand) {
+		else if (interaction.isCommand()) {
 			const command = client.commands.get(interaction.commandName);
 			if (command === undefined) {
 				await interaction.reply({ content: 'I could not find a command matching that name!', ephemeral: true });
