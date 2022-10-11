@@ -1,49 +1,11 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
-import { BackgroundChoices } from '../../constants.js';
+import { LoadoutImageOptions } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'loadout',
 	description: 'Create an image of your Fortnite loadout',
-	options: [
-		{
-			name: 'outfit',
-			description: 'Any outfit in the game\'s files',
-			type: ApplicationCommandOptionType.String,
-			autocomplete: true
-		},
-		{
-			name: 'backbling',
-			description: 'Any back bling in the game\'s files',
-			type: ApplicationCommandOptionType.String,
-			autocomplete: true
-		},
-		{
-			name: 'harvestingtool',
-			description: 'Any harvesting tool in the game\'s files',
-			type: ApplicationCommandOptionType.String,
-			autocomplete: true
-		},
-		{
-			name: 'glider',
-			description: 'Any glider in the game\'s files',
-			type: ApplicationCommandOptionType.String,
-			autocomplete: true
-		},
-		{
-			name: 'wrap',
-			description: 'Any wrap in the game\'s files',
-			type: ApplicationCommandOptionType.String,
-			autocomplete: true
-		},
-		{
-			name: 'background',
-			description: 'Select a specific background color',
-			type: ApplicationCommandOptionType.String,
-			choices: BackgroundChoices
-		}
-	],
+	options: LoadoutImageOptions,
 	scope: 'Global',
 	async execute(interaction) {
 		const outfit = interaction.options.getString('outfit');

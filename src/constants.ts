@@ -1,4 +1,4 @@
-import type { ApplicationCommandOptionChoiceData, ColorResolvable } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionData, ApplicationCommandOptionType, ColorResolvable } from 'discord.js';
 
 export enum BackgroundURLs {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
@@ -31,6 +31,45 @@ export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Obj
 	'zh-CN': '官话',
 	'zh-Hant': '官話'
 }).map(([key, value]) => ({ name: value, value: key }));
+
+export const LoadoutImageOptions: ApplicationCommandOptionData[] = [
+	{
+		name: 'outfit',
+		description: 'Any outfit in the game\'s files',
+		type: ApplicationCommandOptionType.String,
+		autocomplete: true
+	},
+	{
+		name: 'backbling',
+		description: 'Any back bling in the game\'s files',
+		type: ApplicationCommandOptionType.String,
+		autocomplete: true
+	},
+	{
+		name: 'harvestingtool',
+		description: 'Any harvesting tool in the game\'s files',
+		type: ApplicationCommandOptionType.String,
+		autocomplete: true
+	},
+	{
+		name: 'glider',
+		description: 'Any glider in the game\'s files',
+		type: ApplicationCommandOptionType.String,
+		autocomplete: true
+	},
+	{
+		name: 'wrap',
+		description: 'Any wrap in the game\'s files',
+		type: ApplicationCommandOptionType.String,
+		autocomplete: true
+	},
+	{
+		name: 'background',
+		description: 'Select a specific background color',
+		type: ApplicationCommandOptionType.String,
+		choices: BackgroundChoices
+	}
+];
 
 export const PlatformChoices: ApplicationCommandOptionChoiceData<string>[] = [
 	{ name: 'Epic', value: 'epic' },
