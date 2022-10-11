@@ -1,5 +1,6 @@
 import type { DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, Snowflake } from 'discord.js';
+import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
 	accessToken: string;
@@ -91,10 +92,6 @@ export interface EpicAccount {
 	passwordResetRequired?: boolean;
 	links?: AnyObject;
 	externalAuths: Record<string, AnyObject>;
-}
-
-export enum EpicErrorCode {
-	INVALID_GRANT = 18031
 }
 
 export interface Friend {

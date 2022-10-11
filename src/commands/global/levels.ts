@@ -4,8 +4,7 @@ import fortniteAPI from '../../clients/fortnite.js';
 import userSchema from '../../schemas/users.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EpicError, getLevels } from '../../util/epic.js';
-import { EpicErrorCode } from '../../util/types.js';
-import { ChapterLengths, PlatformChoices } from '../../util/constants.js';
+import { ChapterLengths, EpicErrorCode, PlatformChoices } from '../../util/constants.js';
 import { sum } from '../../util/functions.js';
 
 const formatLevels = (levels: Record<string, number>, name?: string) => {

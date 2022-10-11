@@ -15,6 +15,10 @@ export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqr
 
 export const ChapterLengths = [10, 8];
 
+export enum EpicErrorCode {
+	INVALID_GRANT = 18031
+}
+
 export enum ErrorMessages {
 	FalseTypeguard = 'The value "{value}" did not satisfy the typeguard',
 	NotUserOwned = 'The Client application is not owned by a User instance',
