@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
-import milestoneUserSchema from '../../schemas/milestoneusers.js';
+import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { grantMilestone, isRarity } from '../../util/fortnite.js';
 import { ErrorMessages, Rarities, RarityOrdering } from '../../constants.js';
@@ -114,7 +114,7 @@ export default new SlashCommand({
 				}
 
 				await interaction.deferReply();
-				await milestoneUserSchema.updateMany(
+				await memberSchema.updateMany(
 					{ guildId },
 					{ $pull: { milestones: milestoneName } }
 				);

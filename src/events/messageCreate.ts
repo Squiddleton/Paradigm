@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import giveawayUserSchema from '../schemas/giveawayusers.js';
+import memberSchema from '../schemas/members.js';
 import type { IMessage } from '../types.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { isReadyClient } from '../util/functions.js';
@@ -16,16 +16,16 @@ export default new ClientEvent({
 			const isBot = message.author.bot;
 
 			if (!isBot) {
-				const result = await giveawayUserSchema.findOneAndUpdate(
-					{ userId: message.author.id, guildId, 'messages.day': 30 },
-					{ $inc: { 'messages.$.msgs': 1 } }
+				const result = await memberSchema.findOneAndUpdate(
+					{ userId: message.author.id, guildId, 'dailyMessages.day': 30 },
+					{ $inc: { 'dailyMessages.$.messages': 1 } }
 				);
 				if (result === null) {
-					const msgObject: IMessage = { day: 30, msgs: 1 };
+					const msgObject: IMessage = { day: 30, messages: 1 };
 
-					await giveawayUserSchema.updateOne(
+					await memberSchema.updateOne(
 						{ userId: message.author.id, guildId },
-						{ $push: { messages: msgObject } },
+						{ $push: { dailyMessages: msgObject } },
 						{ upsert: true }
 					);
 				}

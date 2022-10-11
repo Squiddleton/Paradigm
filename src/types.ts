@@ -134,7 +134,7 @@ export interface IGuild {
 
 export interface IMessage {
 	day: number;
-	msgs: number;
+	messages: number;
 }
 
 export interface IMilestone {

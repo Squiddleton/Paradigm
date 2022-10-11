@@ -2,7 +2,7 @@ import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentB
 import Canvas from 'canvas';
 import { noPunc, randomFromArray } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
-import milestoneUserSchema from '../schemas/milestoneusers.js';
+import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
@@ -312,7 +312,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => milestoneUserSchema.updateOne(
+export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberSchema.updateOne(
 	{ userId, guildId },
 	{ $addToSet: { milestones: milestoneName } },
 	{ upsert: true }

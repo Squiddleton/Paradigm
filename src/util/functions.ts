@@ -57,4 +57,4 @@ export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * a
 
 export const sum = (previous: number, current: number) => previous + current;
 
-export const sumMsgs = (previous: number, current: IMessage) => previous + current.msgs;
+export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;

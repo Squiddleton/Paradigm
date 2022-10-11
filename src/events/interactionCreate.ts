@@ -2,9 +2,8 @@ import { User, RESTJSONErrorCodes, ApplicationCommandOptionChoiceData, DiscordAP
 import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
-import giveawayUserSchema from'../schemas/giveawayusers.js';
+import memberSchema from'../schemas/members.js';
 import { isReadyClient, noPunc, sumMsgs } from'../util/functions.js';
-import milestoneUserSchema from '../schemas/milestoneusers.js';
 import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
@@ -94,8 +93,8 @@ export default new ClientEvent({
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
 						if (memberOption) {
-							const userMilestones = await milestoneUserSchema.findOne({ userId: memberOption, guildId });
-							milestones = milestones.filter(m => !userMilestones?.milestones.includes(m));
+							const memberResult = await memberSchema.findOne({ userId: memberOption, guildId });
+							milestones = milestones.filter(m => !memberResult?.milestones.includes(m));
 						}
 
 						const closest = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
@@ -168,12 +167,12 @@ export default new ClientEvent({
 				return;
 			}
 
-			const userResult = await giveawayUserSchema.findOneAndUpdate(
+			const memberResult = await memberSchema.findOneAndUpdate(
 				{ userId, guildId: interaction.guildId },
 				{},
 				{ new: true, upsert: true }
 			);
-			if (userResult.messages.reduce(sumMsgs, 0) < giveawayResult.messages) {
+			if (memberResult.dailyMessages.reduce(sumMsgs, 0) < giveawayResult.messages) {
 				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}

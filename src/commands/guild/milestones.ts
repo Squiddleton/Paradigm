@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
-import milestoneUserSchema from '../../schemas/milestoneusers.js';
+import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { isRarity } from '../../util/fortnite.js';
 import { ErrorMessages, RarityOrdering } from '../../constants.js';
@@ -30,7 +30,7 @@ export default new SlashCommand({
 		const user = await member.user.fetch();
 		const { guildId } = interaction;
 
-		const result = await milestoneUserSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
+		const result = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 		const embed = new EmbedBuilder()
 			.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)

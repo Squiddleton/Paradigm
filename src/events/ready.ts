@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import { createGiveawayEmbed, isReadyClient, randomFromArray } from '../util/functions.js';
-import giveawayUserSchema from '../schemas/giveawayusers.js';
+import memberSchema from '../schemas/members.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { ClientEvent, validateChannel } from '@squiddleton/discordjs-util';
@@ -23,8 +23,8 @@ export default new ClientEvent({
 		}, { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', async () => {
-			await giveawayUserSchema.updateMany({}, { $inc: { 'messages.$[].day': -1 } });
-			await giveawayUserSchema.updateMany({}, { $pull: { messages: { day: { $lte: 0 } } } });
+			await memberSchema.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
+			await memberSchema.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });
 
 		schedule('*/1 * * * *', async () => {
