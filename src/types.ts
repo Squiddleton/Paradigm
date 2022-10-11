@@ -1,5 +1,5 @@
 import type { DateString } from '@squiddleton/fortnite-api';
-import type { Snowflake } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, Snowflake } from 'discord.js';
 
 export interface AccessTokenAndId {
 	accessToken: string;
@@ -168,5 +168,7 @@ export interface Stats {
 	stats: Record<string, number>;
 	accountId: string;
 }
+
+export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
