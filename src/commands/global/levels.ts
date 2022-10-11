@@ -80,7 +80,7 @@ export default new SlashCommand({
 		if (accountName === null) {
 			const user = await userSchema.findById(interaction.user.id);
 			if (user === null || user.epicAccountId === null) {
-				await interaction.reply({ content: `No player username was provided, and you have not linked your account with ${interaction.client.user!.username}.`, ephemeral: true });
+				await interaction.reply({ content: `No player username was provided, and you have not linked your account with ${interaction.client.user.username}.`, ephemeral: true });
 				return;
 			}
 
