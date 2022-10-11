@@ -1,4 +1,5 @@
-import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable } from 'discord.js';
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable } from 'discord.js';
+import type { StringChoices } from './types';
 
 export enum BackgroundURLs {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
@@ -8,7 +9,7 @@ export enum BackgroundURLs {
 	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 }
 
-export const BackgroundChoices: ApplicationCommandOptionChoiceData<string>[] = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
+export const BackgroundChoices: StringChoices = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
@@ -23,7 +24,7 @@ export enum ErrorMessages {
 	UnreadyClient = 'The Client should be ready but is not'
 }
 
-export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
+export const LanguageChoices: StringChoices = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
 	de: 'Deutsch',
 	en: 'English',
@@ -80,7 +81,7 @@ export const LoadoutImageOptions: ApplicationCommandOptionData[] = [
 	}
 ];
 
-export const PlatformChoices: ApplicationCommandOptionChoiceData<string>[] = [
+export const PlatformChoices: StringChoices = [
 	{ name: 'Epic', value: 'epic' },
 	{ name: 'Xbox', value: 'xbl' },
 	{ name: 'PlayStation', value: 'psn' }
@@ -125,4 +126,4 @@ export enum UnitsToMS {
 	Days = 86400
 }
 
-export const UnitChoices: ApplicationCommandOptionChoiceData<string>[] = Object.keys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
+export const UnitChoices: StringChoices = Object.keys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
