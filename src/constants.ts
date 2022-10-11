@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionData, ApplicationCommandOptionType, ColorResolvable } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable } from 'discord.js';
 
 export enum BackgroundURLs {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
@@ -107,6 +107,8 @@ export enum RarityOrdering {
 }
 
 export const Rarities = Object.keys(RarityOrdering);
+
+export const TextBasedChannelTypes = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
 
 export enum UnitsToMS {
 	Minutes = 60,

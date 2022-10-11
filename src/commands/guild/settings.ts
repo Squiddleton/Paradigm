@@ -1,6 +1,7 @@
-import { ApplicationCommandOptionType, ChannelType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
+import { TextBasedChannelTypes } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'settings',
@@ -15,7 +16,7 @@ export default new SlashCommand({
 					name: 'wishlistchannel',
 					description: 'The channel to send wishlist notifications in',
 					type: ApplicationCommandOptionType.Channel,
-					channelTypes: [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice]
+					channelTypes: TextBasedChannelTypes
 				}
 			]
 		},

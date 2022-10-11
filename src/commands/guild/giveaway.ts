@@ -1,8 +1,8 @@
-import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ChannelType, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
+import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
 import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
-import { UnitChoices, UnitsToMS } from '../../constants.js';
+import { TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../constants.js';
 import type { IGiveaway } from '../../types.js';
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
@@ -123,7 +123,7 @@ export default new SlashCommand({
 					description: 'Channel to host the giveaway in',
 					type: ApplicationCommandOptionType.Channel,
 					required: true,
-					channelTypes: [ChannelType.GuildText]
+					channelTypes: TextBasedChannelTypes
 				},
 				{
 					name: 'time',
@@ -447,7 +447,7 @@ export default new SlashCommand({
 				const winners = interaction.options.getInteger('winners', true);
 				const messages = interaction.options.getInteger('messages') ?? 0;
 				const channel = interaction.options.getChannel('channel', true);
-				if (!channel.isTextBased()) return;
+				if (!channel.isTextBased()) throw new Error();
 				const giveawayTime = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
 				const role1 = interaction.options.getRole('bonusrole1');
