@@ -3,7 +3,7 @@ import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { grantMilestone, isRarity } from '../../util/fortnite.js';
-import { Rarities, RarityOrdering } from '../../constants.js';
+import { ErrorMessages, Rarities, RarityOrdering } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'milestone',
@@ -78,7 +78,7 @@ export default new SlashCommand({
 	scope: 'Guild',
 	permissions: PermissionFlagsBits.ManageGuild,
 	async execute(interaction) {
-		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessages.OutOfGuild);
 
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
@@ -156,7 +156,12 @@ export default new SlashCommand({
 				else {
 					let i = 0;
 					for (const milestone of milestones.sort((a, b) => {
-						if (!isRarity(a.rarity) || !isRarity(b.rarity)) throw new Error(`The rarity of a milestone in the guild with the id of "${guildId}" is not a valid rarity.`);
+						if (!isRarity(a.rarity)) {
+							throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', a.rarity));
+						}
+						else if (!isRarity(b.rarity)) {
+							throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', b.rarity));
+						}
 						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : RarityOrdering[a.rarity] - RarityOrdering[b.rarity];
 					})) {
 						if (i < 25) embed.addFields([{ name: milestone.name, value: milestone.description, inline: true }]);

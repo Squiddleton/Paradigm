@@ -3,7 +3,7 @@ import guildSchema from '../../schemas/guilds.js';
 import milestoneUserSchema from '../../schemas/milestoneusers.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { isRarity } from '../../util/fortnite.js';
-import { RarityOrdering } from '../../constants.js';
+import { ErrorMessages, RarityOrdering } from '../../constants.js';
 
 export default new SlashCommand({
 	name: 'milestones',
@@ -22,7 +22,7 @@ export default new SlashCommand({
 	],
 	scope: 'Guild',
 	async execute(interaction) {
-		if (!interaction.inCachedGuild()) throw new Error(`The /${this.name} command should only be usable in guilds`);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessages.OutOfGuild);
 
 		const member = interaction.options.getMember('member') ?? interaction.member;
 		const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
@@ -49,15 +49,19 @@ export default new SlashCommand({
 				const fullA = milestones.find(m => m.name === a);
 				const fullB = milestones.find(m => m.name === b);
 
-				if (fullA === undefined) throw new Error(`No milestone matches the name "${a}"`);
-				if (fullB === undefined) throw new Error(`No milestone matches the name "${b}"`);
-				if (!isRarity(fullA.rarity)) throw new Error(`"${fullA.rarity} is not a valid rarity`);
-				if (!isRarity(fullB.rarity)) throw new Error(`"${fullB.rarity} is not a valid rarity`);
+				if (fullA === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', a));
+				if (fullB === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', b));
+				if (!isRarity(fullA.rarity)) {
+					throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', fullA.rarity));
+				}
+				else if (!isRarity(fullB.rarity)) {
+					throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', fullB.rarity));
+				}
 
 				return fullA.rarity === fullB.rarity ? fullA.name > fullB.name ? 1 : -1 : RarityOrdering[fullA.rarity] - RarityOrdering[fullB.rarity];
 			})) {
 				const milestoneWithDescription = milestones.find(m => m.name === milestone);
-				if (milestoneWithDescription === undefined) throw new Error(`No milestone matches the name "${milestone}"`);
+				if (milestoneWithDescription === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', milestone));
 				if (i < 25) embed.addFields([{ name: milestone, value: milestoneWithDescription.description, inline: true }]);
 				i++;
 			}

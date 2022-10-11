@@ -9,13 +9,14 @@ import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
+import { ErrorMessages } from '../constants.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 
 const mapById = (shopOnly: boolean) => {
 	return (rating: Rating): ApplicationCommandOptionChoiceData => {
 		const cosmetic = (shopOnly ? itemShopCosmetics : cosmetics).find(cos => cos.name === rating.target);
-		if (cosmetic === undefined) throw new Error(`No cosmetic has the name "${rating.target}"`);
+		if (cosmetic === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', rating.target));
 		return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
 	};
 };
@@ -44,9 +45,9 @@ export default new ClientEvent({
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
-		if (!isReadyClient(client)) throw new Error();
+		if (!isReadyClient(client)) throw new Error(ErrorMessages.UnreadyClient);
 		const { owner } = client.application;
-		if (!(owner instanceof User)) throw new Error('The owner is not a User instance.');
+		if (!(owner instanceof User)) throw new Error(ErrorMessages.NotUserOwned);
 
 		if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
 			const { name, value } = interaction.options.getFocused(true);
@@ -88,7 +89,7 @@ export default new ClientEvent({
 						break;
 					}
 					case 'milestone': {
-						if (!inCachedGuild) throw new Error('The /milestone command should only be usable in guilds');
+						if (!inCachedGuild) throw new Error(ErrorMessages.OutOfGuild);
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
@@ -105,7 +106,7 @@ export default new ClientEvent({
 				}
 			}
 			catch (error) {
-				if (error instanceof DiscordAPIError && error.code !== RESTJSONErrorCodes.UnknownInteraction) throw error;
+				if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownInteraction) throw error;
 			}
 		}
 
@@ -160,7 +161,7 @@ export default new ClientEvent({
 			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 
 			const giveawayResult = guildResult.giveaways.find(g => g.messageId === interaction.message.id);
-			if (giveawayResult === undefined) throw new Error(`No giveaway was found for the id "${interaction.message.id}"`);
+			if (giveawayResult === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', interaction.message.id));
 
 			if (giveawayResult.entrants.includes(userId)) {
 				await interaction.editReply('You have already entered this giveaway.');

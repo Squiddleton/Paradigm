@@ -6,6 +6,7 @@ import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 import type { DisplayUserProperties } from '../../types.js';
+import { ErrorMessages } from '../../constants.js';
 
 const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<DisplayUserProperties> => {
 	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
@@ -142,7 +143,7 @@ export default new SlashCommand({
 							if (index === 24 && wishlist.wishlistCosmeticIds.length !== 25) return `+ ${wishlist.wishlistCosmeticIds.length - 24} more`;
 
 							const cosmetic = itemShopCosmetics.find(c => c.id === id);
-							if (cosmetic === undefined) throw new Error(`A wishlist contains the invalid cosmetic id "${id}"`);
+							if (cosmetic === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', id));
 							return `${cosmetic.name} (${cosmetic.type.displayValue})`;
 						})
 						.sort((a, b) => {

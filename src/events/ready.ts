@@ -5,6 +5,7 @@ import giveawayUserSchema from '../schemas/giveawayusers.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { ClientEvent, validateChannel } from '@squiddleton/discordjs-util';
+import { ErrorMessages } from '../constants.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -13,7 +14,7 @@ export default new ClientEvent({
 		await client.application.fetch();
 
 		const readyMessage = `${client.user.username} is ready!`;
-		if (!isReadyClient(client)) throw new Error();
+		if (!isReadyClient(client)) throw new Error(ErrorMessages.UnreadyClient);
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 

@@ -14,6 +14,15 @@ export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqr
 
 export const ChapterLengths = [10, 8];
 
+export enum ErrorMessages {
+	FalseTypeguard = 'The value "{value}" did not satisfy the typeguard',
+	NotUserOwned = 'The Client application is not owned by a User instance',
+	OutOfGuild = 'This command should only be usable in (cached) guilds',
+	UncachedClient = 'The Client user is not cached',
+	UnexpectedValue = 'The value {value} was unexpected',
+	UnreadyClient = 'The Client should be ready but is not'
+}
+
 export const LanguageChoices: ApplicationCommandOptionChoiceData<string>[] = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
 	de: 'Deutsch',

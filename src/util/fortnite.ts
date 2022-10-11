@@ -7,7 +7,7 @@ import userSchema from '../schemas/users.js';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { BackgroundURLs, RarityColors, RarityOrdering } from '../constants.js';
+import { BackgroundURLs, ErrorMessages, RarityColors, RarityOrdering } from '../constants.js';
 import type { StringOption } from '../types.js';
 
 const isBackground = (str: string): str is keyof typeof BackgroundURLs => str in BackgroundURLs;
@@ -78,7 +78,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 						const wishlistChannel = validateChannel(client, g.wishlistChannelId);
 						if (wishlistChannel.type !== ChannelType.DM) {
 							const permissions = wishlistChannel.permissionsFor(client.user);
-							if (permissions === null) throw new Error(`The client user is uncached in the channel with the id "${wishlistChannel.id}"`);
+							if (permissions === null) throw new Error(ErrorMessages.UnreadyClient);
 							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
 								const fullMsg = msgs.join('\n');
 								if (debug) {
@@ -128,7 +128,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
 	const noBackground = chosenBackground === null;
-	if (!noBackground && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
+	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? randomFromArray(Object.values(BackgroundURLs)) : BackgroundURLs[chosenBackground];
 	const background = await Canvas.loadImage(rawBackground);
 	const canvas = Canvas.createCanvas(background.width, background.height);
@@ -148,7 +148,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		else if (input !== null) {
 			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && noPunc(e.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
 			if (cosmetic === undefined) {
-				throw new Error(`Invalid ${displayType} name provided.`);
+				throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', displayType));
 			}
 			image = await Canvas.loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
 		}
@@ -207,7 +207,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 };
 
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]) => {
-	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new Error(`The provided background "${chosenBackground}" is not a valid background color`);
+	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
@@ -274,7 +274,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			}
 			await i.deferUpdate();
 
-			if (!i.isSelectMenu()) throw new Error('Menu interaction is not a select menu interaction.');
+			if (!i.isSelectMenu()) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', i.componentType.toString()));
 			const value = i.values[0];
 			const cosmetic = cosmetics.find(c => c.id === i.customId);
 			if (cosmetic) {
@@ -284,7 +284,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 						? cosmetic.images.featured ?? cosmetic.images.icon
 						: variants.find(option => option.tag === value)?.image;
 
-					if (imageURL === undefined) throw new Error(`No variant includes a tag with the value "${value}"`);
+					if (imageURL === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', value));
 
 					options[cosmetic.type.displayValue] = imageURL;
 					const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
