@@ -302,7 +302,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					});
 
 					await i.editReply({ attachments: [], content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, files: [newAttachmentBuilder], components, embeds });
-					return;
 				}
 			}
 		});

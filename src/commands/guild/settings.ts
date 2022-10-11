@@ -62,7 +62,6 @@ export default new SlashCommand({
 					)
 					.setTimestamp();
 				await interaction.reply({ embeds: [embed], ephemeral: true });
-				return;
 			}
 		}
 	}

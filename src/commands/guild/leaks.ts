@@ -31,6 +31,5 @@ export default new SlashCommand({
 		if (user) message = `${user} ${message}`;
 
 		await interaction.reply(message);
-		return;
 	}
 });

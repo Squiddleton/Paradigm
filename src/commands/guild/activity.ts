@@ -46,6 +46,5 @@ export default new SlashCommand({
 		const mapped = users.map(user => `${user.tag} (${user.id})`);
 
 		await interaction.editReply(`${max === 1 ? 'Most active user' : `Top ${max} most active users`} over the past${time === 1 ? '' : ` ${time}`} day${time === 1 ? '' : 's'}:\n${mapped.join('\n')}`);
-		return;
 	}
 });

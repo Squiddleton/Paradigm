@@ -165,7 +165,6 @@ export default new SlashCommand({
 				}
 
 				await interaction.reply({ embeds: [embed], ephemeral: true });
-				return;
 			}
 		}
 	}

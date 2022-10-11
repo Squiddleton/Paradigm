@@ -430,7 +430,6 @@ export default new SlashCommand({
 									components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
 									embeds: [e]
 								});
-								return;
 							}
 						}
 					});
@@ -438,7 +437,6 @@ export default new SlashCommand({
 					collector.on('end', async (collected, reason) => {
 						if (reason === 'time') {
 							await interaction.editReply({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
-							return;
 						}
 					});
 				}
@@ -511,7 +509,7 @@ export default new SlashCommand({
 				);
 
 				await interaction.reply({ content: 'Succesfully hosted the giveaway!', ephemeral: true });
-				return;
+
 			}
 		}
 	}

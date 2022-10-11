@@ -41,6 +41,7 @@
     "no-trailing-spaces": "error",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error",
+    "no-useless-return": "error",
     "@typescript-eslint/no-use-before-define": "error",
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/prefer-nullish-coalescing": "error",
