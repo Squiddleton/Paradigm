@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 
 export default new SlashCommand({
@@ -26,6 +26,12 @@ export default new SlashCommand({
 			await interaction.editReply('No set matches your input.');
 			return;
 		}
-		await interaction.editReply(`Set: **${cosmetics[0].set!.value}**\n\n${cosmetics.map(c => `${c.name} (${c.type.displayValue})`).join('\n')}`);
+
+		await interaction.editReply({ embeds: [
+			new EmbedBuilder()
+				.setTitle(`Set: **${cosmetics[0].set!.value}**`)
+				.setDescription(cosmetics.map(c => `${c.name} (${c.type.displayValue})`).join('\n'))
+				.setTimestamp()
+		] });
 	}
 });
