@@ -4,17 +4,6 @@ import fortniteAPI from '../clients/fortnite.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 import { EncodedClient, EpicEndpoints, EpicErrorCode, Seasons } from './constants.js';
 
-const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
-	method: 'post',
-	headers: {
-		'Content-Type': 'application/json',
-		Authorization: `bearer ${accessToken}`
-	},
-	body
-});
-
-const isError = (obj: any): obj is RawEpicError => 'errorCode' in obj;
-
 export class EpicError extends Error {
 	errorCode: string;
 	errorMessage: string;
@@ -37,6 +26,8 @@ export class EpicError extends Error {
 	}
 }
 
+const isError = (obj: any): obj is RawEpicError => 'errorCode' in obj;
+
 const checkError = async <Res>(raw: Response) => {
 	const res = await raw.json() as Res | RawEpicError;
 	if (isError(res)) {
@@ -44,6 +35,15 @@ const checkError = async <Res>(raw: Response) => {
 	}
 	return res;
 };
+
+const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
+	method: 'post',
+	headers: {
+		'Content-Type': 'application/json',
+		Authorization: `bearer ${accessToken}`
+	},
+	body
+});
 
 export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
 	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
