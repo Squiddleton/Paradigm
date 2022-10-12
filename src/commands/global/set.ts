@@ -27,10 +27,15 @@ export default new SlashCommand({
 			return;
 		}
 
+		const cosmeticToAddedTime = (cosmetic: Cosmetic) => new Date(cosmetic.added).getTime();
+
 		await interaction.editReply({ embeds: [
 			new EmbedBuilder()
 				.setTitle(`Set: **${cosmetics[0].set!.value}**`)
-				.setDescription(cosmetics.map(c => `${c.name} (${c.type.displayValue})`).join('\n'))
+				.setDescription(cosmetics
+					.sort((a, b) => cosmeticToAddedTime(a) - cosmeticToAddedTime(b))
+					.map(c => `${c.name} (${c.type.displayValue})`)
+					.join('\n'))
 				.setTimestamp()
 		] });
 	}
