@@ -2,29 +2,7 @@ import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
-import type { EpicErrorCode } from './constants.js';
-
-enum Endpoints {
-	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
-	DeviceAuth = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{accountId}/deviceAuth',
-	AccountByDisplayName = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/displayName/{displayName}',
-	AccountById = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account',
-	BlockList = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/blocklist/{accountId}',
-	Friends = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/friends/{accountId}',
-	Levels = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/query',
-	Stats = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/account/${accountId},',
-	Timeline = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
-	MCP = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{accountId}/client/{operation}?profileId={profile}&rvn=-1'
-}
-
-/**
- * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
- */
-const encodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
-
-const seasons = Array.from({
-	length: 22 // Increment this value every season
-}, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
+import { EncodedClient, EpicEndpoints, EpicErrorCode, Seasons } from './constants.js';
 
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	method: 'post',
@@ -69,11 +47,11 @@ const checkError = async <Res>(raw: Response) => {
 
 export const getAccessToken = async (deviceAuth?: DeviceAuth): Promise<AccessTokenAndId> => {
 	if (deviceAuth === undefined) deviceAuth = config.epicDeviceAuth.main;
-	const res = await fetch(Endpoints.AccessToken, {
+	const res = await fetch(EpicEndpoints.AccessToken, {
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
-			Authorization: `basic ${encodedClient}`
+			Authorization: `basic ${EncodedClient}`
 		},
 		body: new URLSearchParams({ ...deviceAuth })
 	});
@@ -114,11 +92,11 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 	const stats = await fortniteAPI.stats({ name: accountName });
 	const accountId = stats.account.id;
 
-	const { access_token } = await epicFetch<AuthorizationCodeResponse>(Endpoints.AccessToken, {
+	const { access_token } = await epicFetch<AuthorizationCodeResponse>(EpicEndpoints.AccessToken, {
 		method: 'post',
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
-			Authorization: `basic ${encodedClient}`
+			Authorization: `basic ${EncodedClient}`
 		},
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',
@@ -126,7 +104,7 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 		})
 	});
 
-	const { deviceId, secret } = await epicFetch<DeviceAuthResponse>(Endpoints.DeviceAuth.replace('{accountId}', accountId), {
+	const { deviceId, secret } = await epicFetch<DeviceAuthResponse>(EpicEndpoints.DeviceAuth.replace('{accountId}', accountId), {
 		method: 'post',
 		headers: {
 			Authorization: `Bearer ${access_token}`
@@ -147,7 +125,7 @@ export const getAccount = async (nameOrId: string | string[], isId = false) => {
 	let ids: string[] = [];
 	if (!isId) {
 		for (const displayName of namesOrIds) {
-			const res = await epicFetch<EpicAccount>(Endpoints.AccountByDisplayName.replace('{displayName}', displayName));
+			const res = await epicFetch<EpicAccount>(EpicEndpoints.AccountByDisplayName.replace('{displayName}', displayName));
 			ids.push(res.id);
 		}
 	}
@@ -155,12 +133,12 @@ export const getAccount = async (nameOrId: string | string[], isId = false) => {
 		ids = namesOrIds;
 	}
 
-	return epicFetch<EpicAccount[]>(`${Endpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
+	return epicFetch<EpicAccount[]>(`${EpicEndpoints.AccountById}?accountId=${ids.join('&accountId=')}`);
 };
 
-export const getBlockList = (accountId: string) => epicFetch<BlockList>(Endpoints.BlockList.replace('{accountId}', accountId));
+export const getBlockList = (accountId: string) => epicFetch<BlockList>(EpicEndpoints.BlockList.replace('{accountId}', accountId));
 
-export const getFriends = (accountId: string) => epicFetch<Friend[]>(Endpoints.Friends.replace('{accountId}', accountId));
+export const getFriends = (accountId: string) => epicFetch<Friend[]>(EpicEndpoints.Friends.replace('{accountId}', accountId));
 
 export const getLevels = async (accountId: string, accessToken?: string) => {
 	if (accessToken === undefined) {
@@ -169,28 +147,28 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 	}
 
 	const levels = await epicFetch<Stats[]>(
-		Endpoints.Levels,
+		EpicEndpoints.Levels,
 		postBody(accessToken, JSON.stringify({
 			appId: 'fortnite',
 			startDate: 0,
 			endDate: 0,
 			owners: [accountId],
-			stats: seasons
+			stats: Seasons
 		}))
 	);
 
 	return levels[0].stats;
 };
 
-export const getStats = (accountId: string) => epicFetch<Stats>(Endpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
+export const getStats = (accountId: string) => epicFetch<Stats>(EpicEndpoints.Stats.replace('{accountId}', accountId)).then(r => r.stats);
 
-export const getTimeline = () => epicFetch(Endpoints.Timeline);
+export const getTimeline = () => epicFetch(EpicEndpoints.Timeline);
 
 export const mcpRequest = async (operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => {
 	const accessTokenAndId = await getAccessToken();
 
 	return epicFetch(
-		Endpoints.MCP
+		EpicEndpoints.MCP
 			.replace('{accountId}', accessTokenAndId.accountId)
 			.replace('{operation}', operation)
 			.replace('{profile}', profile),

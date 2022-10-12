@@ -15,6 +15,24 @@ export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqr
 
 export const ChapterLengths = [10, 8];
 
+/**
+ * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
+ */
+export const EncodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
+
+export enum EpicEndpoints {
+	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
+	DeviceAuth = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{accountId}/deviceAuth',
+	AccountByDisplayName = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/displayName/{displayName}',
+	AccountById = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account',
+	BlockList = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/blocklist/{accountId}',
+	Friends = 'https://friends-public-service-prod06.ol.epicgames.com/friends/api/public/friends/{accountId}',
+	Levels = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/query',
+	Stats = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/account/${accountId},',
+	Timeline = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
+	MCP = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{accountId}/client/{operation}?profileId={profile}&rvn=-1'
+}
+
 export enum EpicErrorCode {
 	INVALID_GRANT = 18031
 }
@@ -121,6 +139,10 @@ export enum RarityOrdering {
 }
 
 export const Rarities = Object.keys(RarityOrdering);
+
+export const Seasons = Array.from({
+	length: 22 // Increment this value every season
+}, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 export const TextBasedChannelTypes = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
 
