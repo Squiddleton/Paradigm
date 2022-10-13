@@ -48,7 +48,7 @@ const client = new Client({
 	],
 	presence: {
 		activities: [{
-			name: 'Lil\' Whip (Mmm!)',
+			name: 'Nothing is Inevitable',
 			type: ActivityType.Listening
 		}]
 	}
