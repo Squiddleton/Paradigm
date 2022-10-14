@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBu
 import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollectorFilter } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
-import { ErrorMessages, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
+import { ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
 import type { IGiveaway } from '../../util/types.js';
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
@@ -181,7 +181,7 @@ export default new SlashCommand({
 	scope: 'Guild',
 	permissions: PermissionFlagsBits.ManageGuild,
 	async execute(interaction, client) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessages.OutOfGuild);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
@@ -442,7 +442,7 @@ export default new SlashCommand({
 				const winners = interaction.options.getInteger('winners', true);
 				const messages = interaction.options.getInteger('messages') ?? 0;
 				const channel = interaction.options.getChannel('channel', true);
-				if (!channel.isTextBased()) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', channel.type.toString()));
+				if (!channel.isTextBased()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', channel.type.toString()));
 				const giveawayTime = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
 				const role1 = interaction.options.getRole('bonusrole1');
@@ -456,11 +456,11 @@ export default new SlashCommand({
 				}
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
-				if (!isUnit(units)) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', units));
+				if (!isUnit(units)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', units));
 				const endTime = startTime + (giveawayTime * UnitsToMS[units]);
 
 				const permissions = channel.permissionsFor(client.user);
-				if (permissions === null) throw new Error(ErrorMessages.UncachedClient);
+				if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
 				if (!permissions.has([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks])) {
 					await interaction.reply({ content: 'The View Channel, Send Messages, and Embed Links permissions in the selected channel are required to use this command.', ephemeral: true });
 					return;

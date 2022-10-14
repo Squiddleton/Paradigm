@@ -3,7 +3,7 @@ import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
 import { Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
-import { ErrorMessages } from '../util/constants.js';
+import { ErrorMessage } from '../util/constants.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
@@ -33,7 +33,7 @@ const client = new DiscordClient({
 			return event;
 		}
 		else {
-			throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', typeof event));
+			throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 		}
 	}),
 	exclusiveGuildId: config.exclusiveGuildId,

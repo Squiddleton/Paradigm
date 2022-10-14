@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable } from 'discord.js';
 import type { StringChoices } from './types';
 
-export enum BackgroundURLs {
+export enum BackgroundURL {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
 	Orange = 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
 	Purple = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
@@ -9,7 +9,7 @@ export enum BackgroundURLs {
 	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 }
 
-export const BackgroundChoices: StringChoices = Object.keys(BackgroundURLs).map(background => ({ name: background, value: background }));
+export const BackgroundChoices: StringChoices = Object.keys(BackgroundURL).map(background => ({ name: background, value: background }));
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
@@ -25,7 +25,7 @@ export const CosmeticCacheUpdateThreshold = 3600000;
  */
 export const EncodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';
 
-export enum EpicEndpoints {
+export enum EpicEndpoint {
 	AccessToken = 'https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token',
 	DeviceAuth = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/{accountId}/deviceAuth',
 	AccountByDisplayName = 'https://account-public-service-prod.ol.epicgames.com/account/api/public/account/displayName/{displayName}',
@@ -42,7 +42,7 @@ export enum EpicErrorCode {
 	INVALID_GRANT = 18031
 }
 
-export enum ErrorMessages {
+export enum ErrorMessage {
 	FalseTypeguard = 'The value "{value}" did not satisfy the typeguard',
 	NotUserOwned = 'The Client application is not owned by a User instance',
 	OutOfGuild = 'This command should only be usable in (cached) guilds',

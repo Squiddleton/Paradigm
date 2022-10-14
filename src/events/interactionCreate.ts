@@ -8,7 +8,7 @@ import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
-import { ErrorMessages } from '../util/constants.js';
+import { ErrorMessage } from '../util/constants.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 
@@ -32,9 +32,9 @@ export default new ClientEvent({
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
-		if (!isReadyClient(client)) throw new Error(ErrorMessages.UnreadyClient);
+		if (!isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
 		const { owner } = client.application;
-		if (!(owner instanceof User)) throw new Error(ErrorMessages.NotUserOwned);
+		if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 
 		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
@@ -48,7 +48,7 @@ export default new ClientEvent({
 						const closest = findBestMatch(input, cosmetics.map(mapByName));
 						const choices = closest.ratings.sort(sortByRating).map(rating => {
 							const cosmetic = cosmetics.find(cos => cos.name === rating.target);
-							if (cosmetic === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', rating.target));
+							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', rating.target));
 							return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
 						}).slice(0, 25);
 						await interaction.respond(choices);
@@ -82,7 +82,7 @@ export default new ClientEvent({
 						break;
 					}
 					case 'milestone': {
-						if (!inCachedGuild) throw new Error(ErrorMessages.OutOfGuild);
+						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfGuild);
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
@@ -154,7 +154,7 @@ export default new ClientEvent({
 			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 
 			const giveawayResult = guildResult.giveaways.find(g => g.messageId === interaction.message.id);
-			if (giveawayResult === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', interaction.message.id));
+			if (giveawayResult === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', interaction.message.id));
 
 			if (giveawayResult.entrants.includes(userId)) {
 				await interaction.editReply('You have already entered this giveaway.');

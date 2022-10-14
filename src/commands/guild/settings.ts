@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
-import { ErrorMessages, TextBasedChannelTypes } from '../../util/constants.js';
+import { ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'settings',
@@ -29,7 +29,7 @@ export default new SlashCommand({
 	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
 	async execute(interaction, client) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessages.OutOfGuild);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
@@ -40,7 +40,7 @@ export default new SlashCommand({
 				}
 
 				const permissions = wishlistChannel.permissionsFor(client.user);
-				if (permissions === null) throw new Error(ErrorMessages.UncachedClient);
+				if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
 				if (!permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
 					await interaction.reply({ content: 'I need the View Channel and Send Messages permissions in that channel before it can be set.', ephemeral: true });
 					return;
