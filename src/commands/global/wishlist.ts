@@ -66,8 +66,8 @@ export default new SlashCommand({
 			]
 		},
 		{
-			name: 'list',
-			description: 'List the cosmetics in your wishlist',
+			name: 'view',
+			description: 'View the cosmetics in your wishlist',
 			type: ApplicationCommandOptionType.Subcommand,
 			options: [
 				{
@@ -127,7 +127,7 @@ export default new SlashCommand({
 				}
 				break;
 			}
-			case 'list': {
+			case 'view': {
 				const user = await getUserProperties(interaction);
 
 				const wishlist = await userSchema.findById(user.id);
