@@ -1,10 +1,8 @@
-import type { BodyInit, RequestInfo, RequestInit, Response } from 'node-fetch';
+import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 import { EncodedClient, EpicEndpoints, EpicErrorCode, Seasons } from './constants.js';
-
-const fetch = (url: RequestInfo, init: RequestInit) => import('node-fetch').then(f => f.default(url, init));
 
 export class EpicError extends Error {
 	errorCode: string;
