@@ -2,7 +2,8 @@ declare function require(name:string): any;
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
-import { AnyClientEvent, Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { ErrorMessages } from '../util/constants.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
@@ -10,15 +11,6 @@ for (const folder of readdirSync('./dist/commands')) {
 	for (const file of commandFiles) {
 		const { default: command } = require(`../commands/${folder}/${file}`);
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
-	}
-}
-
-const events: AnyClientEvent[] = [];
-const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
-for (const file of eventFiles) {
-	const { default: event } = require(`../events/${file}`);
-	if (event instanceof ClientEvent) {
-		events.push(event);
 	}
 }
 
@@ -35,7 +27,15 @@ const client = new Client({
 	},
 	commands,
 	devGuildId: config.devGuildId,
-	events,
+	events: readdirSync('./dist/events').filter(file => file.endsWith('.js')).map(file => {
+		const { default: event } = require(`../events/${file}`);
+		if (event instanceof ClientEvent) {
+			return event;
+		}
+		else {
+			throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', typeof event));
+		}
+	}),
 	exclusiveGuildId: config.exclusiveGuildId,
 	failIfNotExists: false,
 	intents: [
