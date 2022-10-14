@@ -48,7 +48,8 @@ export interface Config {
 	/** The guild to deploy all commands with the "Exclusive" scope */
 	exclusiveGuildId: string;
 	epicDeviceAuth: {
-		main: DeviceAuth;
+		device1: DeviceAuth;
+		device2: DeviceAuth;
 		alt?: DeviceAuth;
 	};
 	fortniteAPIKey: string;

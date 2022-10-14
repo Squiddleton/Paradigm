@@ -45,7 +45,7 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	body
 });
 
-export const getAccessToken = async (deviceAuth = config.epicDeviceAuth.main): Promise<AccessTokenAndId> => {
+export const getAccessToken = async (deviceAuth = config.epicDeviceAuth.device2): Promise<AccessTokenAndId> => {
 	const res = await fetch(EpicEndpoints.AccessToken, {
 		method: 'post',
 		headers: {
