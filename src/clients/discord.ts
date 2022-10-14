@@ -14,14 +14,14 @@ for (const folder of readdirSync('./dist/commands')) {
 	}
 }
 
-export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
+export class DiscordClient<Ready extends boolean = boolean> extends BaseClient<Ready> {
 	get devChannel() {
 		if (!this.isReady()) throw new Error('The devChannel property cannot be accessed until the Client is ready');
 		return validateChannel(this, config.devChannelId);
 	}
 }
 
-const client = new Client({
+const client = new DiscordClient({
 	allowedMentions: {
 		parse: ['users']
 	},

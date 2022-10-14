@@ -1,5 +1,5 @@
-import { Client as BaseClient, Colors, EmbedBuilder, Guild, time } from 'discord.js';
-import type { Client } from '../clients/discord.js';
+import { Client, Colors, EmbedBuilder, Guild, time } from 'discord.js';
+import type { DiscordClient } from '../clients/discord.js';
 import type { IGiveaway, IMessage, Quantity } from './types.js';
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
@@ -26,7 +26,7 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 	return embed;
 };
 
-export const isReadyClient = (client: BaseClient): client is Client<true> => client.isReady();
+export const isReadyClient = (client: Client): client is DiscordClient<true> => client.isReady();
 
 export const noPunc = (str: string) => str
 	.toLowerCase()
