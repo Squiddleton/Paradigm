@@ -3,7 +3,7 @@ import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollect
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
-import type { IGiveaway } from '../../util/types.js';
+import type { IBonusRole, IGiveaway } from '../../util/types.js';
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
 
@@ -287,7 +287,7 @@ export default new SlashCommand({
 					await interaction.editReply('There are no more eligible entrants who can win.');
 					return;
 				}
-				const newWinners = [];
+				const newWinners: string[] = [];
 				for (let i = 0; i < amount; i++) {
 					const newWinner = randomFromArray(eligibleEntrants);
 					winners.push(newWinner);
@@ -466,7 +466,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const bonusRoles = [];
+				const bonusRoles: IBonusRole[] = [];
 				if (role1 !== null && role1Amount !== null) bonusRoles.push({ id: role1.id, amount: role1Amount });
 				if (role2 !== null && role2Amount !== null) bonusRoles.push({ id: role2.id, amount: role2Amount });
 
