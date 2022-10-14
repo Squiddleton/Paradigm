@@ -1,4 +1,4 @@
-import { Client, Colors, EmbedBuilder, Guild, time } from 'discord.js';
+import { ChatInputCommandInteraction, Client, Colors, EmbedBuilder, Guild, MessageComponentInteraction, time } from 'discord.js';
 import type { DiscordClient } from '../clients/discord.js';
 import type { IGiveaway, IMessage, Quantity } from './types.js';
 
@@ -27,6 +27,12 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 };
 
 export const isReadyClient = (client: Client): client is DiscordClient<true> => client.isReady();
+
+export const messageComponentCollectorFilter = (interaction: ChatInputCommandInteraction) => (i: MessageComponentInteraction) => {
+	if (i.user.id === interaction.user.id) return true;
+	i.reply({ content: 'Only the command user can use this.', ephemeral: true });
+	return false;
+};
 
 export const noPunc = (str: string) => str
 	.toLowerCase()

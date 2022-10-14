@@ -1,6 +1,6 @@
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, MessageComponentInteraction, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
-import { noPunc, randomFromArray } from './functions.js';
+import { messageComponentCollectorFilter, noPunc, randomFromArray } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
@@ -274,12 +274,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	await interaction.editReply({ components, content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, files: [attachment], embeds });
 	if (components.length > 0) {
 		const message: Message = await interaction.fetchReply();
-		const filter = (i: MessageComponentInteraction) => {
-			if (i.user.id === interaction.user.id) return true;
-			i.reply({ content: 'Only the command user can use this.', ephemeral: true });
-			return false;
-		};
-		const collector = message.createMessageComponentCollector({ filter, time: 120000 });
+		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: 120000 });
 		const options: { [key: string]: string } = {};
 
 		collector.on('collect', async i => {

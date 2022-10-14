@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, Message, ComponentType, ButtonInteraction, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
-import { randomFromArray, quantity, createGiveawayEmbed } from '../../util/functions.js';
+import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, Message, ComponentType, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
+import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollectorFilter } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 import { ErrorMessages, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
@@ -371,12 +371,7 @@ export default new SlashCommand({
 				const msg: Message = await interaction.reply({ components: willUseButtons ? [row] : [], embeds: [embed], fetchReply: true });
 
 				if (willUseButtons) {
-					const filter = (i: ButtonInteraction) => {
-						if (i.user.id === interaction.user.id) return true;
-						i.reply({ content: 'Only the command user can use this.', ephemeral: true });
-						return false;
-					};
-					const collector = msg.createMessageComponentCollector({ componentType: ComponentType.Button, filter, time: 180000 });
+					const collector = msg.createMessageComponentCollector({ componentType: ComponentType.Button, filter: messageComponentCollectorFilter(interaction), time: 180000 });
 					let index = 0;
 					collector.on('collect', async int => {
 						switch (int.customId) {
