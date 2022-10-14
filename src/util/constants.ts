@@ -1,5 +1,7 @@
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable } from 'discord.js';
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable, PermissionFlagsBits, PermissionResolvable } from 'discord.js';
 import type { StringChoices } from './types';
+
+export const AccessibleChannelPermissions: PermissionResolvable[] = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
 
 export enum BackgroundURL {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
@@ -44,6 +46,8 @@ export enum EpicErrorCode {
 
 export enum ErrorMessage {
 	FalseTypeguard = 'The value "{value}" did not satisfy the typeguard',
+	InvisibleChannel = 'The Client is missing the View Channel permission in the channel "{channelId}"',
+	MissingPermissions = 'The Client is missing its required permissions in the channel "{channelId}"',
 	NotUserOwned = 'The Client application is not owned by a User instance',
 	OutOfGuild = 'This command should only be usable in (cached) guilds',
 	UncachedClient = 'The Client user is not cached',

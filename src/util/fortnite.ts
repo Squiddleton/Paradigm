@@ -1,12 +1,11 @@
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ChannelType, PermissionFlagsBits, ColorResolvable, time } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time } from 'discord.js';
 import Canvas from 'canvas';
-import { messageComponentCollectorFilter, noPunc, randomFromArray } from './functions.js';
+import { messageComponentCollectorFilter, noPunc, randomFromArray, validateGuildChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
-import { validateChannel } from '@squiddleton/discordjs-util';
 import { BackgroundURL, CosmeticCacheUpdateThreshold, ErrorMessage, RarityColors, RarityOrdering } from './constants.js';
 import type { CosmeticCache, StringOption } from './types.js';
 
@@ -88,20 +87,15 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				if (msgs.length !== 1 && g.wishlistChannelId !== null) {
 					msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
 					try {
-						const wishlistChannel = validateChannel(client, g.wishlistChannelId);
-						if (wishlistChannel.type !== ChannelType.DM) {
-							const permissions = wishlistChannel.permissionsFor(client.user);
-							if (permissions === null) throw new Error(ErrorMessage.UnreadyClient);
-							if (permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
-								const fullMsg = msgs.join('\n');
-								if (debug) {
-									console.log(fullMsg);
-								}
-								else {
-									for (const message of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
-										await wishlistChannel.send(message);
-									}
-								}
+						const wishlistChannel = validateGuildChannel(client, g.wishlistChannelId);
+
+						const fullMsg = msgs.join('\n');
+						if (debug) {
+							console.log(fullMsg);
+						}
+						else {
+							for (const message of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
+								await wishlistChannel.send(message);
 							}
 						}
 					}

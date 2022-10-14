@@ -1,6 +1,9 @@
 import { ApplicationCommandOptionType, Message } from 'discord.js';
 import Canvas from 'canvas';
-import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ErrorMessage } from '../../util/constants';
+import { validateGuildChannel } from '../../util/functions';
+import type { AnyGuildTextChannel } from '../../util/types';
 
 export default new SlashCommand({
 	name: 'suggest',
@@ -46,7 +49,19 @@ export default new SlashCommand({
 
 		const submissionName = interaction.options.getString('name');
 		const type = interaction.options.getString('type');
-		const submissionChannel = validateChannel(client, '895024792439251064');
+
+		const submissionChannelId = '895024792439251064';
+		let submissionChannel: AnyGuildTextChannel;
+		try {
+			submissionChannel = validateGuildChannel(client, submissionChannelId);
+		}
+		catch (error) {
+			if (error instanceof Error && error.message === ErrorMessage.MissingPermissions.replace('{channelId}', submissionChannelId)) {
+				await interaction.editReply('The bot lacks the View Channel permission, Send Messages permission, or both in that channel. Please grant it both permissions, and then try again.');
+				return;
+			}
+			throw error;
+		}
 
 		let message: Message;
 		try {

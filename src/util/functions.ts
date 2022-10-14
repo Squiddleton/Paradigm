@@ -1,6 +1,8 @@
-import { ChatInputCommandInteraction, Client, Colors, EmbedBuilder, Guild, MessageComponentInteraction, time } from 'discord.js';
+import { validateChannel } from '@squiddleton/discordjs-util';
+import { ChannelType, ChatInputCommandInteraction, Client, Colors, EmbedBuilder, Guild, MessageComponentInteraction, PermissionFlagsBits, Snowflake, time } from 'discord.js';
 import type { DiscordClient } from '../clients/discord.js';
-import type { IGiveaway, IMessage, Quantity } from './types.js';
+import { AccessibleChannelPermissions, ErrorMessage } from './constants.js';
+import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity } from './types.js';
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new EmbedBuilder()
@@ -24,6 +26,12 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
+};
+
+export const getClientPermissions = (client: Client<true>, channel: AnyGuildTextChannel) => {
+	const permissions = channel.permissionsFor(client.user);
+	if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
+	return permissions;
 };
 
 export const isReadyClient = (client: Client): client is DiscordClient<true> => client.isReady();
@@ -64,3 +72,21 @@ export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * a
 export const sum = (previous: number, current: number) => previous + current;
 
 export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;
+
+export const validateGuildChannel = (client: Client<true>, channelId: Snowflake, checkPermissions = true): AnyGuildTextChannel => {
+	const channel = validateChannel(client, channelId);
+	if (channel.type === ChannelType.DM) throw new Error(`The channel "${channelId}" is actually the DM channel for recipient "${channel.recipientId}"`);
+
+	if (checkPermissions) {
+		const permissions = getClientPermissions(client, channel);
+		if (!permissions.has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
+	}
+	return channel;
+};
+
+export const validateVisibleChannel = (client: Client<true>, channelId: Snowflake) => {
+	const channel = validateGuildChannel(client, channelId, false);
+	const permissions = getClientPermissions(client, channel);
+	if (!permissions.has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
+	return channel;
+};

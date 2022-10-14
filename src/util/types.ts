@@ -1,5 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
-import type { ApplicationCommandOptionChoiceData, Snowflake } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, DMChannel, PartialDMChannel, Snowflake, TextBasedChannel } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -24,6 +24,8 @@ export interface AccessTokenResponse {
 	in_app_id: string;
 	device_id: string;
 }
+
+export type AnyGuildTextChannel = Exclude<TextBasedChannel, DMChannel | PartialDMChannel>;
 
 export interface AuthorizationCodeResponse extends AccessTokenResponse {
 	scope: unknown[];

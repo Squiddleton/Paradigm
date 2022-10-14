@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
-import { ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
+import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'settings',
@@ -41,7 +41,7 @@ export default new SlashCommand({
 
 				const permissions = wishlistChannel.permissionsFor(client.user);
 				if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
-				if (!permissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
+				if (!permissions.has(AccessibleChannelPermissions)) {
 					await interaction.reply({ content: 'I need the View Channel and Send Messages permissions in that channel before it can be set.', ephemeral: true });
 					return;
 				}

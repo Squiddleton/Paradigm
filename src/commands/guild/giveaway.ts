@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, Message, ComponentType, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
-import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollectorFilter } from '../../util/functions.js';
+import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollectorFilter, validateVisibleChannel } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
-import { SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
-import { ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
+import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
 import type { IGiveaway } from '../../util/types.js';
 
 const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
@@ -213,7 +213,7 @@ export default new SlashCommand({
 				}
 
 				try {
-					const giveawayChannel = validateChannel(client, giveaway.channelId);
+					const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
 					try {
 						const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
@@ -295,7 +295,7 @@ export default new SlashCommand({
 				}
 
 				const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
-				const giveawayChannel = validateChannel(client, giveaway.channelId);
+				const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
 				const message = await giveawayChannel.messages.fetch(messageId);
 				await message.reply(`This giveaway has been rerolled, so congratulations to the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
 
@@ -321,7 +321,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const giveawayChannel = validateChannel(client, giveaway.channelId);
+				const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
 				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 
 				const quantities = quantity(giveaway.entrants);
@@ -461,7 +461,7 @@ export default new SlashCommand({
 
 				const permissions = channel.permissionsFor(client.user);
 				if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
-				if (!permissions.has([PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.EmbedLinks])) {
+				if (!permissions.has([...AccessibleChannelPermissions, PermissionsBitField.Flags.EmbedLinks])) {
 					await interaction.reply({ content: 'The View Channel, Send Messages, and Embed Links permissions in the selected channel are required to use this command.', ephemeral: true });
 					return;
 				}

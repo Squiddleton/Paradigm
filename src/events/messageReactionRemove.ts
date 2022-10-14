@@ -1,5 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
-import { ClientEvent, validateChannel } from '@squiddleton/discordjs-util';
+import { ClientEvent } from '@squiddleton/discordjs-util';
+import config from '../config';
+import { validateGuildChannel } from '../util/functions';
 
 export default new ClientEvent({
 	name: 'messageReactionRemove',
@@ -15,9 +17,9 @@ export default new ClientEvent({
 			}
 		}
 		const { message } = reaction;
-		if (message.guildId === '486932163636232193') {
+		if (message.guildId === config.exclusiveGuildId) {
 			const toString = reaction.emoji.toString();
-			const logChannel = validateChannel(client, '488112900276224010');
+			const logChannel = validateGuildChannel(client, '488112900276224010');
 
 			await logChannel.send({ embeds: [
 				new EmbedBuilder()
