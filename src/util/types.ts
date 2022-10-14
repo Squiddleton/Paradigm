@@ -41,8 +41,11 @@ export interface BlockList {
 
 export interface Config {
 	token: string;
+	/** The channel to access with Client#devChannel */
 	devChannelId: string;
+	/** The guild to deploy all commands */
 	devGuildId: string;
+	/** The guild to deploy all commands with the "Exclusive" scope */
 	exclusiveGuildId: string;
 	epicDeviceAuth: {
 		main: DeviceAuth;
