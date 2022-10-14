@@ -27,7 +27,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const item = findCosmetic(interaction.options.getString('cosmetic', true));
+		const item = await findCosmetic(interaction.options.getString('cosmetic', true));
 		const language = interaction.options.getString('language') as Language | null;
 
 		if (item === null) {

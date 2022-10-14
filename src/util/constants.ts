@@ -16,6 +16,11 @@ export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqr
 export const ChapterLengths = [10, 8];
 
 /**
+ * 60 minutes * (60 seconds / minute) * (1,000 milliseconds / second)
+ */
+export const CosmeticCacheUpdateThreshold = 3600000;
+
+/**
  * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
  */
 export const EncodedClient = 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=';

@@ -4,21 +4,13 @@ import { findBestMatch, Rating } from 'string-similarity';
 import guildSchema from'../schemas/guilds.js';
 import memberSchema from'../schemas/members.js';
 import { isReadyClient, noPunc, sumMsgs } from'../util/functions.js';
-import { cosmetics, itemShopCosmetics } from '../util/fortnite.js';
+import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import { ErrorMessages } from '../util/constants.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
-
-const mapById = (shopOnly: boolean) => {
-	return (rating: Rating): ApplicationCommandOptionChoiceData => {
-		const cosmetic = (shopOnly ? itemShopCosmetics : cosmetics).find(cos => cos.name === rating.target);
-		if (cosmetic === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', rating.target));
-		return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
-	};
-};
 
 const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
 
@@ -28,15 +20,11 @@ const sortByRating = (a: Rating, b: Rating) => {
 };
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
+	const cosmetics = await fetchCosmetics();
 	const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
 	const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 	await interaction.respond(choices);
 };
-
-const cosmeticNames = cosmetics.map(mapByName);
-const shopCosmeticNames = itemShopCosmetics.map(mapByName);
-
-const playlists = [...new Set((await fortniteAPI.playlists()).map(mapByName))];
 
 export default new ClientEvent({
 	name: 'interactionCreate',
@@ -56,12 +44,18 @@ export default new ClientEvent({
 				switch (name) {
 					case 'cosmetic': {
 						const shopOnly = interaction.commandName === 'wishlist';
-						const closest = findBestMatch(input, shopOnly ? shopCosmeticNames : cosmeticNames);
-						const choices = closest.ratings.sort(sortByRating).map(mapById(shopOnly)).slice(0, 25);
+						const cosmetics = await fetchCosmetics(shopOnly);
+						const closest = findBestMatch(input, cosmetics.map(mapByName));
+						const choices = closest.ratings.sort(sortByRating).map(rating => {
+							const cosmetic = cosmetics.find(cos => cos.name === rating.target);
+							if (cosmetic === undefined) throw new Error(ErrorMessages.UnexpectedValue.replace('{value}', rating.target));
+							return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+						}).slice(0, 25);
 						await interaction.respond(choices);
 						break;
 					}
 					case 'playlist': {
+						const playlists = [...new Set((await fortniteAPI.playlists()).map(mapByName))];
 						const closest = findBestMatch(input, playlists);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);

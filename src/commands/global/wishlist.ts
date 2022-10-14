@@ -2,7 +2,7 @@ import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, Embe
 
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
-import { findCosmetic, itemShopCosmetics } from '../../util/fortnite.js';
+import { findCosmetic, fetchCosmetics } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 import type { DisplayUserProperties } from '../../util/types.js';
@@ -95,11 +95,12 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		const userId = interaction.user.id;
+		const itemShopCosmetics = await fetchCosmetics(true);
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
 				const input = interaction.options.getString('cosmetic', true);
-				const cosmetic = findCosmetic(input, true);
+				const cosmetic = await findCosmetic(input, true);
 				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;

@@ -7,16 +7,19 @@ import userSchema from '../schemas/users.js';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { BackgroundURLs, ErrorMessages, RarityColors, RarityOrdering } from './constants.js';
-import type { StringOption } from './types.js';
+import { BackgroundURLs, CosmeticCacheUpdateThreshold, ErrorMessages, RarityColors, RarityOrdering } from './constants.js';
+import type { CosmeticCache, StringOption } from './types.js';
 
 const isBackground = (str: string): str is keyof typeof BackgroundURLs => str in BackgroundURLs;
 
 export const isRarity = (rarity: string): rarity is keyof typeof RarityOrdering => rarity in RarityOrdering;
 
-export const cosmetics = await fortniteAPI.listCosmetics();
+const cosmeticCache: CosmeticCache = {
+	cosmetics: [],
+	lastUpdatedTimestamp: 0
+};
 
-export const itemShopCosmetics = cosmetics.filter(cosmetic => {
+const itemShopFilter = (cosmetic: Cosmetic) => {
 	if (cosmetic.shopHistory?.length) return true;
 
 	return cosmetic.gameplayTags !== null &&
@@ -26,10 +29,20 @@ export const itemShopCosmetics = cosmetics.filter(cosmetic => {
 	(!['Cosmetics.Source.Promo', 'Cosmetics.Source.Granted.SaveTheWorld', 'Cosmetics.Source.testing', 'Cosmetics.QuestsMetaData.Achievements.Umbrella', 'Cosmetics.Source.MandosBountyLTM'].some(tag => cosmetic.gameplayTags?.includes(tag)) &&
 	!cosmetic.gameplayTags.some(tag => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(word => tag.includes(word))) &&
 	!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
-});
+};
 
-export const findCosmetic = (input: string, itemShop = false) => {
-	const list = itemShop ? itemShopCosmetics : cosmetics;
+export const fetchCosmetics = async (itemShopOnly = false) => {
+	const now = Date.now();
+	if ((cosmeticCache.lastUpdatedTimestamp + CosmeticCacheUpdateThreshold) < now) {
+		cosmeticCache.cosmetics = await fortniteAPI.listCosmetics();
+		cosmeticCache.lastUpdatedTimestamp = now;
+	}
+	const { cosmetics } = cosmeticCache;
+	return itemShopOnly ? cosmetics.filter(itemShopFilter) : cosmetics;
+};
+
+export const findCosmetic = async (input: string, itemShopOnly = false) => {
+	const list = await fetchCosmetics(itemShopOnly);
 	const id = list.find(c => c.id === input) ?? list.find(c => input.includes(c.id));
 	if (id !== undefined) return id;
 	input = noPunc(input);
@@ -127,6 +140,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 };
 
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
+	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? randomFromArray(Object.values(BackgroundURLs)) : BackgroundURLs[chosenBackground];
@@ -207,6 +221,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 };
 
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]) => {
+	const cosmetics = await fetchCosmetics();
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new TypeError(ErrorMessages.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];

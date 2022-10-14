@@ -1,4 +1,4 @@
-import type { DateString } from '@squiddleton/fortnite-api';
+import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, Snowflake } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
@@ -57,6 +57,11 @@ export interface Config {
 		refreshToken: string;
 		userAgent: string;
 	};
+}
+
+export interface CosmeticCache {
+	cosmetics: Cosmetic[];
+	lastUpdatedTimestamp: number;
 }
 
 export interface DisplayUserProperties {

@@ -1,14 +1,24 @@
+declare function require(name:string): any;
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
-import { Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { AnyClientEvent, Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
 	const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
-		const { default: command } = await import(`../commands/${folder}/${file}`);
+		const { default: command } = require(`../commands/${folder}/${file}`);
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
+	}
+}
+
+const events: AnyClientEvent[] = [];
+const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+	const { default: event } = require(`../events/${file}`);
+	if (event instanceof ClientEvent) {
+		events.push(event);
 	}
 }
 
@@ -25,6 +35,7 @@ const client = new Client({
 	},
 	commands,
 	devGuildId: config.devGuildId,
+	events,
 	exclusiveGuildId: config.exclusiveGuildId,
 	failIfNotExists: false,
 	intents: [
@@ -53,19 +64,5 @@ const client = new Client({
 		}]
 	}
 });
-
-const eventFiles = readdirSync('./dist/events').filter(file => file.endsWith('.js'));
-for (const file of eventFiles) {
-	import(`../events/${file}`).then(({ default: event }) => {
-		if (event instanceof ClientEvent) {
-			if (event.once) {
-				client.once(event.name, event.execute);
-			}
-			else {
-				client.on(event.name, event.execute);
-			}
-		}
-	});
-}
 
 export default client;

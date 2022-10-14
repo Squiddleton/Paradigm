@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
-import { cosmetics, createCosmeticEmbed } from '../../util/fortnite.js';
+import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { BackgroundURLs } from '../../util/constants.js';
@@ -34,6 +34,7 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		await interaction.deferReply();
+		const cosmetics = await fetchCosmetics();
 		const type = interaction.options.getString('type');
 		if (type) {
 			await interaction.editReply({ embeds: [createCosmeticEmbed(randomFromArray(cosmetics.filter(i => i.type.value === type)))] });

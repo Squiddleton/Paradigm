@@ -1,7 +1,7 @@
 import Canvas from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { cosmetics } from '../../util/fortnite.js';
+import { fetchCosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { RarityColors } from '../../util/constants.js';
 
@@ -10,6 +10,7 @@ export default new SlashCommand({
 	description: 'Guess a Fortnite Outfit\'s name from its silhouette',
 	scope: 'Global',
 	async execute(interaction) {
+		const cosmetics = await fetchCosmetics();
 		const items = cosmetics.filter(i => i.type.displayValue === 'Outfit' && i.name !== 'TBD');
 		const cosmetic = randomFromArray(items);
 		const image = cosmetic.images.featured ?? cosmetic.images.icon;
