@@ -34,6 +34,8 @@ export const getClientPermissions = (client: Client<true>, channel: AnyGuildText
 	return permissions;
 };
 
+export const getEnumKeys = (e: Record<string, any>) => Object.keys(e).filter(x => !(parseInt(x) >= 0));
+
 export const isReadyClient = (client: Client): client is DiscordClient<true> => client.isReady();
 
 export const messageComponentCollectorFilter = (interaction: ChatInputCommandInteraction) => (i: MessageComponentInteraction) => {

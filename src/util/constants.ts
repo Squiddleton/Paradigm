@@ -1,4 +1,5 @@
 import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable, PermissionFlagsBits, PermissionResolvable } from 'discord.js';
+import { getEnumKeys } from './functions';
 import type { StringChoices } from './types';
 
 export const AccessibleChannelPermissions: PermissionResolvable[] = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
@@ -11,7 +12,7 @@ export enum BackgroundURL {
 	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 }
 
-export const BackgroundChoices: StringChoices = Object.keys(BackgroundURL).map(background => ({ name: background, value: background }));
+export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(background => ({ name: background, value: background }));
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
@@ -147,7 +148,7 @@ export enum RarityOrdering {
 	Mythic
 }
 
-export const Rarities = Object.keys(RarityOrdering);
+export const Rarities = getEnumKeys(RarityOrdering);
 
 export const Seasons = Array.from({
 	length: 22 // Increment this value every season
@@ -161,4 +162,4 @@ export enum UnitsToMS {
 	Days = 86400
 }
 
-export const UnitChoices: StringChoices = Object.keys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
+export const UnitChoices: StringChoices = getEnumKeys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
