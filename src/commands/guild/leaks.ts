@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, Snowflake } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 
 export default new SlashCommand({
@@ -23,7 +23,7 @@ export default new SlashCommand({
 			'785210975733284915': 'Please keep discussion related to Fortnite speculation, including if it pertains to leaks; use <#488040333310164992> for completely irrelevant conversations.'
 		};
 
-		const isSpecial = (channelId: string): channelId is keyof typeof messages => channelId in messages;
+		const isSpecial = (channelId: Snowflake): channelId is keyof typeof messages => channelId in messages;
 		const { channelId } = interaction;
 		let message = isSpecial(channelId) ? messages[channelId] : 'Do not post leaks outside of <#509930374021775394>, <#740607796898168913>, <#509936143169748992>, and <#785210975733284915>; posting elsewhere will result in message deletion.\nIf you cannot see these channels, get the Leaks and Datamines role by reacting to the message [here](https://discord.com/channels/486932163636232193/879930518228050010/879939613903425576 "Go to role-assignment").';
 

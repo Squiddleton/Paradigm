@@ -44,11 +44,11 @@ export interface BlockList {
 export interface Config {
 	token: string;
 	/** The channel to access with Client#devChannel */
-	devChannelId: string;
+	devChannelId: Snowflake;
 	/** The guild to deploy all commands */
-	devGuildId: string;
+	devGuildId: Snowflake;
 	/** The guild to deploy all commands with the "Exclusive" scope */
-	exclusiveGuildId: string;
+	exclusiveGuildId: Snowflake;
 	epicDeviceAuth: {
 		device1: DeviceAuth;
 		device2: DeviceAuth;
@@ -115,13 +115,13 @@ export interface Friend {
 }
 
 export interface IBonusRole {
-	id: string;
+	id: Snowflake;
 	amount: number;
 }
 
 export interface IGiveaway {
-	messageId: string;
-	channelId: string;
+	messageId: Snowflake;
+	channelId: Snowflake;
 	text: string;
 	startTime: number;
 	endTime: number;
@@ -129,15 +129,15 @@ export interface IGiveaway {
 	messages: number;
 	bonusRoles: IBonusRole[];
 	winnerNumber: number;
-	entrants: string[];
-	winners: string[];
+	entrants: Snowflake[];
+	winners: Snowflake[];
 }
 
 export interface IGuild {
-	_id: string;
+	_id: Snowflake;
 	giveaways: IGiveaway[];
 	milestones: IMilestone[];
-	wishlistChannelId: string | null;
+	wishlistChannelId: Snowflake | null;
 }
 
 export interface IMessage {

@@ -134,7 +134,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		await interaction.editReply('There are no more eligible entrants who can win.');
 		return;
 	}
-	const newWinners: string[] = [];
+	const newWinners: Snowflake[] = [];
 	for (let i = 0; i < amount; i++) {
 		const newWinner = randomFromArray(eligibleEntrants);
 		winners.push(newWinner);
