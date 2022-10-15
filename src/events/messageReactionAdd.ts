@@ -2,6 +2,7 @@ import { EmbedBuilder } from 'discord.js';
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import config from '../config';
 import { validateGuildChannel } from '../util/functions';
+import { DiscordIds } from '../util/constants';
 
 export default new ClientEvent({
 	name: 'messageReactionAdd',
@@ -19,7 +20,7 @@ export default new ClientEvent({
 		const { message } = reaction;
 		if (message.guildId === config.exclusiveGuildId) {
 			const toString = reaction.emoji.toString();
-			const logChannel = validateGuildChannel(client, '488112900276224010');
+			const logChannel = validateGuildChannel(client, DiscordIds.Channels.Logs);
 
 			await logChannel.send({ embeds: [
 				new EmbedBuilder()

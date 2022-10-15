@@ -16,6 +16,21 @@ export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
+export const DiscordIds = {
+	Channels: {
+		Logs: '488112900276224010',
+		ShopPosts: '489836390759268353',
+		Submissions: '895024792439251064'
+	},
+	Roles: {
+		ItemShop: '568590143640961037',
+		Mod: '544952148790738954'
+	},
+	Users: {
+		Catalyst: '848452706791981056'
+	}
+} as const;
+
 export const ChapterLengths = [10, 8];
 
 /**

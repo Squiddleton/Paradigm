@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, Message } from 'discord.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ErrorMessage } from '../../util/constants';
+import { DiscordIds, ErrorMessage } from '../../util/constants';
 import { validateGuildChannel } from '../../util/functions';
 import type { AnyGuildTextChannel } from '../../util/types';
 
@@ -50,7 +50,7 @@ export default new SlashCommand({
 		const submissionName = interaction.options.getString('name');
 		const type = interaction.options.getString('type');
 
-		const submissionChannelId = '895024792439251064';
+		const submissionChannelId = DiscordIds.Channels.Submissions;
 		let submissionChannel: AnyGuildTextChannel;
 		try {
 			submissionChannel = validateGuildChannel(client, submissionChannelId);
