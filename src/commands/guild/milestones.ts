@@ -1,9 +1,6 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import guildSchema from '../../schemas/guilds.js';
-import memberSchema from '../../schemas/members.js';
+import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { isRarity } from '../../util/fortnite.js';
-import { ErrorMessage, RarityOrdering } from '../../util/constants.js';
+import { viewMilestones } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'milestones',
@@ -22,51 +19,6 @@ export default new SlashCommand({
 	],
 	scope: 'Guild',
 	async execute(interaction) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
-
-		const member = interaction.options.getMember('member') ?? interaction.member;
-		const ephemeral = interaction.options.getBoolean('ephemeral') ?? false;
-		const { displayName } = member;
-		const user = await member.user.fetch();
-		const { guildId } = interaction;
-
-		const result = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
-
-		const embed = new EmbedBuilder()
-			.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)
-			.setThumbnail(member.displayAvatarURL())
-			.setColor(user.accentColor ?? null)
-			.setTimestamp();
-
-		if (result.milestones.length === 0) {
-			embed.setDescription('No milestones');
-		}
-		else {
-			const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
-
-			let i = 0;
-			for (const milestone of result.milestones.sort((a, b) => {
-				const fullA = milestones.find(m => m.name === a);
-				const fullB = milestones.find(m => m.name === b);
-
-				if (fullA === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', a));
-				if (fullB === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', b));
-				if (!isRarity(fullA.rarity)) {
-					throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', fullA.rarity));
-				}
-				else if (!isRarity(fullB.rarity)) {
-					throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', fullB.rarity));
-				}
-
-				return fullA.rarity === fullB.rarity ? fullA.name > fullB.name ? 1 : -1 : RarityOrdering[fullA.rarity] - RarityOrdering[fullB.rarity];
-			})) {
-				const milestoneWithDescription = milestones.find(m => m.name === milestone);
-				if (milestoneWithDescription === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', milestone));
-				if (i < 25) embed.addFields([{ name: milestone, value: milestoneWithDescription.description, inline: true }]);
-				i++;
-			}
-		}
-
-		await interaction.reply({ embeds: [embed], ephemeral });
+		await viewMilestones(interaction);
 	}
 });

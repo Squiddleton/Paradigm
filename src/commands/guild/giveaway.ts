@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, Message, ComponentType, DiscordAPIError, RESTJSONErrorCodes, time } from 'discord.js';
-import { randomFromArray, quantity, createGiveawayEmbed, messageComponentCollectorFilter, validateVisibleChannel } from '../../util/functions.js';
+import { ApplicationCommandOptionType, ButtonStyle, PermissionsBitField, ActionRowBuilder, ButtonBuilder, PermissionFlagsBits, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
+import { createGiveawayEmbed, validateVisibleChannel, rerollGiveaway, reviewGiveaway, areMismatchedBonusRoles } from '../../util/functions.js';
 import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
@@ -196,7 +196,7 @@ export default new SlashCommand({
 				const role1Amount = interaction.options.getInteger('bonusrole1amount');
 				const role2Amount = interaction.options.getInteger('bonusrole2amount');
 
-				if ((role1 !== null && role1Amount === null) || (role1 === null && role1Amount !== null) || (role2 !== null && role2Amount === null) || (role2 === null && role2Amount !== null)) {
+				if (areMismatchedBonusRoles(role1, role1Amount) || areMismatchedBonusRoles(role2, role2Amount)) {
 					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
 					return;
 				}
@@ -204,7 +204,7 @@ export default new SlashCommand({
 				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = giveaways.find(g => g.messageId === messageId);
 				if (giveaway === undefined) {
-					await interaction.reply({ content: 'No giveaway matches that message id.', ephemeral: true });
+					await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, ephemeral: true });
 					return;
 				}
 				if (giveaway.completed) {
@@ -265,176 +265,11 @@ export default new SlashCommand({
 				break;
 			}
 			case 'reroll': {
-				await interaction.deferReply({ ephemeral: true });
-				const messageId = interaction.options.getString('message', true);
-				const amount = interaction.options.getInteger('amount') ?? 1;
-
-				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
-
-				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
-				if (giveaway === undefined) {
-					await interaction.editReply('I could not find a giveaway for that message id.');
-					return;
-				}
-				if (!giveaway.completed) {
-					await interaction.editReply('You cannot reroll a giveaway before it ends.');
-					return;
-				}
-
-				const { winners } = giveaway;
-				const eligibleEntrants = giveaway.entrants.filter(e => !giveaway.winners.includes(e));
-				if (!eligibleEntrants.length) {
-					await interaction.editReply('There are no more eligible entrants who can win.');
-					return;
-				}
-				const newWinners: string[] = [];
-				for (let i = 0; i < amount; i++) {
-					const newWinner = randomFromArray(eligibleEntrants);
-					winners.push(newWinner);
-					newWinners.push(newWinner);
-				}
-
-				const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
-				const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
-				const message = await giveawayChannel.messages.fetch(messageId);
-				await message.reply(`This giveaway has been rerolled, so congratulations to the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
-
-				await guildSchema.findOneAndUpdate(
-					{
-						_id: interaction.guildId,
-						'giveaways.messageId': messageId
-					},
-					{ $set: { 'giveaways.$.winners': winners } }
-				);
-
-				await interaction.editReply(`The giveaway has been rerolled with the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`);
-				return;
+				await rerollGiveaway(interaction);
+				break;
 			}
 			case 'review': {
-				const inc = 20;
-				const messageId = interaction.options.getString('message', true);
-				const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
-				const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
-
-				if (giveaway === undefined) {
-					await interaction.reply({ content: 'I could not find a giveaway with that message id.', ephemeral: true });
-					return;
-				}
-
-				const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
-				const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
-
-				const quantities = quantity(giveaway.entrants);
-				const entries = Object.entries(quantities);
-				const entrants = entries.map(entry => `${entries.indexOf(entry) + 1}. <@${entry[0]}>${entry[1] > 1 ? ` x${entry[1]}` : ''}`);
-
-				const embed = new EmbedBuilder()
-					.setTitle(giveawayMessage.embeds[0].title)
-					.setThumbnail(interaction.guild.iconURL())
-					.setColor('Blue')
-					.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(0, inc).join('\n') || 'None'}`)
-					.setFields([
-						{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
-						{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
-						{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
-						{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
-						{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
-						{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
-					])
-					.setTimestamp();
-
-				const willUseButtons = entrants.length > inc;
-				const firstButton = new ButtonBuilder()
-					.setCustomId('first')
-					.setLabel('⏪')
-					.setStyle(ButtonStyle.Primary)
-					.setDisabled(true);
-				const backButton = new ButtonBuilder()
-					.setCustomId('back')
-					.setLabel('◀️')
-					.setStyle(ButtonStyle.Primary)
-					.setDisabled(true);
-				const forwardButton = new ButtonBuilder()
-					.setCustomId('forward')
-					.setLabel('▶️')
-					.setStyle(ButtonStyle.Primary);
-				const lastButton = new ButtonBuilder()
-					.setCustomId('last')
-					.setLabel('⏩')
-					.setStyle(ButtonStyle.Primary);
-				const cancelButton = new ButtonBuilder()
-					.setCustomId('cancel')
-					.setLabel('Cancel')
-					.setStyle(ButtonStyle.Danger);
-				const row = new ActionRowBuilder<ButtonBuilder>({ components: [firstButton, backButton, forwardButton, lastButton, cancelButton] });
-
-				const msg: Message = await interaction.reply({ components: willUseButtons ? [row] : [], embeds: [embed], fetchReply: true });
-
-				if (willUseButtons) {
-					const collector = msg.createMessageComponentCollector({ componentType: ComponentType.Button, filter: messageComponentCollectorFilter(interaction), time: 180000 });
-					let index = 0;
-					collector.on('collect', async int => {
-						switch (int.customId) {
-							case 'cancel': {
-								await int.update({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
-								return collector.stop();
-							}
-							case 'first': {
-								index = 0;
-								await int.update({
-									components: [row.setComponents([firstButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton]) ],
-									embeds: [embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`)]
-								});
-								return;
-							}
-							case 'back': {
-								index -= inc;
-								const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-								if (index === 0) {
-									await int.update({
-										components: [row.setComponents([firstButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-										embeds: [e]
-									});
-									return;
-								}
-								await int.update({
-									components: [row.setComponents([firstButton, backButton, forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-									embeds: [e]
-								});
-								return;
-							}
-							case 'forward': {
-								index += inc;
-								const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-								if (index + inc >= entrants.length) {
-									await int.update({
-										components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-										embeds: [e]
-									});
-									return;
-								}
-								await int.update({ components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-									embeds: [e]
-								});
-								return;
-							}
-							case 'last': {
-								index = inc * Math.floor(entrants.length / inc);
-								const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-								await int.update({
-									components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-									embeds: [e]
-								});
-							}
-						}
-					});
-
-					collector.on('end', async (collected, reason) => {
-						if (reason === 'time') {
-							await interaction.editReply({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
-						}
-					});
-				}
+				await reviewGiveaway(interaction);
 				break;
 			}
 			case 'start': {
@@ -450,7 +285,7 @@ export default new SlashCommand({
 				const role1Amount = interaction.options.getInteger('bonusrole1amount');
 				const role2Amount = interaction.options.getInteger('bonusrole2amount');
 
-				if ((role1 !== null && role1Amount === null) || (role1 === null && role1Amount !== null) || (role2 !== null && role2Amount === null) || (role2 === null && role2Amount !== null)) {
+				if (areMismatchedBonusRoles(role1, role1Amount) || areMismatchedBonusRoles(role2, role2Amount)) {
 					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
 					return;
 				}
@@ -504,7 +339,6 @@ export default new SlashCommand({
 				);
 
 				await interaction.reply({ content: 'Succesfully hosted the giveaway!', ephemeral: true });
-
 			}
 		}
 	}

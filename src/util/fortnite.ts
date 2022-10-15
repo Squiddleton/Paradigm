@@ -1,13 +1,14 @@
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time, Colors, CommandInteraction } from 'discord.js';
 import Canvas from 'canvas';
-import { messageComponentCollectorFilter, noPunc, randomFromArray, validateGuildChannel } from './functions.js';
+import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, sum, validateGuildChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
-import type { Cosmetic } from '@squiddleton/fortnite-api';
+import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
-import { BackgroundURL, CosmeticCacheUpdateThreshold, ErrorMessage, RarityColors, RarityOrdering } from './constants.js';
-import type { CosmeticCache, StringOption } from './types.js';
+import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors, RarityOrdering } from './constants.js';
+import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
+import { EpicError, getLevels } from './epic.js';
 
 const isBackground = (str: string): str is keyof typeof BackgroundURL => str in BackgroundURL;
 
@@ -316,8 +317,207 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
+const formatLevels = (levels: Record<string, number>, name?: string) => {
+	return `${
+		name === undefined
+			? '**Your**'
+			: `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}`
+	} **Battle Pass Levels**\n\n${
+		Object
+			.entries(levels)
+			.sort()
+			.map(([k, v]) => {
+				const overallSeason = parseInt(k.match(/\d+/)![0]);
+				const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum, 0));
+				const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+				return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum, 0)}: ${Math.floor(v / 100)}`;
+			})
+			.join('\n')}`;
+};
+
+const handleLevelsError = (e: unknown) => {
+	if (e instanceof FortniteAPIError) {
+		switch (e.code) {
+			case 403: {
+				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
+			}
+			case 404: {
+				return 'No account was found with that username on that platform.';
+			}
+		}
+	}
+	if (e instanceof EpicError) {
+		if (e.numericErrorCode === EpicErrorCode.INVALID_GRANT) {
+			console.error('The main Epic account credentials must be updated.');
+			return 'This bot\'s Epic account credentials must be updated; please try again later.';
+		}
+		else {
+			console.error(e);
+			return e.message;
+		}
+	}
+	console.error(e);
+	return 'There was an error while fetching the account.';
+};
+
+export const getLevelsString = async (client: Client<true>, options: LevelCommandOptions) => {
+	const { accountName, accountType } = options;
+
+	if (accountName === null) {
+		const user = await userSchema.findById(options.targetUser.id);
+		if (user === null || user.epicAccountId === null) {
+			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
+		}
+
+		try {
+			const levels = await getLevels(user.epicAccountId);
+			return { content: formatLevels(levels) };
+		}
+		catch (error) {
+			return { content: handleLevelsError(error), ephemeral: true };
+		}
+	}
+	else {
+		try {
+			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
+			const levels = await getLevels(account.id);
+			return { content: formatLevels(levels, account.name), account };
+		}
+		catch (error) {
+			return { content: handleLevelsError(error), ephemeral: true };
+		}
+	}
+};
+
+const handleStatsError = async (interaction: CommandInteraction, error: unknown) => {
+	if (!(error instanceof FortniteAPIError)) throw error;
+	switch (error.code) {
+		case 403: {
+			await interaction.editReply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
+			break;
+		}
+		case 404: {
+			await interaction.editReply('No account was found with that username on that platform.');
+			break;
+		}
+	}
+};
+
+export const getStatsImage = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
+	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
+
+	if (options.accountName === null) {
+		const user = await userSchema.findById(options.targetUser.id);
+		if (user === null || user.epicAccountId === null) {
+			if (content !== undefined) {
+				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with the ${interaction.client.user.username}.`);
+			}
+			else {
+				await interaction.editReply(`No player username was provided, and you have not linked your account with ${interaction.client.user.username}.`);
+			}
+			return;
+		}
+
+		try {
+			const { image } = await fortniteAPI.stats({ id: user.epicAccountId, image: options.input, timeWindow: options.timeWindow });
+			await interaction.editReply({ content, files: [image] });
+		}
+		catch (error) {
+			await handleStatsError(interaction, error);
+		}
+	}
+	else {
+		try {
+			const { image, account } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
+			await interaction.editReply({ files: [image] });
+
+			if (interaction.isChatInputCommand()) {
+				await linkEpicAccount(interaction, account);
+			}
+		}
+		catch (error) {
+			await handleStatsError(interaction, error);
+		}
+	}
+};
+
 export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberSchema.updateOne(
 	{ userId, guildId },
 	{ $addToSet: { milestones: milestoneName } },
 	{ upsert: true }
 );
+
+const getUserProperties = async (interaction: CommandInteraction): Promise<DisplayUserProperties> => {
+	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
+	// Users must be force-fetched to retrieve banners
+	const user = await unfetchedUser.fetch();
+	const userId = user.id;
+	const isSameUser = interaction.user.id === user.id;
+	const userData = {
+		id: userId,
+		username: user.username,
+		color: user.accentColor ?? Colors.Purple,
+		avatar: user.displayAvatarURL(),
+		same: isSameUser
+	};
+
+	// Return as a User if the interaction was received in DMs
+	if (!interaction.inCachedGuild()) return userData;
+
+	if (isSameUser) {
+		return {
+			id: userId,
+			username: interaction.member.displayName,
+			color: interaction.member.displayColor,
+			avatar: interaction.member.displayAvatarURL(),
+			same: true
+		};
+	}
+
+	const mentionedMember = interaction.options.getMember('user');
+	if (mentionedMember === null) return userData;
+
+	return {
+		id: userId,
+		username: mentionedMember.displayName,
+		color: mentionedMember.displayColor,
+		avatar: mentionedMember.displayAvatarURL(),
+		same: false
+	};
+};
+
+export const viewWishlist = async (interaction: CommandInteraction) => {
+	const itemShopCosmetics = await fetchCosmetics(true);
+	const user = await getUserProperties(interaction);
+
+	const wishlist = await userSchema.findById(user.id);
+	if (!wishlist?.wishlistCosmeticIds.length) {
+		await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
+		return;
+	}
+
+	await interaction.reply({
+		embeds: [
+			new EmbedBuilder()
+				.setColor(user.color)
+				.setDescription(wishlist.wishlistCosmeticIds
+					.slice(0, 25)
+					.map((id, index) => {
+						if (index === 24 && wishlist.wishlistCosmeticIds.length !== 25) return `+ ${wishlist.wishlistCosmeticIds.length - 24} more`;
+
+						const cosmetic = itemShopCosmetics.find(c => c.id === id);
+						if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
+						return `${cosmetic.name} (${cosmetic.type.displayValue})`;
+					})
+					.sort((a, b) => {
+						if (a.startsWith('+ ') && a.endsWith(' more')) return 1;
+						return a.localeCompare(b);
+					})
+					.join('\n'))
+				.setThumbnail(user.avatar)
+				.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
+				.setTimestamp()
+		],
+		ephemeral: !user.same
+	});
+};

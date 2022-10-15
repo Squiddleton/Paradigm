@@ -1,5 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
-import type { ApplicationCommandOptionChoiceData, DMChannel, PartialDMChannel, Snowflake, TextBasedChannel } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -157,6 +157,12 @@ export interface IUser {
 	messages: IMessage[];
 }
 
+export interface LevelCommandOptions {
+	targetUser: User;
+	accountName: string | null;
+	accountType: 'epic' | 'xbl' | 'psn';
+}
+
 export type Quantity = { [key: string]: number };
 
 export interface RawEpicError {
@@ -170,11 +176,18 @@ export interface RawEpicError {
 	error?: string;
 }
 
+export type SlashOrMessageContextMenu = ChatInputCommandInteraction | MessageContextMenuCommandInteraction;
+
 export interface Stats {
 	startTime: number;
 	endTime: number;
 	stats: Record<string, number>;
 	accountId: string;
+}
+
+export interface StatsCommandOptions extends LevelCommandOptions {
+	input: 'all' | 'keyboardMouse' | 'gamepad' | 'touch';
+	timeWindow: 'lifetime' | 'season';
 }
 
 export type StringChoices = ApplicationCommandOptionChoiceData<string>[];

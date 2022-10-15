@@ -1,51 +1,10 @@
-import { ApplicationCommandOptionType, ChatInputCommandInteraction, Colors, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType } from 'discord.js';
 
 import userSchema from '../../schemas/users.js';
 import { noPunc } from '../../util/functions.js';
-import { findCosmetic, fetchCosmetics } from '../../util/fortnite.js';
+import { findCosmetic, fetchCosmetics, viewWishlist } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
-import type { DisplayUserProperties } from '../../util/types.js';
-import { ErrorMessage } from '../../util/constants.js';
-
-const getUserProperties = async (interaction: ChatInputCommandInteraction): Promise<DisplayUserProperties> => {
-	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
-	// Users must be force-fetched to retrieve banners
-	const user = await unfetchedUser.fetch();
-	const userId = user.id;
-	const isSameUser = interaction.user.id === user.id;
-	const userData = {
-		id: userId,
-		username: user.username,
-		color: user.accentColor ?? Colors.Purple,
-		avatar: user.displayAvatarURL(),
-		same: isSameUser
-	};
-
-	// Return as a User if the interaction was received in DMs
-	if (!interaction.inCachedGuild()) return userData;
-
-	if (isSameUser) {
-		return {
-			id: userId,
-			username: interaction.member.displayName,
-			color: interaction.member.displayColor,
-			avatar: interaction.member.displayAvatarURL(),
-			same: true
-		};
-	}
-
-	const mentionedMember = interaction.options.getMember('user');
-	if (mentionedMember === null) return userData;
-
-	return {
-		id: userId,
-		username: mentionedMember.displayName,
-		color: mentionedMember.displayColor,
-		avatar: mentionedMember.displayAvatarURL(),
-		same: false
-	};
-};
 
 export default new SlashCommand({
 	name: 'wishlist',
@@ -153,34 +112,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'view': {
-				const user = await getUserProperties(interaction);
-
-				const wishlist = await userSchema.findById(user.id);
-				if (!wishlist?.wishlistCosmeticIds.length) {
-					await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
-					return;
-				}
-
-				const embed = new EmbedBuilder()
-					.setColor(user.color)
-					.setDescription(wishlist.wishlistCosmeticIds
-						.slice(0, 25)
-						.map((id, index) => {
-							if (index === 24 && wishlist.wishlistCosmeticIds.length !== 25) return `+ ${wishlist.wishlistCosmeticIds.length - 24} more`;
-
-							const cosmetic = itemShopCosmetics.find(c => c.id === id);
-							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
-							return `${cosmetic.name} (${cosmetic.type.displayValue})`;
-						})
-						.sort((a, b) => {
-							if (a.startsWith('+ ') && a.endsWith(' more')) return 1;
-							return a.localeCompare(b);
-						})
-						.join('\n'))
-					.setThumbnail(user.avatar)
-					.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
-					.setTimestamp();
-				await interaction.reply({ embeds: [embed], ephemeral: !user.same });
+				await viewWishlist(interaction);
 				break;
 			}
 		}

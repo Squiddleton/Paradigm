@@ -53,6 +53,7 @@ export enum ErrorMessage {
 	OutOfGuild = 'This command should only be usable in (cached) guilds',
 	UncachedClient = 'The Client user is not cached',
 	UnexpectedValue = 'The value {value} was unexpected',
+	UnknownGiveaway = 'No giveaway was found with that message id',
 	UnreadyClient = 'The Client should be ready but is not'
 }
 
