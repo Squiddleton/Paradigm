@@ -1,11 +1,10 @@
 import { validateChannel } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, EmbedBuilder, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, time, UserContextMenuCommandInteraction } from 'discord.js';
-import type { DiscordClient } from '../clients/discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
 import { AccessibleChannelPermissions, ErrorMessage, RarityOrdering } from './constants.js';
-import { isRarity } from './fortnite.js';
+import { isRarity } from './typeguards.js';
 import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu } from './types.js';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
@@ -41,8 +40,6 @@ export const getClientPermissions = (client: Client<true>, channel: AnyGuildText
 };
 
 export const getEnumKeys = (e: Record<string, any>) => Object.keys(e).filter(x => !(parseInt(x) >= 0));
-
-export const isReadyClient = (client: Client): client is DiscordClient<true> => client.isReady();
 
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: { id: string; name: string }) => {
 	if (interaction.options.getBoolean('link')) {

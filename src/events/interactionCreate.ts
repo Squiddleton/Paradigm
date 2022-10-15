@@ -3,12 +3,13 @@ import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
 import memberSchema from'../schemas/members.js';
-import { isReadyClient, noPunc, sumMsgs } from'../util/functions.js';
+import { noPunc, sumMsgs } from'../util/functions.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import { ErrorMessage } from '../util/constants.js';
+import { isReadyClient } from '../util/typeguards.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
 

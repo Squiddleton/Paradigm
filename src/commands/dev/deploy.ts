@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ErrorMessage } from '../../util/constants.js';
-import { isReadyClient } from '../../util/functions.js';
+import { isReadyClient } from '../../util/typeguards.js';
 
 export default new SlashCommand({
 	name: 'deploy',

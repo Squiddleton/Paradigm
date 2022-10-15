@@ -2,8 +2,9 @@ import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 
 import guildSchema from '../../schemas/guilds.js';
 import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { grantMilestone, isRarity } from '../../util/fortnite.js';
+import { grantMilestone } from '../../util/fortnite.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
+import { isRarity } from '../../util/typeguards.js';
 
 export default new SlashCommand({
 	name: 'milestone',

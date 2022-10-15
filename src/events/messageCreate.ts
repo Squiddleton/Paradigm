@@ -2,7 +2,7 @@ import { ClientEvent } from '@squiddleton/discordjs-util';
 import memberSchema from '../schemas/members.js';
 import type { IMessage } from '../util/types.js';
 import { checkWishlists } from '../util/fortnite.js';
-import { isReadyClient } from '../util/functions.js';
+import { isReadyClient } from '../util/typeguards.js';
 
 const denySubmissionMessage = 'Discussion is not allowed in this channel. Please use the `/suggest` command for submissions.';
 

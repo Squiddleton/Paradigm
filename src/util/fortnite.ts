@@ -6,13 +6,10 @@ import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
-import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors, RarityOrdering } from './constants.js';
+import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
 import { EpicError, getLevels } from './epic.js';
-
-const isBackground = (str: string): str is keyof typeof BackgroundURL => str in BackgroundURL;
-
-export const isRarity = (rarity: string): rarity is keyof typeof RarityOrdering => rarity in RarityOrdering;
+import { isBackground } from './typeguards.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],

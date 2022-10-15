@@ -4,8 +4,7 @@ import guildSchema from '../../schemas/guilds.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
 import type { IBonusRole, IGiveaway } from '../../util/types.js';
-
-const isUnit = (unit: string): unit is keyof typeof UnitsToMS => unit in UnitsToMS;
+import { isUnit } from '../../util/typeguards.js';
 
 export default new SlashCommand({
 	name: 'giveaway',
