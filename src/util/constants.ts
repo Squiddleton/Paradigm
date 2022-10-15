@@ -42,7 +42,7 @@ export enum EpicEndpoint {
 }
 
 export enum EpicErrorCode {
-	INVALID_GRANT = 18031
+	InvalidGrant = 18031
 }
 
 export enum ErrorMessage {
