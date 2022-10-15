@@ -127,6 +127,31 @@ export default new SlashCommand({
 				}
 				break;
 			}
+			case 'remove': {
+				const input = interaction.options.getString('cosmetic', true);
+				const cosmetic = itemShopCosmetics.find(c => c.id === input) ?? itemShopCosmetics.find(c => noPunc(c.name) === noPunc(input));
+				if (cosmetic === undefined) {
+					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
+					return;
+				}
+
+				const wishlist = await userSchema.findById(userId);
+				if (!wishlist) {
+					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
+					return;
+				}
+				if (!wishlist.wishlistCosmeticIds.includes(cosmetic.id)) {
+					await interaction.reply({ content: 'No cosmetic in your wishlist matches the option provided.', ephemeral: true });
+					return;
+				}
+
+				await userSchema.findByIdAndUpdate(
+					userId,
+					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
+				);
+				await interaction.reply(`${cosmetic.name} has been removed from your wishlist.`);
+				break;
+			}
 			case 'view': {
 				const user = await getUserProperties(interaction);
 
@@ -156,31 +181,6 @@ export default new SlashCommand({
 					.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
 					.setTimestamp();
 				await interaction.reply({ embeds: [embed], ephemeral: !user.same });
-				break;
-			}
-			case 'remove': {
-				const input = interaction.options.getString('cosmetic', true);
-				const cosmetic = itemShopCosmetics.find(c => c.id === input) ?? itemShopCosmetics.find(c => noPunc(c.name) === noPunc(input));
-				if (cosmetic === undefined) {
-					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
-					return;
-				}
-
-				const wishlist = await userSchema.findById(userId);
-				if (!wishlist) {
-					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
-					return;
-				}
-				if (!wishlist.wishlistCosmeticIds.includes(cosmetic.id)) {
-					await interaction.reply({ content: 'No cosmetic in your wishlist matches the option provided.', ephemeral: true });
-					return;
-				}
-
-				await userSchema.findByIdAndUpdate(
-					userId,
-					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
-				);
-				await interaction.reply(`${cosmetic.name} has been removed from your wishlist.`);
 				break;
 			}
 		}
