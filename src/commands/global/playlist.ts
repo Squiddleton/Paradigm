@@ -28,17 +28,19 @@ export default new SlashCommand({
 			return;
 		}
 
-		await interaction.editReply({ embeds: [
-			new EmbedBuilder()
-				.setTitle(playlist.name)
-				.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
-				.setImage(playlist.images.showcase)
-				.setFields([
-					{ name: 'Modes', value: [...new Set(playlists.filter(mode => mode.name === playlist.name).map(mode => mode.subName))].join('/') || 'N/A', inline: true },
-					{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
-				])
-				.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })
-				.setTimestamp()
-		] });
+		await interaction.editReply({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle(playlist.name)
+					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
+					.setImage(playlist.images.showcase)
+					.setFields([
+						{ name: 'Modes', value: [...new Set(playlists.filter(mode => mode.name === playlist.name).map(mode => mode.subName))].join('/') || 'N/A', inline: true },
+						{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
+					])
+					.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })
+					.setTimestamp()
+			]
+		});
 	}
 });

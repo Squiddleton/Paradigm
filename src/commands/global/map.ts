@@ -9,16 +9,18 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const map = await fortniteAPI.map();
 
-		await interaction.reply({ embeds: [
-			new EmbedBuilder()
-				.setTitle('Artemis')
-				.setImage(map.images.pois)
-				.setFields([
-					{ name: 'Named POIs', value: map.pois.filter(poi => !poi.id.includes('UnNamedPOI')).length.toString(), inline: true },
-					{ name: 'Landmarks', value: map.pois.filter(poi => poi.id.includes('UnNamedPOI')).length.toString(), inline: true }
-				])
-				.setColor('Blue')
-				.setTimestamp()
-		] });
+		await interaction.reply({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle('Artemis')
+					.setImage(map.images.pois)
+					.setFields([
+						{ name: 'Named POIs', value: map.pois.filter(poi => !poi.id.includes('UnNamedPOI')).length.toString(), inline: true },
+						{ name: 'Landmarks', value: map.pois.filter(poi => poi.id.includes('UnNamedPOI')).length.toString(), inline: true }
+					])
+					.setColor('Blue')
+					.setTimestamp()
+			]
+		});
 	}
 });

@@ -74,17 +74,21 @@ export default new SlashCommand({
 
 		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${noPunc(interaction.user.username)}sLoadout.png` });
 
-		const embed = new EmbedBuilder()
-			.setTitle('Randomly Generated Loadout')
-			.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
-			.setFields([
-				{ name: 'Outfit', value: outfit.name, inline: true },
-				{ name: 'Back Bling', value: bb.name, inline: true },
-				{ name: 'Harvesting Tool', value: ht.name, inline: true },
-				{ name: 'Glider', value: glider.name, inline: true },
-				{ name: 'Wrap', value: wrap.name, inline: true }
-			])
-			.setTimestamp();
-		await interaction.editReply({ embeds: [embed], files: [attachment] });
+		await interaction.editReply({
+			embeds: [
+				new EmbedBuilder()
+					.setTitle('Randomly Generated Loadout')
+					.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
+					.setFields([
+						{ name: 'Outfit', value: outfit.name, inline: true },
+						{ name: 'Back Bling', value: bb.name, inline: true },
+						{ name: 'Harvesting Tool', value: ht.name, inline: true },
+						{ name: 'Glider', value: glider.name, inline: true },
+						{ name: 'Wrap', value: wrap.name, inline: true }
+					])
+					.setTimestamp()
+			],
+			files: [attachment]
+		});
 	}
 });

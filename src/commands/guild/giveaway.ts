@@ -323,8 +323,7 @@ export default new SlashCommand({
 						.setCustomId('giveaway')
 						.setStyle(ButtonStyle.Success)
 				] });
-				const embed = createGiveawayEmbed(withoutMessage, interaction.guild);
-				const message = await channel.send({ components: [row], embeds: [embed] });
+				const message = await channel.send({ components: [row], embeds: [createGiveawayEmbed(withoutMessage, interaction.guild)] });
 
 				const giveaway: IGiveaway = {
 					messageId: message.id,

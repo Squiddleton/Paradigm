@@ -22,18 +22,20 @@ export default new ClientEvent({
 			const toString = reaction.emoji.toString();
 			const logChannel = validateGuildChannel(client, DiscordIds.Channels.Logs);
 
-			await logChannel.send({ embeds: [
-				new EmbedBuilder()
-					.setDescription(`Reaction from ${user} (${user.id}) added.`)
-					.setFields([
-						{ name: 'Reaction Name', value: reaction.emoji.name ?? toString, inline: true },
-						{ name: 'Reaction URL', value: reaction.emoji.url ?? toString, inline: true },
-						{ name: 'Message URL', value: message.url, inline: true }
-					])
-					.setColor('Green')
-					.setFooter({ text: 'Logs: Reactions' })
-					.setTimestamp()
-			] });
+			await logChannel.send({
+				embeds: [
+					new EmbedBuilder()
+						.setDescription(`Reaction from ${user} (${user.id}) added.`)
+						.setFields([
+							{ name: 'Reaction Name', value: reaction.emoji.name ?? toString, inline: true },
+							{ name: 'Reaction URL', value: reaction.emoji.url ?? toString, inline: true },
+							{ name: 'Message URL', value: message.url, inline: true }
+						])
+						.setColor('Green')
+						.setFooter({ text: 'Logs: Reactions' })
+						.setTimestamp()
+				]
+			});
 		}
 	}
 });

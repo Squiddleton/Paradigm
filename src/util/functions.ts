@@ -244,41 +244,41 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 				}
 				case 'back': {
 					index -= inc;
-					const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
+					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
 					if (index === 0) {
 						await int.update({
 							components: [row.setComponents([firstButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-							embeds: [e]
+							embeds: [embed]
 						});
 						return;
 					}
 					await int.update({
 						components: [row.setComponents([firstButton, backButton, forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-						embeds: [e]
+						embeds: [embed]
 					});
 					return;
 				}
 				case 'forward': {
 					index += inc;
-					const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
+					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
 					if (index + inc >= entrants.length) {
 						await int.update({
 							components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-							embeds: [e]
+							embeds: [embed]
 						});
 						return;
 					}
 					await int.update({ components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-						embeds: [e]
+						embeds: [embed]
 					});
 					return;
 				}
 				case 'last': {
 					index = inc * Math.floor(entrants.length / inc);
-					const e = embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
+					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
 					await int.update({
 						components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-						embeds: [e]
+						embeds: [embed]
 					});
 				}
 			}

@@ -53,16 +53,21 @@ export default new SlashCommand({
 			case 'view': {
 				const result = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				const { wishlistChannelId } = result;
-				const embed = new EmbedBuilder()
-					.setTitle(`${interaction.guild.name} Server Settings`)
-					.setThumbnail(interaction.guild.iconURL())
-					.setFields(
-						{ name: 'Total Giveaways', value: result.giveaways.length.toString(), inline: true },
-						{ name: 'Total Milestones', value: result.milestones.length.toString(), inline: true },
-						{ name: 'Wishlist Channel', value: wishlistChannelId === null ? 'None' : `<#${wishlistChannelId}>`, inline: true }
-					)
-					.setTimestamp();
-				await interaction.reply({ embeds: [embed], ephemeral: true });
+
+				await interaction.reply({
+					embeds: [
+						new EmbedBuilder()
+							.setTitle(`${interaction.guild.name} Server Settings`)
+							.setThumbnail(interaction.guild.iconURL())
+							.setFields(
+								{ name: 'Total Giveaways', value: result.giveaways.length.toString(), inline: true },
+								{ name: 'Total Milestones', value: result.milestones.length.toString(), inline: true },
+								{ name: 'Wishlist Channel', value: wishlistChannelId === null ? 'None' : `<#${wishlistChannelId}>`, inline: true }
+							)
+							.setTimestamp()
+					],
+					ephemeral: true
+				});
 			}
 		}
 	}
