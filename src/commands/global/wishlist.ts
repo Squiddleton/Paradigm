@@ -66,18 +66,6 @@ export default new SlashCommand({
 			]
 		},
 		{
-			name: 'view',
-			description: 'View the cosmetics in your wishlist',
-			type: ApplicationCommandOptionType.Subcommand,
-			options: [
-				{
-					name: 'user',
-					description: 'The user whose wishlist you\'re checking; defaults to yourself',
-					type: ApplicationCommandOptionType.User
-				}
-			]
-		},
-		{
 			name: 'remove',
 			description: 'Remove a cosmetic from your wishlist',
 			type: ApplicationCommandOptionType.Subcommand,
@@ -88,6 +76,18 @@ export default new SlashCommand({
 					type: ApplicationCommandOptionType.String,
 					required: true,
 					autocomplete: true
+				}
+			]
+		},
+		{
+			name: 'view',
+			description: 'View the cosmetics in your wishlist',
+			type: ApplicationCommandOptionType.Subcommand,
+			options: [
+				{
+					name: 'user',
+					description: 'The user whose wishlist you\'re checking; defaults to yourself',
+					type: ApplicationCommandOptionType.User
 				}
 			]
 		}
