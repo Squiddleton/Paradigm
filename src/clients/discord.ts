@@ -1,4 +1,3 @@
-declare function require(name:string): any;
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
