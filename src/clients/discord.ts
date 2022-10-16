@@ -39,10 +39,10 @@ const client = new DiscordClient({
 	exclusiveGuildId: config.exclusiveGuildId,
 	failIfNotExists: false,
 	intents: [
+		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildMessages,
-		GatewayIntentBits.Guilds,
-		GatewayIntentBits.GuildMembers
+		GatewayIntentBits.Guilds
 	],
 	makeCache: Options.cacheWithLimits({
 		ApplicationCommandManager: 10,
