@@ -1,8 +1,8 @@
-import { EmbedBuilder } from 'discord.js';
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import config from '../config';
 import { validateGuildChannel } from '../util/functions';
 import { DiscordIds } from '../util/constants';
+import { TimestampedEmbed } from '../util/classes';
 
 export default new ClientEvent({
 	name: 'messageReactionAdd',
@@ -24,7 +24,7 @@ export default new ClientEvent({
 
 			await logChannel.send({
 				embeds: [
-					new EmbedBuilder()
+					new TimestampedEmbed()
 						.setDescription(`Reaction from ${user} (${user.id}) added.`)
 						.setFields([
 							{ name: 'Reaction Name', value: reaction.emoji.name ?? toString, inline: true },
@@ -33,7 +33,6 @@ export default new ClientEvent({
 						])
 						.setColor('Green')
 						.setFooter({ text: 'Logs: Reactions' })
-						.setTimestamp()
 				]
 			});
 		}

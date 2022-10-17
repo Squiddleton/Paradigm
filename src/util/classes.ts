@@ -34,7 +34,7 @@ export class EpicError extends Error {
 }
 
 export class TimestampedEmbed extends EmbedBuilder {
-	constructor(data: EmbedData) {
+	constructor(data?: EmbedData) {
 		super(data);
 		this.setTimestamp();
 	}

@@ -1,10 +1,11 @@
-import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
 import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { grantMilestone } from '../../util/fortnite.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
 import { isRarity } from '../../util/typeguards.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'milestone',
@@ -144,10 +145,9 @@ export default new SlashCommand({
 			}
 			case 'list': {
 				const guildName = interaction.guild.name;
-				const embed = new EmbedBuilder()
+				const embed = new TimestampedEmbed()
 					.setTitle(`${guildName}'${guildName.endsWith('s') ? '' : 's'} Milestones`)
-					.setThumbnail(interaction.guild.iconURL())
-					.setTimestamp();
+					.setThumbnail(interaction.guild.iconURL());
 
 				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 

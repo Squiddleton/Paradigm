@@ -1,7 +1,8 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 import { LoadoutImageOptions } from '../../util/constants.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'tweet',
@@ -32,7 +33,7 @@ export default new SlashCommand({
 			return;
 		}
 
-		const embed = new EmbedBuilder()
+		const embed = new TimestampedEmbed()
 			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: 'https://pbs.twimg.com/profile_images/1571377748999913474/ffSqYla1_400x400.jpg' })
 			.setDescription(text === null ? `Grab the @${interaction.inCachedGuild() ? interaction.member.displayName : interaction.user.username} locker bundle for a limited time!` : `${text.slice(0, 4000)}`)
 			.setFields([
@@ -41,8 +42,7 @@ export default new SlashCommand({
 			])
 			.setImage('attachment://loadout.png')
 			.setColor(0x29a8df)
-			.setFooter({ text: 'Twitter', iconURL: 'https://www.stickee.co.uk/wp-content/uploads/2017/02/twitter-logo-2-500x500.png' })
-			.setTimestamp();
+			.setFooter({ text: 'Twitter', iconURL: 'https://www.stickee.co.uk/wp-content/uploads/2017/02/twitter-logo-2-500x500.png' });
 
 		await createStyleListeners(interaction, attachment, outfit, backbling, harvestingtool, glider, wrap, chosenBackground, [embed]);
 	}

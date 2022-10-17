@@ -1,8 +1,9 @@
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, EmbedBuilder, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, time, UserContextMenuCommandInteraction } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, time, UserContextMenuCommandInteraction } from 'discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
+import { TimestampedEmbed } from './classes';
 import { AccessibleChannelPermissions, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu } from './types.js';
@@ -10,7 +11,7 @@ import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessage
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
 export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
-	const embed = new EmbedBuilder()
+	const embed = new TimestampedEmbed()
 		.setTitle(giveaway.text)
 		.setThumbnail(guild.iconURL())
 		.setColor(ended ? Colors.Red : Colors.Green)
@@ -26,8 +27,7 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 					{ name: 'Winner Amount', value: giveaway.winnerNumber.toString(), inline: true },
 					{ name: 'Time', value: `Ends ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
-		)
-		.setTimestamp();
+		);
 	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
@@ -178,7 +178,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const entries = Object.entries(quantities);
 	const entrants = entries.map(entry => `${entries.indexOf(entry) + 1}. <@${entry[0]}>${entry[1] > 1 ? ` x${entry[1]}` : ''}`);
 
-	const embed = new EmbedBuilder()
+	const embed = new TimestampedEmbed()
 		.setTitle(message.embeds[0].title)
 		.setThumbnail(interaction.guild.iconURL())
 		.setColor('Blue')
@@ -190,8 +190,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
 			{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
 			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
-		])
-		.setTimestamp();
+		]);
 
 	const willUseButtons = entrants.length > inc;
 	const firstButton = new ButtonBuilder()
@@ -302,11 +301,10 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 
 	const result = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
-	const embed = new EmbedBuilder()
+	const embed = new TimestampedEmbed()
 		.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)
 		.setThumbnail(member.displayAvatarURL())
-		.setColor(user.accentColor ?? null)
-		.setTimestamp();
+		.setColor(user.accentColor ?? null);
 
 	if (result.milestones.length === 0) {
 		embed.setDescription('No milestones');

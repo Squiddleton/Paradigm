@@ -1,9 +1,10 @@
 import Canvas from 'canvas';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { fetchCosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { RarityColors } from '../../util/constants.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'guess',
@@ -42,11 +43,10 @@ export default new SlashCommand({
 
 		const color = RarityColors[cosmetic.rarity.displayValue];
 
-		const embed = new EmbedBuilder()
+		const embed = new TimestampedEmbed()
 			.setTitle('What is this Outfit?')
 			.setImage('attachment://outfit.png')
-			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null)
-			.setTimestamp();
+			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);
 
 		const message = await interaction.reply({ components: [row], embeds: [embed], files: [silhouette] });
 

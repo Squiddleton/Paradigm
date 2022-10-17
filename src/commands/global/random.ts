@@ -1,9 +1,10 @@
-import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
 import Canvas from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { BackgroundURL } from '../../util/constants.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'random',
@@ -76,7 +77,7 @@ export default new SlashCommand({
 
 		await interaction.editReply({
 			embeds: [
-				new EmbedBuilder()
+				new TimestampedEmbed()
 					.setTitle('Randomly Generated Loadout')
 					.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
 					.setFields([
@@ -86,7 +87,6 @@ export default new SlashCommand({
 						{ name: 'Glider', value: glider.name, inline: true },
 						{ name: 'Wrap', value: wrap.name, inline: true }
 					])
-					.setTimestamp()
 			],
 			files: [attachment]
 		});

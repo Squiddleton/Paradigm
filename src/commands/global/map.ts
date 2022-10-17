@@ -1,6 +1,6 @@
-import { EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'map',
@@ -11,7 +11,7 @@ export default new SlashCommand({
 
 		await interaction.reply({
 			embeds: [
-				new EmbedBuilder()
+				new TimestampedEmbed()
 					.setTitle('Artemis')
 					.setImage(map.images.pois)
 					.setFields([
@@ -19,7 +19,6 @@ export default new SlashCommand({
 						{ name: 'Landmarks', value: map.pois.filter(poi => poi.id.includes('UnNamedPOI')).length.toString(), inline: true }
 					])
 					.setColor('Blue')
-					.setTimestamp()
 			]
 		});
 	}

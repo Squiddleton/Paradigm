@@ -1,7 +1,8 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { noPunc } from '../../util/functions.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'playlist',
@@ -30,7 +31,7 @@ export default new SlashCommand({
 
 		await interaction.editReply({
 			embeds: [
-				new EmbedBuilder()
+				new TimestampedEmbed()
 					.setTitle(playlist.name)
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
 					.setImage(playlist.images.showcase)
@@ -39,7 +40,6 @@ export default new SlashCommand({
 						{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
 					])
 					.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })
-					.setTimestamp()
 			]
 		});
 	}

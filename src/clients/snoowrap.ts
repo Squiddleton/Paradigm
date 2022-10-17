@@ -1,7 +1,7 @@
 import { CommentStream, SubmissionStream } from 'snoostorm';
 import RedditClient from 'snoowrap';
 import config from '../config.js';
-import type { DiscordClient } from './discord.js';
+import type { DiscordClient } from '../util/classes.js';
 
 const reddit = new RedditClient(config.snoowrap);
 export default reddit;

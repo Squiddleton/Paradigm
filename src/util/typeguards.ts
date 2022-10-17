@@ -1,5 +1,5 @@
 import type { AttachmentBuilder, Client } from 'discord.js';
-import type { DiscordClient } from '../clients/discord';
+import type { DiscordClient } from './classes';
 import { BackgroundURL, RarityOrdering, UnitsToMS } from './constants';
 import type { RawEpicError } from './types';
 

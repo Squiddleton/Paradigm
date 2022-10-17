@@ -1,4 +1,4 @@
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, EmbedBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time, Colors, CommandInteraction } from 'discord.js';
+import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time, Colors, CommandInteraction } from 'discord.js';
 import Canvas from 'canvas';
 import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, sum, validateGuildChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
@@ -8,8 +8,9 @@ import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
-import { EpicError, getLevels } from './epic.js';
+import { getLevels } from './epic.js';
 import { isBackground } from './typeguards.js';
+import { EpicError, TimestampedEmbed } from './classes.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],
@@ -109,7 +110,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	const color = RarityColors[cosmetic.rarity.displayValue] ?? 'Random';
 
-	const embed = new EmbedBuilder()
+	const embed = new TimestampedEmbed()
 		.setTitle(cosmetic.name)
 		.setDescription(cosmetic.description)
 		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
@@ -120,8 +121,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
 			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
-		])
-		.setTimestamp();
+		]);
 		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
 		const debut = cosmetic.shopHistory[0];
@@ -212,7 +212,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	return new AttachmentBuilder(canvas.toBuffer(), { name: 'loadout.png' });
 };
 
-export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[]) => {
+export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[]) => {
 	const cosmetics = await fetchCosmetics();
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
@@ -495,7 +495,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 
 	await interaction.reply({
 		embeds: [
-			new EmbedBuilder()
+			new TimestampedEmbed()
 				.setColor(user.color)
 				.setDescription(wishlist.wishlistCosmeticIds
 					.slice(0, 25)
@@ -513,7 +513,6 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 					.join('\n'))
 				.setThumbnail(user.avatar)
 				.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
-				.setTimestamp()
 		],
 		ephemeral: !user.same
 	});

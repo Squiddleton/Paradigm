@@ -1,7 +1,8 @@
-import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
+import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'settings',
@@ -56,7 +57,7 @@ export default new SlashCommand({
 
 				await interaction.reply({
 					embeds: [
-						new EmbedBuilder()
+						new TimestampedEmbed()
 							.setTitle(`${interaction.guild.name} Server Settings`)
 							.setThumbnail(interaction.guild.iconURL())
 							.setFields(
@@ -64,7 +65,6 @@ export default new SlashCommand({
 								{ name: 'Total Milestones', value: result.milestones.length.toString(), inline: true },
 								{ name: 'Wishlist Channel', value: wishlistChannelId === null ? 'None' : `<#${wishlistChannelId}>`, inline: true }
 							)
-							.setTimestamp()
 					],
 					ephemeral: true
 				});
