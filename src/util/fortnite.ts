@@ -314,23 +314,17 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-const formatLevels = (levels: Record<string, number>, name?: string) => {
-	return `${
-		name === undefined
-			? '**Your**'
-			: `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'}`
-	} **Battle Pass Levels**\n\n${
-		Object
-			.entries(levels)
-			.sort()
-			.map(([k, v]) => {
-				const overallSeason = parseInt(k.match(/\d+/)![0]);
-				const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum, 0));
-				const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-				return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum, 0)}: ${Math.floor(v / 100)}`;
-			})
-			.join('\n')}`;
-};
+const formatLevels = (levels: Record<string, number>, name: string) => `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'} **Battle Pass Levels**\n\n${
+	Object
+		.entries(levels)
+		.sort()
+		.map(([k, v]) => {
+			const overallSeason = parseInt(k.match(/\d+/)![0]);
+			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum, 0));
+			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum, 0)}: ${Math.floor(v / 100)}`;
+		})
+		.join('\n')}`;
 
 const handleLevelsError = (e: unknown) => {
 	if (e instanceof FortniteAPIError) {
@@ -368,7 +362,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 
 		try {
 			const levels = await getLevels(user.epicAccountId);
-			return { content: formatLevels(levels) };
+			return { content: formatLevels(levels, options.targetUser.username) };
 		}
 		catch (error) {
 			return { content: handleLevelsError(error), ephemeral: true };
