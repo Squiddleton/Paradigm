@@ -1,8 +1,9 @@
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import config from '../config.js';
-import { Client as BaseClient, ClientEvent, ContextMenu, ContextMenuType, SlashCommand, validateChannel } from '@squiddleton/discordjs-util';
+import { ClientEvent, ContextMenu, ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
 import { ErrorMessage } from '../util/constants.js';
+import { DiscordClient } from '../util/classes.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
@@ -10,13 +11,6 @@ for (const folder of readdirSync('./dist/commands')) {
 	for (const file of commandFiles) {
 		const { default: command } = require(`../commands/${folder}/${file}`);
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
-	}
-}
-
-export class DiscordClient<Ready extends boolean = boolean> extends BaseClient<Ready> {
-	get devChannel() {
-		if (!this.isReady()) throw new Error('The devChannel property cannot be accessed until the Client is ready');
-		return validateChannel(this, config.devChannelId);
 	}
 }
 

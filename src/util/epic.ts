@@ -2,30 +2,9 @@ import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
-import { EncodedClient, EpicEndpoint, EpicErrorCode, Seasons } from './constants.js';
+import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
 import { isRawEpicError } from './typeguards';
-
-export class EpicError extends Error {
-	errorCode: string;
-	errorMessage: string;
-	messageVars: unknown[];
-	numericErrorCode: EpicErrorCode | number;
-	originatingService: string;
-	intent: string;
-	errorDescription: string | null;
-	error: string | null;
-	constructor(error: RawEpicError) {
-		super(error.errorMessage);
-		this.errorCode = error.errorCode;
-		this.errorMessage = error.errorMessage;
-		this.messageVars = error.messageVars;
-		this.numericErrorCode = error.numericErrorCode;
-		this.originatingService = error.originatingService;
-		this.intent = error.intent;
-		this.errorDescription = error.error_description ?? null;
-		this.error = error.error ?? null;
-	}
-}
+import { EpicError } from './classes.js';
 
 const checkError = async <Res>(raw: Response) => {
 	const res = await raw.json() as Res | RawEpicError;
