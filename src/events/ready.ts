@@ -29,8 +29,8 @@ export default new ClientEvent({
 		}, { timezone: 'America/New_York' });
 
 		schedule('*/1 * * * *', async () => {
-			const guildResult = await guildSchema.find();
-			const giveaways = guildResult.map(g => g.giveaways).flat().filter(giveaway => !giveaway.completed && giveaway.endTime <= (Date.now() / 1000));
+			const guildResults = await guildSchema.find();
+			const giveaways = guildResults.map(g => g.giveaways).flat().filter(giveaway => !giveaway.completed && giveaway.endTime <= (Date.now() / 1000));
 
 			for (const giveaway of giveaways) {
 				try {

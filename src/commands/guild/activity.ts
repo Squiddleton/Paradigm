@@ -35,13 +35,13 @@ export default new SlashCommand({
 
 		const time = interaction.options.getInteger('time') ?? 30;
 		const max = interaction.options.getInteger('max') ?? 10;
-		const members = await memberSchema.find();
+		const memberResults = await memberSchema.find();
 
 		const combineMsgs = (msgs: IMessage[]) => msgs
 			.filter(m => (31 - m.day) <= time)
 			.reduce(sumMsgs, 0);
 
-		const sorted = members.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
+		const sorted = memberResults.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
 		const users = await Promise.all(sorted.slice(0, max).map(m => client.users.fetch(m.userId)));
 		const mapped = users.map(user => `${user.tag} (${user.id})`);
 

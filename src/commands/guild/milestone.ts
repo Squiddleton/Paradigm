@@ -107,10 +107,10 @@ export default new SlashCommand({
 			case 'delete': {
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const matchingGuild = await guildSchema.findOneAndUpdate(
+				const guildResult = await guildSchema.findOneAndUpdate(
 					{ _id: guildId, 'milestones.name': milestoneName },
 					{ $pull: { milestones: { name: milestoneName } } });
-				if (matchingGuild === null) {
+				if (guildResult === null) {
 					await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });
 					return;
 				}

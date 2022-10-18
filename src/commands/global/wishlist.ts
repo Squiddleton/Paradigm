@@ -61,21 +61,21 @@ export default new SlashCommand({
 					return;
 				}
 
-				const result = await userSchema.findByIdAndUpdate(
+				const userResult = await userSchema.findByIdAndUpdate(
 					userId,
 					{ $addToSet: { wishlistCosmeticIds: cosmetic.id } },
 					{ upsert: true }
 				);
-				result?.wishlistCosmeticIds.includes(cosmetic.id)
+				userResult?.wishlistCosmeticIds.includes(cosmetic.id)
 					? await interaction.reply({ content: `${cosmetic.name} is already on your wishlist.`, ephemeral: true })
 					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
 
 				if (interaction.inCachedGuild()) {
-					const guild = await guildSchema.findById(interaction.guildId);
-					if (guild === null || guild.wishlistChannelId === null) {
+					const guildResult = await guildSchema.findById(interaction.guildId);
+					if (guildResult === null || guildResult.wishlistChannelId === null) {
 						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use `/settings edit` to set one.', ephemeral: true });
 					}
-					else if (interaction.guild.channels.cache.get(guild.wishlistChannelId) === undefined) {
+					else if (interaction.guild.channels.cache.get(guildResult.wishlistChannelId) === undefined) {
 						await guildSchema.findByIdAndUpdate(interaction.guildId, { wishlistChannelId: null });
 						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use `/settings edit` to set a new one.', ephemeral: true });
 					}
@@ -89,12 +89,12 @@ export default new SlashCommand({
 					return;
 				}
 
-				const wishlist = await userSchema.findById(userId);
-				if (!wishlist) {
+				const userResult = await userSchema.findById(userId);
+				if (userResult === null) {
 					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
 					return;
 				}
-				if (!wishlist.wishlistCosmeticIds.includes(cosmetic.id)) {
+				if (!userResult.wishlistCosmeticIds.includes(cosmetic.id)) {
 					await interaction.reply({ content: 'No cosmetic in your wishlist matches the option provided.', ephemeral: true });
 					return;
 				}

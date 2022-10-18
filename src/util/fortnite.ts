@@ -73,20 +73,20 @@ export const fetchItemShop = async () => {
 
 export const checkWishlists = async (client: Client<true>, debug = false) => {
 	const entries = await fetchItemShop();
-	const users = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(cosmetic => cosmetic.id) } });
-	const guilds = await guildSchema.find({ wishlistChannelId: { $ne: null } });
+	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(cosmetic => cosmetic.id) } });
+	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
-	for (const g of guilds) {
+	for (const g of guildResults) {
 		const guild = client.guilds.cache.get(g._id);
 		if (guild !== undefined) {
-			const members = users.length > 100
-				? (await guild.members.fetch()).filter(m => users.some(u => u._id === m.id))
-				: await guild.members.fetch({ user: users.map(u => u._id) });
+			const members = userResults.length > 100
+				? (await guild.members.fetch()).filter(m => userResults.some(u => u._id === m.id))
+				: await guild.members.fetch({ user: userResults.map(u => u._id) });
 
 			if (members.size !== 0) {
 				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
-				for (const user of users.filter(u => members.has(u._id))) {
+				for (const user of userResults.filter(u => members.has(u._id))) {
 					const items = removeDuplicates(entries.filter(item => user.wishlistCosmeticIds.includes(item.id)).map(item => item.name));
 					if (items.length > 0) {
 						msgs.push(`<@${user._id}>: ${items.join(', ')}`);
@@ -365,13 +365,13 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	const { accountName, accountType } = options;
 
 	if (accountName === null) {
-		const user = await userSchema.findById(options.targetUser.id);
-		if (user === null || user.epicAccountId === null) {
+		const userResult = await userSchema.findById(options.targetUser.id);
+		if (userResult === null || userResult.epicAccountId === null) {
 			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
 		}
 
 		try {
-			const levels = await getLevels(user.epicAccountId);
+			const levels = await getLevels(userResult.epicAccountId);
 			return { content: formatLevels(levels, options.targetUser.username) };
 		}
 		catch (error) {
@@ -408,8 +408,8 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
 	if (options.accountName === null) {
-		const user = await userSchema.findById(options.targetUser.id);
-		if (user === null || user.epicAccountId === null) {
+		const userResult = await userSchema.findById(options.targetUser.id);
+		if (userResult === null || userResult.epicAccountId === null) {
 			if (content !== undefined) {
 				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with the ${interaction.client.user.username}.`);
 			}
@@ -420,7 +420,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 		}
 
 		try {
-			const { image } = await fortniteAPI.stats({ id: user.epicAccountId, image: options.input, timeWindow: options.timeWindow });
+			const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ content, files: [image] });
 		}
 		catch (error) {
@@ -491,8 +491,8 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	const itemShopCosmetics = await fetchCosmetics(true);
 	const user = await getUserProperties(interaction);
 
-	const wishlist = await userSchema.findById(user.id);
-	if (!wishlist?.wishlistCosmeticIds.length) {
+	const userResult = await userSchema.findById(user.id);
+	if (!userResult?.wishlistCosmeticIds.length) {
 		await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
 		return;
 	}
@@ -501,10 +501,10 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		embeds: [
 			new TimestampedEmbed()
 				.setColor(user.color)
-				.setDescription(wishlist.wishlistCosmeticIds
+				.setDescription(userResult.wishlistCosmeticIds
 					.slice(0, 25)
 					.map((id, index) => {
-						if (index === 24 && wishlist.wishlistCosmeticIds.length !== 25) return `+ ${wishlist.wishlistCosmeticIds.length - 24} more`;
+						if (index === 24 && userResult.wishlistCosmeticIds.length !== 25) return `+ ${userResult.wishlistCosmeticIds.length - 24} more`;
 
 						const cosmetic = itemShopCosmetics.find(c => c.id === id);
 						if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));

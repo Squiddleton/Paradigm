@@ -17,11 +17,11 @@ export default new ClientEvent({
 			const isBot = message.author.bot;
 
 			if (!isBot) {
-				const result = await memberSchema.findOneAndUpdate(
+				const memberResult = await memberSchema.findOneAndUpdate(
 					{ userId: message.author.id, guildId, 'dailyMessages.day': 30 },
 					{ $inc: { 'dailyMessages.$.messages': 1 } }
 				);
-				if (result === null) {
+				if (memberResult === null) {
 					const msgObject: IMessage = { day: 30, messages: 1 };
 
 					await memberSchema.updateOne(

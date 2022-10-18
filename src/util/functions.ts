@@ -301,21 +301,21 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 	const { displayName } = member;
 	const user = await member.user.fetch();
 
-	const result = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
+	const memberResult = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 	const embed = new TimestampedEmbed()
 		.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)
 		.setThumbnail(member.displayAvatarURL())
 		.setColor(user.accentColor ?? null);
 
-	if (result.milestones.length === 0) {
+	if (memberResult.milestones.length === 0) {
 		embed.setDescription('No milestones');
 	}
 	else {
 		const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 		let i = 0;
-		for (const milestone of result.milestones.sort((a, b) => {
+		for (const milestone of memberResult.milestones.sort((a, b) => {
 			const fullA = milestones.find(m => m.name === a);
 			const fullB = milestones.find(m => m.name === b);
 
