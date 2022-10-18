@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { noPunc } from '../../util/functions.js';
+import { noPunc, removeDuplicates } from '../../util/functions.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
@@ -36,7 +36,7 @@ export default new SlashCommand({
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
 					.setImage(playlist.images.showcase)
 					.setFields([
-						{ name: 'Modes', value: [...new Set(playlists.filter(mode => mode.name === playlist.name).map(mode => mode.subName))].join('/') || 'N/A', inline: true },
+						{ name: 'Modes', value: removeDuplicates(playlists.filter(mode => mode.name === playlist.name).map(mode => mode.subName)).join('/') || 'N/A', inline: true },
 						{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
 					])
 					.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })

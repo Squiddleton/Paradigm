@@ -3,7 +3,7 @@ import { findBestMatch, Rating } from 'string-similarity';
 
 import guildSchema from'../schemas/guilds.js';
 import memberSchema from'../schemas/members.js';
-import { noPunc, sumMsgs } from'../util/functions.js';
+import { noPunc, removeDuplicates, sumMsgs } from'../util/functions.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
@@ -53,7 +53,7 @@ export default new ClientEvent({
 						break;
 					}
 					case 'playlist': {
-						const playlists = [...new Set((await fortniteAPI.playlists()).map(mapByName))];
+						const playlists = removeDuplicates((await fortniteAPI.playlists()).map(mapByName));
 						const closest = findBestMatch(input, playlists);
 						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);

@@ -1,6 +1,6 @@
 import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time, Colors, CommandInteraction } from 'discord.js';
 import Canvas from 'canvas';
-import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, sum, validateGuildChannel } from './functions.js';
+import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
@@ -77,7 +77,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
 				for (const user of users.filter(u => members.has(u._id))) {
-					const items = [...new Set(entries.filter(item => user.wishlistCosmeticIds.includes(item.id)).map(item => item.name))];
+					const items = removeDuplicates(entries.filter(item => user.wishlistCosmeticIds.includes(item.id)).map(item => item.name));
 					if (items.length > 0) {
 						msgs.push(`<@${user._id}>: ${items.join(', ')}`);
 					}

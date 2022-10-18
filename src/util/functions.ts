@@ -81,6 +81,8 @@ export const quantity = (arr: string[]) => {
 
 export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 
+export const removeDuplicates = <T>(arr: T[]) => Array.from(new Set(arr));
+
 export const sum = (previous: number, current: number) => previous + current;
 
 export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;
