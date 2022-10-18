@@ -11,7 +11,7 @@ import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-u
 import { ErrorMessage } from '../util/constants.js';
 import { isReadyClient } from '../util/typeguards.js';
 
-const mapByName = (item: Cosmetic | Playlist) => item.name ?? 'null';
+const mapByName = (item: Cosmetic | Playlist) => item.name;
 
 const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
 
