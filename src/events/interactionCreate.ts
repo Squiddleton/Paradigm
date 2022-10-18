@@ -15,10 +15,7 @@ const mapByName = (item: Cosmetic | Playlist) => item.name;
 
 const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
 
-const sortByRating = (a: Rating, b: Rating) => {
-	if (a.rating === b.rating) return a.target.localeCompare(b.target);
-	return b.rating - a.rating;
-};
+const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
 	const cosmetics = await fetchCosmetics();
