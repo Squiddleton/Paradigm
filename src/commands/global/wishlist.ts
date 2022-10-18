@@ -1,8 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-
 import userSchema from '../../schemas/users.js';
-import { noPunc } from '../../util/functions.js';
-import { findCosmetic, fetchCosmetics, viewWishlist } from '../../util/fortnite.js';
+import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 
@@ -54,12 +52,10 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		const userId = interaction.user.id;
-		const itemShopCosmetics = await fetchCosmetics(true);
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
-				const input = interaction.options.getString('cosmetic', true);
-				const cosmetic = await findCosmetic(input, true);
+				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true), true);
 				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;
@@ -87,9 +83,8 @@ export default new SlashCommand({
 				break;
 			}
 			case 'remove': {
-				const input = interaction.options.getString('cosmetic', true);
-				const cosmetic = itemShopCosmetics.find(c => c.id === input) ?? itemShopCosmetics.find(c => noPunc(c.name) === noPunc(input));
-				if (cosmetic === undefined) {
+				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true), true);
+				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;
 				}

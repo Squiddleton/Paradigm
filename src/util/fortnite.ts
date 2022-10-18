@@ -40,11 +40,21 @@ export const fetchCosmetics = async (itemShopOnly = false) => {
 };
 
 export const findCosmetic = async (input: string, itemShopOnly = false) => {
-	const list = await fetchCosmetics(itemShopOnly);
-	const id = list.find(c => c.id === input) ?? list.find(c => input.includes(c.id));
-	if (id !== undefined) return id;
-	input = noPunc(input);
-	return list.find(c => noPunc(c.name) === input) ?? null;
+	try {
+		const cosmeticById = await fortniteAPI.findCosmetic({ id: input });
+		return cosmeticById;
+	}
+	catch {
+		try {
+			const cosmeticByName = await fortniteAPI.findCosmetic({ name: input });
+			return cosmeticByName;
+		}
+		catch {
+			const list = await fetchCosmetics(itemShopOnly);
+			input = noPunc(input);
+			return list.find(c => noPunc(c.name) === input) ?? null;
+		}
+	}
 };
 
 export const fetchItemShop = async () => {
