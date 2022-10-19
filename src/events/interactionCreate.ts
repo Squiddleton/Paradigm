@@ -18,8 +18,8 @@ const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.targe
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
 	const cosmetics = await fetchCosmetics();
-	const closest = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
-	const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
+	const { ratings } = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
+	const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 	await interaction.respond(choices);
 };
 
@@ -42,8 +42,8 @@ export default new ClientEvent({
 					case 'cosmetic': {
 						const shopOnly = interaction.commandName === 'wishlist';
 						const cosmetics = await fetchCosmetics(shopOnly);
-						const closest = findBestMatch(input, cosmetics.map(mapByName));
-						const choices = closest.ratings.sort(sortByRating).map(rating => {
+						const { ratings } = findBestMatch(input, cosmetics.map(mapByName));
+						const choices = ratings.sort(sortByRating).map(rating => {
 							const cosmetic = cosmetics.find(cos => cos.name === rating.target);
 							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', rating.target));
 							return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
@@ -53,8 +53,8 @@ export default new ClientEvent({
 					}
 					case 'playlist': {
 						const playlists = removeDuplicates((await fortniteAPI.playlists()).map(mapByName));
-						const closest = findBestMatch(input, playlists);
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
+						const { ratings } = findBestMatch(input, playlists);
+						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);
 						break;
 					}
@@ -83,13 +83,15 @@ export default new ClientEvent({
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
 						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
-						if (memberOption) {
+						if (typeof memberOption === 'string') {
 							const memberResult = await memberSchema.findOne({ userId: memberOption, guildId });
-							milestones = milestones.filter(m => !memberResult?.milestones.includes(m));
+							if (memberResult !== null) {
+								milestones = milestones.filter(m => !memberResult.milestones.includes(m));
+							}
 						}
 
-						const closest = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
-						const choices = closest.ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
+						const { ratings } = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
+						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices[0]?.name === 'None' ? [] : choices);
 						break;
 					}
