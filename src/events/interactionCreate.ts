@@ -142,28 +142,31 @@ export default new ClientEvent({
 		}
 
 		else if (interaction.isButton() && interaction.customId === 'giveaway' && inCachedGuild) {
+			const { guildId } = interaction;
+			const messageId = interaction.message.id;
+
 			await interaction.deferReply({ ephemeral: true });
 			if (interaction.member.joinedTimestamp !== null && interaction.member.joinedTimestamp + 6 * 86400000 > Date.now()) {
 				await interaction.editReply('You need to have been in the server for at least 6 days to enter.');
 				return;
 			}
 
-			const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
+			const guildResult = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
-			const giveawayResult = guildResult.giveaways.find(g => g.messageId === interaction.message.id);
-			if (giveawayResult === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', interaction.message.id));
+			const giveawayResult = guildResult.giveaways.find(g => g.messageId === messageId);
+			if (giveawayResult === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', messageId));
 
 			if (giveawayResult.entrants.includes(userId)) {
 				await interaction.editReply('You have already entered this giveaway.');
 				return;
 			}
 
-			const memberResult = await memberSchema.findOneAndUpdate(
-				{ userId, guildId: interaction.guildId },
+			const { dailyMessages } = await memberSchema.findOneAndUpdate(
+				{ userId, guildId },
 				{},
 				{ new: true, upsert: true }
 			);
-			if (memberResult.dailyMessages.reduce(sumMsgs, 0) < giveawayResult.messages) {
+			if (dailyMessages.reduce(sumMsgs, 0) < giveawayResult.messages) {
 				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}
@@ -183,7 +186,7 @@ export default new ClientEvent({
 
 			await guildSchema.updateOne(
 				{
-					_id: interaction.guildId,
+					_id: guildId,
 					'giveaways.messageId': interaction.message.id
 				},
 				{ $push: { 'giveaways.$.entrants': { $each: entries } } }
