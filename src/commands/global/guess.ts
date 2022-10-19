@@ -1,4 +1,4 @@
-import Canvas from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { fetchCosmetics } from '../../util/fortnite.js';
@@ -16,8 +16,8 @@ export default new SlashCommand({
 		const cosmetic = randomFromArray(items);
 		const image = cosmetic.images.featured ?? cosmetic.images.icon;
 
-		const background = await Canvas.loadImage(image);
-		const canvas = Canvas.createCanvas(background.width, background.height);
+		const background = await loadImage(image);
+		const canvas = createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 

@@ -1,8 +1,8 @@
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
+import { createCanvas, loadImage } from 'canvas';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { noPunc, randomFromArray } from '../../util/functions.js';
 import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
-import Canvas from 'canvas';
-import { SlashCommand } from '@squiddleton/discordjs-util';
 import { BackgroundURL } from '../../util/constants.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 
@@ -53,24 +53,24 @@ export default new SlashCommand({
 		const outfits = cosmetics.filter(i => i.type.displayValue === 'Outfit');
 		const outfit = randomFromArray(outfits);
 
-		const background = await Canvas.loadImage(randomFromArray(Object.values(BackgroundURL)));
-		const canvas = Canvas.createCanvas(background.width, background.height);
+		const background = await loadImage(randomFromArray(Object.values(BackgroundURL)));
+		const canvas = createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-		const o = await Canvas.loadImage(outfit.images.featured ? outfit.images.featured : outfit.images.icon);
+		const o = await loadImage(outfit.images.featured ? outfit.images.featured : outfit.images.icon);
 		ctx.drawImage(o, (background.width - (background.height * o.width / o.height)) / 2, 0, background.height * o.width / o.height, background.height);
 
-		const b = await Canvas.loadImage(bb.images.featured ? bb.images.featured : bb.images.icon);
+		const b = await loadImage(bb.images.featured ? bb.images.featured : bb.images.icon);
 		ctx.drawImage(b, 0, 0, background.height * b.width / b.height / 2, background.height / 2);
 
-		const h = await Canvas.loadImage(ht.images.featured ? ht.images.featured : ht.images.icon);
+		const h = await loadImage(ht.images.featured ? ht.images.featured : ht.images.icon);
 		ctx.drawImage(h, 0, background.height / 2, background.height * h.width / h.height / 2, background.height / 2);
 
-		const g = await Canvas.loadImage(glider.images.featured ? glider.images.featured : glider.images.icon);
+		const g = await loadImage(glider.images.featured ? glider.images.featured : glider.images.icon);
 		ctx.drawImage(g, background.width - (background.height * g.width / g.height / 2), 0, background.height * g.width / g.height / 2, background.height / 2);
 
-		const w = await Canvas.loadImage(wrap.images.featured ? wrap.images.featured : wrap.images.icon);
+		const w = await loadImage(wrap.images.featured ? wrap.images.featured : wrap.images.icon);
 		ctx.drawImage(w, background.width - (background.height * w.width / w.height / 2), background.height / 2, background.height * w.width / w.height / 2, background.height / 2);
 
 		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${noPunc(interaction.user.username)}sLoadout.png` });

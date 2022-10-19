@@ -1,5 +1,5 @@
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, time, UserContextMenuCommandInteraction } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';

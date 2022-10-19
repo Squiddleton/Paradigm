@@ -1,5 +1,5 @@
-import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import fortniteAPI from '../../clients/fortnite.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({

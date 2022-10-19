@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import memberSchema from '../../schemas/members.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import memberSchema from '../../schemas/members.js';
 import type { IMessage } from '../../util/types.js';
 import { sumMsgs } from '../../util/functions.js';
 

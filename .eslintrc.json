@@ -6,11 +6,13 @@
     "project": ["./tsconfig.json"]
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import"
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended"
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:import/recommended"
   ],
   "ignorePatterns": [
     "dist"
@@ -25,6 +27,8 @@
     "comma-style": "error",
     "curly": ["error", "multi-line", "consistent"],
     "dot-location": ["error", "property"],
+    "import/no-unresolved": "error",
+    "import/order": "error",
     "indent": "off",
     "@typescript-eslint/indent": ["error", "tab"],
     "@typescript-eslint/member-delimiter-style": "error",
@@ -50,6 +54,7 @@
     "require-await": "error",
     "semi": "off",
     "@typescript-eslint/semi": ["error", "always"],
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }],
     "space-before-blocks": "off",
     "@typescript-eslint/space-before-blocks": "error",
     "@typescript-eslint/space-before-function-paren": ["error", {
@@ -62,5 +67,14 @@
     "space-unary-ops": "error",
     "spaced-comment": "error",
     "yoda": "error"
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "typescript": true,
+      "node": true
+    }
   }
 } 

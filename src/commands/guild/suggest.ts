@@ -1,5 +1,5 @@
 import { ApplicationCommandOptionType, Message } from 'discord.js';
-import Canvas from 'canvas';
+import { loadImage } from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { DiscordIds, ErrorMessage } from '../../util/constants';
 import { validateGuildChannel } from '../../util/functions';
@@ -39,7 +39,7 @@ export default new SlashCommand({
 		const { url } = interaction.options.getAttachment('image', true);
 		if (!['gif', 'webp'].some(ending => url.endsWith(ending))) {
 			try {
-				await Canvas.loadImage(url);
+				await loadImage(url);
 			}
 			catch {
 				await interaction.editReply('Your image link was invalid.');

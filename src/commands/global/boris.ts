@@ -1,5 +1,5 @@
-import imgurClient from '../../clients/imgur.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import imgurClient from '../../clients/imgur.js';
 import { randomFromArray } from '../../util/functions.js';
 import { BorisAlbumIds } from '../../util/constants.js';
 

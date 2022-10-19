@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType } from 'discord.js';
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import userSchema from '../../schemas/users.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
-import { SlashCommand } from '@squiddleton/discordjs-util';
 import guildSchema from '../../schemas/guilds.js';
 
 export default new SlashCommand({

@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType } from 'discord.js';
-import fortniteAPI from '../../clients/fortnite.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import fortniteAPI from '../../clients/fortnite.js';
 import { noPunc, removeDuplicates } from '../../util/functions.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 

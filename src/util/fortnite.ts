@@ -1,11 +1,11 @@
-import { ButtonStyle, ChatInputCommandInteraction, ActionRowBuilder, AttachmentBuilder, ButtonBuilder, SelectMenuBuilder, ComponentType, MessageActionRowComponentBuilder, Message, Snowflake, Client, ColorResolvable, time, Colors, CommandInteraction } from 'discord.js';
-import Canvas from 'canvas';
-import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, time } from 'discord.js';
+import { Image, createCanvas, loadImage } from 'canvas';
+import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
-import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import fortniteAPI from '../clients/fortnite.js';
+import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
 import { getLevels } from './epic.js';
@@ -146,8 +146,8 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? randomFromArray(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
-	const background = await Canvas.loadImage(rawBackground);
-	const canvas = Canvas.createCanvas(background.width, background.height);
+	const background = await loadImage(rawBackground);
+	const canvas = createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
@@ -155,18 +155,18 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	type Dimensions = { [K in Link]: [number, number, number, number] };
 
 	const handleImage = async (input: StringOption, displayType: Link, displayValues: string[]) => {
-		let image: Canvas.Image | null = null;
+		let image: Image | null = null;
 		const link = links[displayType];
 
 		if (link !== undefined) {
-			image = await Canvas.loadImage(link);
+			image = await loadImage(link);
 		}
 		else if (input !== null) {
 			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && noPunc(e.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
 			if (cosmetic === undefined) {
 				throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', displayType));
 			}
-			image = await Canvas.loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
+			image = await loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
 		}
 
 		if (image !== null) {
@@ -215,7 +215,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		if (!oi) {
 			return 'Invalid wrap name provided.';
 		}
-		const wrapImg = await Canvas.loadImage(oi.images.featured ?? oi.images.icon);
+		const wrapImg = await loadImage(oi.images.featured ?? oi.images.icon);
 		ctx.drawImage(wrapImg, background.width - (background.height * wrapImg.width / wrapImg.height / 2), background.height / 2, background.height * wrapImg.width / wrapImg.height / 2, background.height / 2);
 	}
 
