@@ -76,7 +76,7 @@ export default new SlashCommand({
 							for (const component of components) {
 								component.setComponents(component.components.map(menu => {
 									return menu instanceof SelectMenuBuilder
-										? menu.setOptions(menu.options.map(option => ({ label: option.data.label ?? 'label', value: option.data.value ?? 'value' })))
+										? menu.setOptions(menu.options.map(option => ({ label: option.toJSON().label, value: option.toJSON().value })))
 										: menu;
 								}
 								));
@@ -101,7 +101,10 @@ export default new SlashCommand({
 				for (const component of components) {
 					component.setComponents(component.components.map(menu => {
 						return menu instanceof SelectMenuBuilder
-							? menu.setOptions(menu.options.map(o => ({ label: o.data.label ?? 'label', value: o.data.value ?? 'value', default: menu.data.custom_id === i.customId && o.data.value === optionChosen.tag })))
+							? menu.setOptions(menu.options.map(o => {
+								const option = o.toJSON();
+								return { label: option.label, value: option.value, default: menu.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
+							}))
 							: menu;
 					}
 					));

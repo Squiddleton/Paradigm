@@ -302,7 +302,8 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
 					components = components.map(row => {
 						const menu = row.components[0];
-						if (menu.data.type === ComponentType.Button || (menu.data.type === ComponentType.SelectMenu && menu.data.custom_id !== cosmetic.id)) return row;
+						const menuJSON = menu.toJSON();
+						if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return row;
 
 						if (menu instanceof SelectMenuBuilder) {
 							menu.setOptions(value.startsWith('truedefault')
