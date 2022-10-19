@@ -68,7 +68,7 @@ export enum ErrorMessage {
 	NotUserOwned = 'The Client application is not owned by a User instance',
 	OutOfGuild = 'This command should only be usable in (cached) guilds',
 	UncachedClient = 'The Client user is not cached',
-	UnexpectedValue = 'The value {value} was unexpected',
+	UnexpectedValue = 'The value "{value}" was unexpected',
 	UnknownGiveaway = 'No giveaway was found with that message id',
 	UnreadyClient = 'The Client should be ready but is not'
 }
