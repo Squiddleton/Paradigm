@@ -44,7 +44,7 @@ export default new SlashCommand({
 			return;
 		}
 
-		const components = [
+		const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
 			new ActionRowBuilder<ButtonBuilder>()
 				.setComponents(
 					new ButtonBuilder()
@@ -56,14 +56,15 @@ export default new SlashCommand({
 						.setLabel('Lock Image In')
 						.setStyle(ButtonStyle.Danger)
 				),
-			...variants.slice(0, 4).map(variant => new ActionRowBuilder<MessageActionRowComponentBuilder>()
+			...variants.slice(0, 4).map(variant => new ActionRowBuilder<SelectMenuBuilder>()
 				.setComponents(new SelectMenuBuilder()
 					.setCustomId(variant.channel)
 					.setMinValues(1)
 					.setPlaceholder(variant.type.toUpperCase())
 					.setOptions(variant.options.slice(0, 25).map(option => ({ label: option.name.toUpperCase(), value: option.tag })))
 				)
-			)];
+			)
+		];
 
 		const message = await interaction.editReply({ components, embeds: [embed] });
 		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
