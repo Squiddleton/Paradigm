@@ -1,7 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 import { LoadoutImageOptions } from '../../util/constants.js';
-import { isLoadoutError } from '../../util/typeguards.js';
 
 export default new SlashCommand({
 	name: 'loadout',
@@ -23,7 +22,7 @@ export default new SlashCommand({
 		await interaction.deferReply();
 		const attachment = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground);
 
-		if (isLoadoutError(attachment)) {
+		if (typeof attachment === 'string') {
 			await interaction.editReply(attachment);
 			return;
 		}
