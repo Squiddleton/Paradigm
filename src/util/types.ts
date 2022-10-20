@@ -163,6 +163,17 @@ export interface LevelCommandOptions {
 	accountType: 'epic' | 'xbl' | 'psn';
 }
 
+export interface Links {
+	Outfit?: string;
+	'Back Bling'?: string;
+	'Harvesting Tool'?: string;
+	Glider?: string;
+}
+
+export type Link = keyof Links;
+
+export type Dimensions = { [K in Link]: [number, number, number, number] };
+
 export type Quantity = { [key: string]: number };
 
 export interface RawEpicError {

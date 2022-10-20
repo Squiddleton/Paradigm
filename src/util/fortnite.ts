@@ -7,7 +7,7 @@ import userSchema from '../schemas/users.js';
 import fortniteAPI from '../clients/fortnite.js';
 import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
-import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
+import type { CosmeticCache, Dimensions, DisplayUserProperties, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getLevels } from './epic.js';
 import { isBackground } from './typeguards.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
@@ -141,7 +141,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	return embed;
 };
 
-export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: { Outfit?: string; 'Back Bling'?: string; 'Harvesting Tool'?: string; Glider?: string } = {}) => {
+export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
 	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
@@ -150,9 +150,6 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	const canvas = createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-	type Link = keyof typeof links;
-	type Dimensions = { [K in Link]: [number, number, number, number] };
 
 	const handleImage = async (input: StringOption, displayType: Link, displayValues: string[]) => {
 		let image: Image | null = null;
