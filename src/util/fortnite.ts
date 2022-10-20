@@ -270,7 +270,10 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			})
 		);
 	}
-	await interaction.editReply({ components, content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, files: [attachment], embeds });
+
+	const content = embeds.length > 0 ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null;
+
+	await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
 		const message: Message = await interaction.fetchReply();
 		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
@@ -278,7 +281,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 		collector.on('collect', async i => {
 			if (i.customId === 'lock') {
-				await i.update({ components: [], content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, embeds });
+				await i.update({ components: [], content, embeds });
 				return;
 			}
 			await i.deferUpdate();
@@ -296,6 +299,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					if (imageURL === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
 
 					options[cosmetic.type.displayValue] = imageURL;
+
 					const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
 					components = components.map(row => {
 						const menu = row.components[0];
@@ -311,13 +315,13 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 						return row.setComponents([menu]);
 					});
 
-					await i.editReply({ attachments: [], content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, files: [newAttachmentBuilder], components, embeds });
+					await i.editReply({ attachments: [], content, files: [newAttachmentBuilder], components, embeds });
 				}
 			}
 		});
 
 		collector.on('end', async (collected, reason) => {
-			if (reason === 'time') await interaction.editReply({ components: [], content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, embeds });
+			if (reason === 'time') await interaction.editReply({ components: [], content, embeds });
 		});
 	}
 };
