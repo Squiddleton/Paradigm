@@ -266,9 +266,9 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			new ActionRowBuilder({
 				components: [
 					new ButtonBuilder()
-						.setCustomId('confirm')
-						.setLabel('Confirm')
-						.setStyle(ButtonStyle.Success)
+						.setCustomId('lock')
+						.setLabel('Lock Image In')
+						.setStyle(ButtonStyle.Danger)
 				]
 			})
 		);
@@ -280,7 +280,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 		const options: { [key: string]: string } = {};
 
 		collector.on('collect', async i => {
-			if (i.customId === 'confirm') {
+			if (i.customId === 'lock') {
 				await i.update({ components: [], content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, embeds });
 				return;
 			}
