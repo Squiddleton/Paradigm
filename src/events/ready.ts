@@ -6,7 +6,7 @@ import memberSchema from '../schemas/members.js';
 import guildSchema from '../schemas/guilds.js';
 import { checkWishlists } from '../util/fortnite.js';
 import { ErrorMessage } from '../util/constants.js';
-import { isReadyClient } from '../util/typeguards.js';
+import { DiscordClient } from '../util/classes.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -15,7 +15,7 @@ export default new ClientEvent({
 		await client.application.fetch();
 
 		const readyMessage = `${client.user.username} is ready!`;
-		if (!isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
+		if (!DiscordClient.isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 

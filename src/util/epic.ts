@@ -3,12 +3,11 @@ import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
-import { isRawEpicError } from './typeguards';
 import { EpicError } from './classes.js';
 
 const checkError = async <Res>(raw: Response) => {
 	const res = await raw.json() as Res | RawEpicError;
-	if (isRawEpicError(res)) {
+	if (EpicError.isRawEpicError(res)) {
 		throw new EpicError(res);
 	}
 	return res;

@@ -1,13 +1,16 @@
-import { Client as BaseClient, validateChannel } from '@squiddleton/discordjs-util';
-import { EmbedBuilder, EmbedData } from 'discord.js';
+import { Client as UtilClient, validateChannel } from '@squiddleton/discordjs-util';
+import { Client as BaseClient, EmbedBuilder, EmbedData } from 'discord.js';
 import config from '../config';
 import type { EpicErrorCode } from './constants';
 import type { RawEpicError } from './types';
 
-export class DiscordClient<Ready extends boolean = boolean> extends BaseClient<Ready> {
+export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
 	get devChannel() {
 		if (!this.isReady()) throw new Error('The devChannel property cannot be accessed until the Client is ready');
 		return validateChannel(this, config.devChannelId);
+	}
+	static isReadyClient(client: BaseClient): client is DiscordClient<true> {
+		return client.isReady();
 	}
 }
 
@@ -30,6 +33,9 @@ export class EpicError extends Error {
 		this.intent = error.intent;
 		this.errorDescription = error.error_description ?? null;
 		this.error = error.error ?? null;
+	}
+	static isRawEpicError(obj: any): obj is RawEpicError {
+		return 'errorCode' in obj;
 	}
 }
 

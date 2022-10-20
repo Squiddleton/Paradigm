@@ -8,7 +8,7 @@ import { noPunc, removeDuplicates, sumMsgs } from'../util/functions.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import { ErrorMessage } from '../util/constants.js';
-import { isReadyClient } from '../util/typeguards.js';
+import { DiscordClient } from '../util/classes.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name;
 
@@ -29,7 +29,7 @@ export default new ClientEvent({
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
-		if (!isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
+		if (!DiscordClient.isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
 		const { owner } = client.application;
 		if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 

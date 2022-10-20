@@ -2,8 +2,8 @@ import { ClientEvent } from '@squiddleton/discordjs-util';
 import memberSchema from '../schemas/members.js';
 import type { IMessage } from '../util/types.js';
 import { checkWishlists } from '../util/fortnite.js';
-import { isReadyClient } from '../util/typeguards.js';
 import { DiscordIds } from '../util/constants.js';
+import { DiscordClient } from '../util/classes.js';
 
 const denySubmissionMessage = 'Discussion is not allowed in this channel. Please use the `/suggest` command for submissions.';
 
@@ -11,7 +11,7 @@ export default new ClientEvent({
 	name: 'messageCreate',
 	async execute(message) {
 		const { client } = message;
-		if (message.inGuild() && isReadyClient(client)) {
+		if (message.inGuild() && DiscordClient.isReadyClient(client)) {
 			const { guildId } = message;
 			const exclusiveGuildId = client.exclusiveGuildId;
 			const isBot = message.author.bot;
