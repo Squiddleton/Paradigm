@@ -3,7 +3,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorR
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { fetchCosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
-import { DefaultCollectorTime, RarityColors } from '../../util/constants.js';
+import { GuessCollectorTime, RarityColors } from '../../util/constants.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
@@ -64,7 +64,7 @@ export default new SlashCommand({
 				)
 			);
 
-		const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: DefaultCollectorTime });
+		const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: GuessCollectorTime });
 		collector.on('collect', async buttonInteraction => {
 			await buttonInteraction.showModal(modal);
 		});
@@ -77,7 +77,7 @@ export default new SlashCommand({
 		};
 
 		try {
-			const modalInteraction = await interaction.awaitModalSubmit({ filter, time: DefaultCollectorTime });
+			const modalInteraction = await interaction.awaitModalSubmit({ filter, time: GuessCollectorTime });
 
 			if (modalInteraction.isFromMessage()) {
 				embed

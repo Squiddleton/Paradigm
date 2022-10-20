@@ -75,6 +75,8 @@ export enum ErrorMessage {
 	UnreadyClient = 'The Client should be ready but is not'
 }
 
+export const GuessCollectorTime = 60000;
+
 export const LanguageChoices: StringChoices = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
 	de: 'Deutsch',
