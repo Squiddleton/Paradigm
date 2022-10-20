@@ -86,6 +86,7 @@ export default new SlashCommand({
 						}
 						case 'lock': {
 							await i.update({ components: [] });
+							collector.stop();
 							break;
 						}
 					}
@@ -112,8 +113,8 @@ export default new SlashCommand({
 
 				await i.update({ components, embeds: [embed.setImage(optionChosen.image)] });
 			})
-			.on('end', async () => {
-				await interaction.editReply({ components: [] });
+			.on('end', async (collected, reason) => {
+				if (reason === 'time') await interaction.editReply({ components: [] });
 			});
 	}
 });
