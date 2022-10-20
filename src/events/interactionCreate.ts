@@ -2,9 +2,9 @@ import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPI
 import { Rating, findBestMatch } from 'string-similarity';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
-import guildSchema from'../schemas/guilds.js';
-import memberSchema from'../schemas/members.js';
-import { noPunc, removeDuplicates, sumMsgs } from'../util/functions.js';
+import guildSchema from '../schemas/guilds.js';
+import memberSchema from '../schemas/members.js';
+import { noPunc, removeDuplicates, sumMsgs } from '../util/functions.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import fortniteAPI from '../clients/fortnite.js';
 import { ErrorMessage } from '../util/constants.js';
