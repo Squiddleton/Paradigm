@@ -4,7 +4,7 @@ import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
 import { TimestampedEmbed } from './classes';
-import { AccessibleChannelPermissions, ErrorMessage, RarityOrdering } from './constants.js';
+import { AccessibleChannelPermissions, DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
@@ -223,7 +223,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		const collector = msg.channel.createMessageComponentCollector({
 			componentType: ComponentType.Button,
 			filter: (i) => i.message.id === msg.id && messageComponentCollectorFilter(interaction)(i),
-			time: 180000
+			time: DefaultCollectorTime
 		});
 
 		let index = 0;

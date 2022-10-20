@@ -16,6 +16,15 @@ export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
+export const ChapterLengths = [10, 8];
+
+/**
+ * 60 minutes * (60 seconds / minute) * (1,000 milliseconds / second)
+ */
+export const CosmeticCacheUpdateThreshold = 3600000;
+
+export const DefaultCollectorTime = 180000;
+
 export const DiscordIds = {
 	Channels: {
 		Logs: '488112900276224010',
@@ -30,13 +39,6 @@ export const DiscordIds = {
 		Catalyst: '848452706791981056'
 	}
 } as const;
-
-export const ChapterLengths = [10, 8];
-
-/**
- * 60 minutes * (60 seconds / minute) * (1,000 milliseconds / second)
- */
-export const CosmeticCacheUpdateThreshold = 3600000;
 
 /**
  * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64

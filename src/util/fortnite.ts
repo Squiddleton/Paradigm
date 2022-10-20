@@ -6,7 +6,7 @@ import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import fortniteAPI from '../clients/fortnite.js';
 import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
-import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
+import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import type { CosmeticCache, DisplayUserProperties, LevelCommandOptions, StatsCommandOptions, StringOption } from './types.js';
 import { getLevels } from './epic.js';
 import { isBackground } from './typeguards.js';
@@ -276,7 +276,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	await interaction.editReply({ components, content: embeds.length ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null, files: [attachment], embeds });
 	if (components.length > 0) {
 		const message: Message = await interaction.fetchReply();
-		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: 120000 });
+		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
 		const options: { [key: string]: string } = {};
 
 		collector.on('collect', async i => {
