@@ -190,6 +190,11 @@ export interface StatsCommandOptions extends LevelCommandOptions {
 	timeWindow: 'lifetime' | 'season';
 }
 
+export interface StatsEpicAccount {
+	id: string;
+	name: string;
+}
+
 export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;

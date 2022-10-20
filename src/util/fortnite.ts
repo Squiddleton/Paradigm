@@ -391,7 +391,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	}
 };
 
-const handleStatsError = async (interaction: CommandInteraction, error: unknown) => {
+export const handleStatsError = async (interaction: CommandInteraction, error: unknown) => {
 	if (!(error instanceof FortniteAPIError)) throw error;
 	switch (error.code) {
 		case 403: {
@@ -433,7 +433,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			const { image, account } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
 
-			if (interaction.isChatInputCommand()) {
+			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) {
 				await linkEpicAccount(interaction, account);
 			}
 		}

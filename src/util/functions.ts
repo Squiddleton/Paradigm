@@ -6,7 +6,7 @@ import userSchema from '../schemas/users';
 import { TimestampedEmbed } from './classes';
 import { AccessibleChannelPermissions, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
-import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu } from './types.js';
+import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
@@ -41,11 +41,9 @@ export const getClientPermissions = (client: Client<true>, channel: AnyGuildText
 
 export const getEnumKeys = (e: Record<string, any>) => Object.keys(e).filter(x => !(parseInt(x) >= 0));
 
-export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: { id: string; name: string }) => {
-	if (interaction.options.getBoolean('link')) {
-		await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
-		await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral: true });
-	}
+export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount) => {
+	await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
+	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral: true });
 };
 
 export const messageComponentCollectorFilter = (interaction: BaseInteraction) => (i: MessageComponentInteraction) => {

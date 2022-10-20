@@ -37,7 +37,7 @@ export default new SlashCommand({
 		});
 
 		await interaction.reply(content);
-		if (account !== undefined) {
+		if (account !== undefined && interaction.options.getBoolean('link')) {
 			await linkEpicAccount(interaction, account);
 		}
 	}
