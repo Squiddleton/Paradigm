@@ -32,7 +32,7 @@ export default new SlashCommand({
 
 		let account: StatsEpicAccount;
 		try {
-			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') as 'epic' | 'xbl' | 'psn') ?? 'epic' });
+			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn' });
 			account = stats.account;
 		}
 		catch (error) {
