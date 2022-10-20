@@ -33,7 +33,7 @@ export default new SlashCommand({
 	async execute(interaction, client) {
 		await interaction.deferReply();
 
-		const time = interaction.options.getInteger('time') ?? 30;
+		const time = interaction.options.getInteger('time', true);
 		const max = interaction.options.getInteger('max') ?? 10;
 		const memberResults = await memberSchema.find();
 

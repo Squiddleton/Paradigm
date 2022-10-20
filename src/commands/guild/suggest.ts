@@ -47,8 +47,8 @@ export default new SlashCommand({
 			}
 		}
 
-		const submissionName = interaction.options.getString('name');
-		const type = interaction.options.getString('type');
+		const submissionName = interaction.options.getString('name', true);
+		const type = interaction.options.getString('type', true);
 
 		const submissionChannelId = DiscordIds.Channels.Submissions;
 		let submissionChannel: AnyGuildTextChannel;
