@@ -236,12 +236,11 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 							components: [
 								new SelectMenuBuilder()
 									.setCustomId(cosmetic.id)
+									.setMinValues(1)
 									.setOptions([
 										{ label: `Default ${displayType}`, value: 'truedefault', default: true },
 										...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
 									])
-									.setMinValues(1)
-									.setMaxValues(1)
 							]
 						})
 					);
