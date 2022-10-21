@@ -60,7 +60,7 @@ export default new SlashCommand({
 				.setComponents(new SelectMenuBuilder()
 					.setCustomId(variant.channel)
 					.setMinValues(1)
-					.setPlaceholder(variant.type.toUpperCase())
+					.setPlaceholder((variant.type ?? variant.channel).toUpperCase())
 					.setOptions(variant.options.slice(0, 25).map(option => ({ label: option.name.toUpperCase(), value: option.tag })))
 				)
 			)
