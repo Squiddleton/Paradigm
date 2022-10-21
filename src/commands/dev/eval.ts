@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand, evalCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType } from 'discord.js';
 
 export default new SlashCommand({
 	name: 'eval',

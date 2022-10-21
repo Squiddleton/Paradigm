@@ -1,5 +1,5 @@
-import { ApplicationCommandType, PermissionFlagsBits } from 'discord.js';
 import { ContextMenu } from '@squiddleton/discordjs-util';
+import { ApplicationCommandType, PermissionFlagsBits } from 'discord.js';
 import { reviewGiveaway } from '../../util/functions';
 
 export default new ContextMenu({

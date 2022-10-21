@@ -1,10 +1,10 @@
-import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
-import { createCanvas, loadImage } from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { noPunc, randomFromArray } from '../../util/functions.js';
-import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
-import { BackgroundURL } from '../../util/constants.js';
+import { createCanvas, loadImage } from 'canvas';
+import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
+import { BackgroundURL } from '../../util/constants.js';
+import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
+import { noPunc, randomFromArray } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'random',

@@ -1,10 +1,10 @@
+import { SlashCommand } from '@squiddleton/discordjs-util';
 import { createCanvas, loadImage } from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
-import { SlashCommand } from '@squiddleton/discordjs-util';
+import { TimestampedEmbed } from '../../util/classes.js';
+import { GuessCollectorTime, RarityColors } from '../../util/constants.js';
 import { fetchCosmetics } from '../../util/fortnite.js';
 import { noPunc, randomFromArray } from '../../util/functions.js';
-import { GuessCollectorTime, RarityColors } from '../../util/constants.js';
-import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'guess',

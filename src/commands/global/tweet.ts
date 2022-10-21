@@ -1,8 +1,8 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
-import { LoadoutImageOptions } from '../../util/constants.js';
+import { ApplicationCommandOptionType } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
+import { LoadoutImageOptions } from '../../util/constants.js';
+import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'tweet',

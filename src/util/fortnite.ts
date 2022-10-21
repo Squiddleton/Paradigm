@@ -1,16 +1,16 @@
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, time } from 'discord.js';
-import { Image, createCanvas, loadImage } from 'canvas';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { Image, createCanvas, loadImage } from 'canvas';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, time } from 'discord.js';
+import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
-import fortniteAPI from '../clients/fortnite.js';
-import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
-import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
-import type { CosmeticCache, Dimensions, DisplayUserProperties, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
-import { getLevels } from './epic.js';
-import { isBackground } from './typeguards.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
+import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
+import { getLevels } from './epic.js';
+import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { isBackground } from './typeguards.js';
+import type { CosmeticCache, Dimensions, DisplayUserProperties, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],

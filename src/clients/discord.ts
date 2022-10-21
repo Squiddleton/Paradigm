@@ -1,9 +1,9 @@
 import { readdirSync } from 'node:fs';
-import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { ClientEvent, ContextMenu, ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
+import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import config from '../config.js';
-import { ErrorMessage } from '../util/constants.js';
 import { DiscordClient } from '../util/classes.js';
+import { ErrorMessage } from '../util/constants.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {

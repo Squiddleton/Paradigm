@@ -1,5 +1,5 @@
-import { ApplicationCommandType } from 'discord.js';
 import { ContextMenu } from '@squiddleton/discordjs-util';
+import { ApplicationCommandType } from 'discord.js';
 import { getLevelsString, getStatsImage } from '../../util/fortnite';
 import type { LevelCommandOptions } from '../../util/types';
 

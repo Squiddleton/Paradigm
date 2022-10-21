@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType, Snowflake } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType, Snowflake } from 'discord.js';
 
 export default new SlashCommand({
 	name: 'leaks',

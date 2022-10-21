@@ -1,5 +1,5 @@
-import { ApplicationCommandType } from 'discord.js';
 import { ContextMenu } from '@squiddleton/discordjs-util';
+import { ApplicationCommandType } from 'discord.js';
 import { viewWishlist } from '../../util/fortnite';
 
 export default new ContextMenu({

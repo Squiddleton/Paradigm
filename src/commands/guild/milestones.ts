@@ -1,5 +1,5 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType } from 'discord.js';
 import { viewMilestones } from '../../util/functions.js';
 
 export default new SlashCommand({

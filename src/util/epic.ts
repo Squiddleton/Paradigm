@@ -1,9 +1,9 @@
 import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
-import config from '../config.js';
 import fortniteAPI from '../clients/fortnite.js';
-import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
-import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
+import config from '../config.js';
 import { EpicError } from './classes.js';
+import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
+import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 
 const checkError = async <Res>(raw: Response) => {
 	const res = await raw.json() as Res | RawEpicError;

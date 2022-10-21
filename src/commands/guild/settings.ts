@@ -1,8 +1,8 @@
-import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
-import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
 import { TimestampedEmbed } from '../../util/classes.js';
+import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'settings',

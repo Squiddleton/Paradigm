@@ -1,14 +1,14 @@
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, RESTJSONErrorCodes, User } from 'discord.js';
-import { Rating, findBestMatch } from 'string-similarity';
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
+import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, RESTJSONErrorCodes, User } from 'discord.js';
+import { Rating, findBestMatch } from 'string-similarity';
+import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
-import { noPunc, removeDuplicates, sumMsgs } from '../util/functions.js';
-import { fetchCosmetics } from '../util/fortnite.js';
-import fortniteAPI from '../clients/fortnite.js';
-import { ErrorMessage } from '../util/constants.js';
 import { DiscordClient } from '../util/classes.js';
+import { ErrorMessage } from '../util/constants.js';
+import { fetchCosmetics } from '../util/fortnite.js';
+import { noPunc, removeDuplicates, sumMsgs } from '../util/functions.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name;
 

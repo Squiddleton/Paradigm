@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
-import { ApplicationCommandOptionType, codeBlock } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType, codeBlock } from 'discord.js';
 
 export default new SlashCommand({
 	name: 'terminal',

@@ -1,8 +1,8 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
-import { noPunc, removeDuplicates } from '../../util/functions.js';
 import { TimestampedEmbed } from '../../util/classes.js';
+import { noPunc, removeDuplicates } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'playlist',

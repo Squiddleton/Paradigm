@@ -1,6 +1,6 @@
-import { ApplicationCommandOptionType, Message } from 'discord.js';
-import { loadImage } from 'canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { loadImage } from 'canvas';
+import { ApplicationCommandOptionType, Message } from 'discord.js';
 import { DiscordIds, ErrorMessage } from '../../util/constants';
 import { validateGuildChannel } from '../../util/functions';
 import type { AnyGuildTextChannel } from '../../util/types';

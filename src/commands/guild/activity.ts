@@ -1,8 +1,8 @@
-import { ApplicationCommandOptionType } from 'discord.js';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandOptionType } from 'discord.js';
 import memberSchema from '../../schemas/members.js';
-import type { IMessage } from '../../util/types.js';
 import { sumMsgs } from '../../util/functions.js';
+import type { IMessage } from '../../util/types.js';
 
 export default new SlashCommand({
 	name: 'activity',

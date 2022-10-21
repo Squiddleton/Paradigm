@@ -1,8 +1,8 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import config from '../config';
-import { validateGuildChannel } from '../util/functions';
-import { DiscordIds } from '../util/constants';
 import { TimestampedEmbed } from '../util/classes';
+import { DiscordIds } from '../util/constants';
+import { validateGuildChannel } from '../util/functions';
 
 export default new ClientEvent({
 	name: 'messageReactionAdd',

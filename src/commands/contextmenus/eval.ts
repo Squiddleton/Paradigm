@@ -1,5 +1,5 @@
-import { ApplicationCommandType } from 'discord.js';
 import { ContextMenu, evalCommand } from '@squiddleton/discordjs-util';
+import { ApplicationCommandType } from 'discord.js';
 
 export default new ContextMenu({
 	name: 'Eval',
