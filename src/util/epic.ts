@@ -122,7 +122,7 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 		accessToken = accessTokenAndId.accessToken;
 	}
 
-	const levels = await epicFetch<Stats[]>(
+	const [levels] = await epicFetch<Stats[]>(
 		EpicEndpoint.Levels,
 		postBody(accessToken, JSON.stringify({
 			appId: 'fortnite',
@@ -133,7 +133,7 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 		}))
 	);
 
-	return levels[0].stats;
+	return levels.stats;
 };
 
 export const getStats = (accountId: string) => epicFetch<Stats>(EpicEndpoint.Stats.replace('{accountId}', accountId)).then(r => r.stats);
