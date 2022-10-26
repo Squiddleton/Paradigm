@@ -63,6 +63,8 @@ View and edit server-specific settings for The Paradigm. This command requires t
 
 Set the shop section updates channel (sends new item shop section names before they release) and the wishlist channel (more below) for the server.
 
+![Shop sections notification](examples/shop-sections-notification.png)
+
 #### /settings view
 
 View the amount of total giveaways, amount of total milestones, shop section updates channel, and wishlist channel for the server.
@@ -70,6 +72,8 @@ View the amount of total giveaways, amount of total milestones, shop section upd
 ### /wishlist
 
 Set up notifications when certain in-game cosmetics appear in the Fortnite item shop. This information is provided by [Fortnite-API](https://fortnite-api.com/) instead of directly querying the official Epic API. The wishlist announcements are sent in the channel set from the `wishlistchannel` option of `/settings edit`. **If the wishlist channel is not set, no members will be notified in that server.**
+
+![Wishlist notification](examples/wishlist-notification.png)
 
 #### /wishlist add
 
