@@ -61,11 +61,11 @@ View and edit server-specific settings for The Paradigm. This command requires t
 
 #### /settings edit
 
-Set the wishlist channel (more below) for the server.
+Set the shop section updates channel (sends new item shop section names before they release) and the wishlist channel (more below) for the server.
 
 #### /settings view
 
-View the amount of total giveaways, amount of total milestones, and the wishlist channel for the server.
+View the amount of total giveaways, amount of total milestones, shop section updates channel, and wishlist channel for the server.
 
 ### /wishlist
 

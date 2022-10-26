@@ -1,16 +1,17 @@
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { Image, createCanvas, loadImage } from 'canvas';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, time } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
+import fetch from 'node-fetch';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
-import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
-import { getLevels } from './epic.js';
-import { linkEpicAccount, messageComponentCollectorFilter, noPunc, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
+import { epicFetch, getLevels } from './epic.js';
+import { linkEpicAccount, messageComponentCollectorFilter, noPunc, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { isBackground } from './typeguards.js';
-import type { CosmeticCache, Dimensions, DisplayUserProperties, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],
@@ -39,6 +40,41 @@ export const fetchCosmetics = async (itemShopOnly = false) => {
 	return itemShopOnly ? cosmetics.filter(itemShopFilter) : cosmetics;
 };
 
+export const fetchItemShop = async () => {
+	const rawAPI = await fortniteAPI.shop({ combined: true });
+
+	const withoutDupes: Cosmetic[] = [];
+	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(entry => entry.items).flat();
+
+	for (const item of withDupes) {
+		if (!withoutDupes.some(c => c.id === item.id)) {
+			withoutDupes.push(item);
+		}
+	}
+	return withoutDupes;
+};
+
+export const fetchShopNames = async (state: TimelineClientEvent) => {
+	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => r.json());
+	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
+
+	const shopIds = Object.keys(state.state.sectionStoreEnds);
+
+	const namesWithoutQuantity = shopIds
+		.map(id => {
+			const returned = shopSections.find(section => section.sectionId === id);
+			if (returned === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', 'undefined'));
+			return returned;
+		})
+		.sort((a, b) => b.landingPriority - a.landingPriority)
+		.map(section => section.sectionDisplayName)
+		.filter((name): name is string => name !== undefined);
+
+	return Object.entries(quantity(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
+};
+
+export const fetchStates = () => epicFetch<Timeline>(EpicEndpoint.Timeline).then(timeline => timeline.channels['client-events'].states);
+
 export const findCosmetic = async (input: string, itemShopOnly = false) => {
 	try {
 		const cosmeticById = await fortniteAPI.findCosmetic({ id: input });
@@ -55,20 +91,6 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 			return list.find(c => noPunc(c.name) === input) ?? null;
 		}
 	}
-};
-
-export const fetchItemShop = async () => {
-	const rawAPI = await fortniteAPI.shop({ combined: true });
-
-	const withoutDupes: Cosmetic[] = [];
-	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(entry => entry.items).flat();
-
-	for (const item of withDupes) {
-		if (!withoutDupes.some(c => c.id === item.id)) {
-			withoutDupes.push(item);
-		}
-	}
-	return withoutDupes;
 };
 
 export const checkWishlists = async (client: Client<true>, debug = false) => {
@@ -286,7 +308,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			await i.deferUpdate();
 
 			if (!i.isSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
-			const value = i.values[0];
+			const [value] = i.values;
 			const cosmetic = cosmetics.find(c => c.id === i.customId);
 			if (cosmetic) {
 				const variants = cosmetic.variants?.[0].options;
@@ -301,7 +323,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 					const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
 					components = components.map(row => {
-						const menu = row.components[0];
+						const [menu] = row.components;
 						const menuJSON = menu.toJSON();
 						if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return row;
 
@@ -448,6 +470,37 @@ export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneN
 	{ $addToSet: { milestones: milestoneName } },
 	{ upsert: true }
 );
+
+export const postShopSections = async (client: Client<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
+	const [oldState, newState] = await fetchStates();
+	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
+
+	const formattedNames = currentNames
+		.map(name => `${cachedNames.includes(name) ? ' ' : '+'} ${name}`)
+		.concat(cachedNames
+			.filter(name => !currentNames.includes(name))
+			.map(name => `- ${name}`));
+
+	const guildResults = await guildSchema.find({ shopSectionsChannelId: { $ne: null } });
+	for (const { shopSectionsChannelId } of guildResults) {
+		if (shopSectionsChannelId !== null) {
+			try {
+				const channel = validateGuildChannel(client, shopSectionsChannelId);
+				await channel.send({
+					embeds: [
+						new EmbedBuilder()
+							.setTitle('Shop Sections Update')
+							.setDescription(codeBlock('diff', formattedNames.join('\n')))
+							.setTimestamp(new Date(oldState.state.dailyStoreEnd))
+					]
+				});
+			}
+			catch (error) {
+				console.error(error);
+			}
+		}
+	}
+};
 
 const getUserProperties = async (interaction: CommandInteraction): Promise<DisplayUserProperties> => {
 	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;

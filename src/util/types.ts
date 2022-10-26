@@ -114,6 +114,102 @@ export interface Friend {
 	favorite: boolean;
 }
 
+export type Template<T> = T & {
+	_activeDate: DateString;
+	lastModified: DateString;
+	_locale: string;
+	_templateName: string;
+};
+
+export interface SubgameInfo {
+	image: string;
+	color: string;
+	_type: string;
+	description: string;
+	subgame: string;
+	standardMessageLine2: string;
+	title: string;
+	standardMessageLine1: string;
+}
+
+export interface MOTD {
+	hidden: boolean;
+	_type: string;
+	message: {
+		entryType: string;
+		image: string;
+		titleImage: string;
+		hidden: boolean;
+		videoMute: boolean;
+		_type: string;
+		title: string;
+		body: string;
+		videoLoop: boolean;
+		videoStreamingEnabled: boolean;
+		id: string;
+		videoAutoplay: boolean;
+		videoFullscreen: boolean;
+		spotlight: boolean;
+	};
+	platform: string;
+}
+
+export interface ShopSection {
+	bSortOffersByOwnership: boolean;
+	bShowIneligibleOffersIfGiftable: boolean;
+	bEnableToastNotification: boolean;
+	background: {
+		stage: string;
+		_type: string;
+		key: string;
+	};
+	_type: string;
+	landingPriority: number;
+	bHidden: boolean;
+	sectionId: string;
+	bShowTimer: boolean;
+	sectionDisplayName?: string;
+	bShowIneligibleOffers: boolean;
+}
+
+export interface FortniteWebsite {
+	_title: string;
+	_activeDate: DateString;
+	lastModified: DateString;
+	_locale: string;
+	_templateName: string;
+	subgameinfo: Template<{
+		battleroyale: SubgameInfo;
+		savetheworld: SubgameInfo & { specialMessage: string };
+		_title: string;
+		_noIndex: boolean;
+		creative: Omit<SubgameInfo, 'standardMessageLine2'>;
+		_activeDate: DateString;
+	}>;
+	athenamessage: Template<{
+		_title: string;
+		overrideablemessage: {
+			_type: string;
+			message: {
+				image: string;
+				_type: string;
+				title: string;
+				body: string;
+			};
+		};
+	}>;
+	// There are MANY unlisted properties
+	shopSections: Template<{
+		_title: string;
+		sectionList: {
+			_type: string;
+			sections: ShopSection[];
+		};
+		_noIndex: boolean;
+	}>;
+	// Many more unlisted properties beneath
+}
+
 export interface IBonusRole {
 	id: Snowflake;
 	amount: number;
@@ -137,6 +233,7 @@ export interface IGuild {
 	_id: Snowflake;
 	giveaways: IGiveaway[];
 	milestones: IMilestone[];
+	shopSectionsChannelId: Snowflake | null;
 	wishlistChannelId: Snowflake | null;
 }
 
@@ -209,3 +306,50 @@ export interface StatsEpicAccount {
 export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
+
+export interface ChannelData<State> {
+	states: State[];
+	cacheExpire: DateString;
+}
+
+export interface ActiveEvent {
+	eventType: string;
+	activeUntil: DateString;
+	activeSince: DateString;
+}
+
+export interface TimelineClientEvent {
+	validFrom: DateString;
+	activeEvents: ActiveEvent[];
+	state: {
+		activeStorefronts: unknown[];
+		eventNamedWeights: unknown;
+		activeEvents: unknown[];
+		seasonNumber: number;
+		seasonTemplateId: string;
+		matchXpBonusPoints: number;
+		eventPunchCardTemplateId: string;
+		seasonBegin: DateString;
+		seasonEnd: DateString;
+		seasonDisplayedEnd: DateString;
+		weeklyStoreEnd: DateString;
+		stwEventStoreEnd: DateString;
+		stwWeeklyStoreEnd: DateString;
+		sectionStoreEnds: Record<string, DateString>;
+		rmtPromotion: string;
+		dailyStoreEnd: DateString;
+	};
+}
+
+export interface Timeline {
+	channels: {
+		'standalone-store': ChannelData<unknown>;
+		'client-matchmaking': ChannelData<unknown>;
+		tk: ChannelData<unknown>;
+		'featured-islands': ChannelData<unknown>;
+		'community-votes': ChannelData<unknown>;
+		'client-events': ChannelData<TimelineClientEvent>;
+	};
+	cacheIntervalMins: number;
+	currentTime: DateString;
+}

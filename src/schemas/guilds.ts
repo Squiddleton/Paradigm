@@ -83,6 +83,10 @@ const guildSchema = new mongoose.Schema<IGuild>({
 		required: true,
 		default: []
 	},
+	shopSectionsChannelId: {
+		type: String,
+		default: null
+	},
 	wishlistChannelId: {
 		type: String,
 		default: null

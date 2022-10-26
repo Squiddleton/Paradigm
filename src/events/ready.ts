@@ -5,7 +5,7 @@ import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
-import { checkWishlists } from '../util/fortnite.js';
+import { checkWishlists, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed, randomFromArray, validateVisibleChannel } from '../util/functions.js';
 
 export default new ClientEvent({
@@ -27,6 +27,21 @@ export default new ClientEvent({
 			await memberSchema.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberSchema.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });
+
+		let cachedStates = await fetchStates();
+		setInterval(async () => {
+			const currentStates = await fetchStates();
+
+			if (currentStates.length === 2 && cachedStates.length === 1) { // A new (future) state has been added
+				const cachedNames = await fetchShopNames(cachedStates[0]);
+				const currentNames = await fetchShopNames(currentStates[1]);
+
+				if (cachedNames.join() !== currentNames.join()) { // The shop tabs have changed
+					await postShopSections(client, currentNames, cachedNames);
+				}
+			}
+			cachedStates = currentStates;
+		}, 300000);
 
 		schedule('*/1 * * * *', async () => {
 			const guildResults = await guildSchema.find();
