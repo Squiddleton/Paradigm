@@ -136,7 +136,9 @@ export default new ClientEvent({
 					error
 				);
 				const errorMessage: InteractionReplyOptions = {
-					content: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.tag} if this issue persists.`}`,
+					content: (error instanceof DiscordAPIError && typeof error.code === 'number' && [RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.UnknownWebhook].includes(error.code))
+						? 'That command took too long to execute; please try again.'
+						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.tag} if this issue persists.`}`,
 					ephemeral: true
 				};
 				(interaction.replied || interaction.deferred) ? await interaction.followUp(errorMessage) : await interaction.reply(errorMessage);
