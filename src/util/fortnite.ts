@@ -1,6 +1,6 @@
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { Image, createCanvas, loadImage } from 'canvas';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, Message, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
 import fetch from 'node-fetch';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
@@ -296,7 +296,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 	await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
-		const message: Message = await interaction.fetchReply();
+		const message = await interaction.fetchReply();
 		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
 		const options: { [key: string]: string } = {};
 
