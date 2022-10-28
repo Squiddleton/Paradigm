@@ -174,9 +174,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
-	const quantities = quantity(giveaway.entrants);
-	const entries = Object.entries(quantities);
-	const entrants = entries.map(entry => `${entries.indexOf(entry) + 1}. <@${entry[0]}>${entry[1] > 1 ? ` x${entry[1]}` : ''}`);
+	const entrants = Object.entries(quantity(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
 
 	const embed = new TimestampedEmbed()
 		.setTitle(message.embeds[0].title)
