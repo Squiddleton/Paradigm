@@ -9,7 +9,7 @@ import userSchema from '../schemas/users.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
-import { linkEpicAccount, messageComponentCollectorFilter, noPunc, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, noPunc, paginate, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { isBackground } from './typeguards.js';
 import type { CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
@@ -542,7 +542,7 @@ const getUserProperties = async (interaction: CommandInteraction): Promise<Displ
 };
 
 export const viewWishlist = async (interaction: CommandInteraction) => {
-	const itemShopCosmetics = await fetchCosmetics(true);
+	const cosmetics = await fetchCosmetics();
 	const user = await getUserProperties(interaction);
 
 	const userResult = await userSchema.findById(user.id);
@@ -551,27 +551,32 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		return;
 	}
 
-	await interaction.reply({
-		embeds: [
-			new TimestampedEmbed()
-				.setColor(user.color)
-				.setDescription(userResult.wishlistCosmeticIds
-					.slice(0, 25)
-					.map((id, index) => {
-						if (index === 24 && userResult.wishlistCosmeticIds.length !== 25) return `+ ${userResult.wishlistCosmeticIds.length - 24} more`;
+	const inc = 25;
+	const buttons = createPaginationButtons();
+	const cosmeticStrings = userResult.wishlistCosmeticIds
+		.map(id => {
+			const cosmetic = cosmetics.find(c => c.id === id);
+			if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
+			return `${cosmetic.name} (${cosmetic.type.displayValue})`;
+		})
+		.sort((a, b) => a.localeCompare(b));
 
-						const cosmetic = itemShopCosmetics.find(c => c.id === id);
-						if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
-						return `${cosmetic.name} (${cosmetic.type.displayValue})`;
-					})
-					.sort((a, b) => {
-						if (a.startsWith('+ ') && a.endsWith(' more')) return 1;
-						return a.localeCompare(b);
-					})
-					.join('\n'))
-				.setThumbnail(user.avatar)
-				.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`)
-		],
-		ephemeral: !user.same
+	const embed = new TimestampedEmbed()
+		.setColor(user.color)
+		.setDescription(cosmeticStrings
+			.slice(0, inc)
+			.join('\n'))
+		.setThumbnail(user.avatar)
+		.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`);
+
+	const willUseButtons = cosmeticStrings.length > inc;
+
+	const msg = await interaction.reply({
+		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [],
+		embeds: [embed],
+		ephemeral: !user.same,
+		fetchReply: true
 	});
+
+	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Cosmetics', cosmeticStrings, inc);
 };

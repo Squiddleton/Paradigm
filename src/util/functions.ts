@@ -1,12 +1,12 @@
 import { validateChannel } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, ComponentType, Guild, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
 import { TimestampedEmbed } from './classes';
 import { AccessibleChannelPermissions, DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
-import type { AnyGuildTextChannel, IGiveaway, IMessage, Quantity, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import type { AnyGuildTextChannel, IGiveaway, IMessage, PaginationButtons, Quantity, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
@@ -31,6 +31,33 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
+};
+
+export const createPaginationButtons = (): PaginationButtons => {
+	return {
+		first: new ButtonBuilder()
+			.setCustomId('first')
+			.setLabel('⏪')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(true),
+		back: new ButtonBuilder()
+			.setCustomId('back')
+			.setLabel('◀️')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(true),
+		next: new ButtonBuilder()
+			.setCustomId('next')
+			.setLabel('▶️')
+			.setStyle(ButtonStyle.Primary),
+		last: new ButtonBuilder()
+			.setCustomId('last')
+			.setLabel('⏩')
+			.setStyle(ButtonStyle.Primary),
+		quit: new ButtonBuilder()
+			.setCustomId('quit')
+			.setLabel('Quit')
+			.setStyle(ButtonStyle.Danger)
+	};
 };
 
 export const getClientPermissions = (client: Client<true>, channel: AnyGuildTextChannel) => {
@@ -58,6 +85,78 @@ export const noPunc = (str: string) => str
 	.replace(/\p{Diacritic}/gu, '')
 	.replaceAll('&', 'and')
 	.replace(/[^0-9a-z]/gi, '');
+
+export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
+	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
+	const { first, back, next, last, quit } = buttons;
+	let index = 0;
+	const collector = message.channel.createMessageComponentCollector({
+		componentType: ComponentType.Button,
+		filter: (i) => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
+		time: DefaultCollectorTime
+	});
+	collector.on('collect', async int => {
+		switch (int.customId) {
+			case 'quit': {
+				await int.update({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
+				return collector.stop();
+			}
+			case 'first': {
+				index = 0;
+				await int.update({
+					components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit]) ],
+					embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
+				});
+				return;
+			}
+			case 'back': {
+				index -= inc;
+				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+				if (index === 0) {
+					await int.update({
+						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
+						embeds: [embed]
+					});
+					return;
+				}
+				await int.update({
+					components: [row.setComponents([first, back, next.setDisabled(false), last.setDisabled(false), quit])],
+					embeds: [embed]
+				});
+				return;
+			}
+			case 'next': {
+				index += inc;
+				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+				if (index + inc >= items.length) {
+					await int.update({
+						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
+						embeds: [embed]
+					});
+					return;
+				}
+				await int.update({ components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(false), last.setDisabled(false), quit])],
+					embeds: [embed]
+				});
+				return;
+			}
+			case 'last': {
+				index = inc * Math.floor(items.length / inc);
+				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+				await int.update({
+					components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
+					embeds: [embed]
+				});
+			}
+		}
+	});
+
+	collector.on('end', async (collected, reason) => {
+		if (reason === 'time') {
+			await interaction.editReply({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
+		}
+	});
+};
 
 /**
  *
@@ -191,102 +290,12 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		]);
 
 	const willUseButtons = entrants.length > inc;
-	const firstButton = new ButtonBuilder()
-		.setCustomId('first')
-		.setLabel('⏪')
-		.setStyle(ButtonStyle.Primary)
-		.setDisabled(true);
-	const backButton = new ButtonBuilder()
-		.setCustomId('back')
-		.setLabel('◀️')
-		.setStyle(ButtonStyle.Primary)
-		.setDisabled(true);
-	const forwardButton = new ButtonBuilder()
-		.setCustomId('forward')
-		.setLabel('▶️')
-		.setStyle(ButtonStyle.Primary);
-	const lastButton = new ButtonBuilder()
-		.setCustomId('last')
-		.setLabel('⏩')
-		.setStyle(ButtonStyle.Primary);
-	const cancelButton = new ButtonBuilder()
-		.setCustomId('cancel')
-		.setLabel('Cancel')
-		.setStyle(ButtonStyle.Danger);
-	const row = new ActionRowBuilder<ButtonBuilder>({ components: [firstButton, backButton, forwardButton, lastButton, cancelButton] });
+	const buttons = createPaginationButtons();
+	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
 
 	const msg = await interaction.reply({ components: willUseButtons ? [row] : [], embeds: [embed], fetchReply: true, ephemeral: true });
 
-	if (willUseButtons) {
-		const collector = msg.channel.createMessageComponentCollector({
-			componentType: ComponentType.Button,
-			filter: (i) => i.message.id === msg.id && messageComponentCollectorFilter(interaction)(i),
-			time: DefaultCollectorTime
-		});
-
-		let index = 0;
-		collector.on('collect', async int => {
-			switch (int.customId) {
-				case 'cancel': {
-					await int.update({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
-					return collector.stop();
-				}
-				case 'first': {
-					index = 0;
-					await int.update({
-						components: [row.setComponents([firstButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton]) ],
-						embeds: [embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`)]
-					});
-					return;
-				}
-				case 'back': {
-					index -= inc;
-					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-					if (index === 0) {
-						await int.update({
-							components: [row.setComponents([firstButton.setDisabled(true), backButton.setDisabled(true), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-							embeds: [embed]
-						});
-						return;
-					}
-					await int.update({
-						components: [row.setComponents([firstButton, backButton, forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-						embeds: [embed]
-					});
-					return;
-				}
-				case 'forward': {
-					index += inc;
-					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-					if (index + inc >= entrants.length) {
-						await int.update({
-							components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-							embeds: [embed]
-						});
-						return;
-					}
-					await int.update({ components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(false), lastButton.setDisabled(false), cancelButton])],
-						embeds: [embed]
-					});
-					return;
-				}
-				case 'last': {
-					index = inc * Math.floor(entrants.length / inc);
-					embed.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(index, index + inc).join('\n')}`);
-					await int.update({
-						components: [row.setComponents([firstButton.setDisabled(false), backButton.setDisabled(false), forwardButton.setDisabled(true), lastButton.setDisabled(true), cancelButton])],
-						embeds: [embed]
-					});
-				}
-			}
-		});
-
-		collector.on('end', async (collected, reason) => {
-			if (reason === 'time') {
-				await interaction.editReply({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
-			}
-		});
-	}
+	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Entrants', entrants, inc);
 };
 
 export const viewMilestones = async (interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction) => {

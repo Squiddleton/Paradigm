@@ -1,5 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
-import type { ApplicationCommandOptionChoiceData, ChatInputCommandInteraction, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -270,6 +270,14 @@ export interface Links {
 export type Link = keyof Links;
 
 export type Dimensions = { [K in Link]: [number, number, number, number] };
+
+export interface PaginationButtons {
+	first: ButtonBuilder;
+	back: ButtonBuilder;
+	next: ButtonBuilder;
+	last: ButtonBuilder;
+	quit: ButtonBuilder;
+}
 
 export type Quantity = { [key: string]: number };
 
