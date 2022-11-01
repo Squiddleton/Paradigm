@@ -563,9 +563,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 
 	const embed = new TimestampedEmbed()
 		.setColor(user.color)
-		.setDescription(cosmeticStrings
-			.slice(0, inc)
-			.join('\n'))
+		.setDescription(`Cosmetics (${cosmeticStrings.length}):\n${cosmeticStrings.slice(0, inc).join('\n')}`)
 		.setThumbnail(user.avatar)
 		.setTitle(`${formatPossessive(user.username)} Wishlist`);
 
