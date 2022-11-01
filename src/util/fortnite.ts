@@ -9,7 +9,7 @@ import userSchema from '../schemas/users.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
-import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, noPunc, paginate, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { createPaginationButtons, formatPossessive, linkEpicAccount, messageComponentCollectorFilter, noPunc, paginate, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { isBackground } from './typeguards.js';
 import type { CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
@@ -347,7 +347,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-const formatLevels = (levels: Record<string, number>, name: string) => `\`${name}\`'${['s', 'z'].some(l => name.toLowerCase().endsWith(l)) ? '' : 's'} **Battle Pass Levels**\n\n${
+const formatLevels = (levels: Record<string, number>, name: string) => `\`${formatPossessive(name)}\` **Battle Pass Levels**\n\n${
 	Object
 		.entries(levels)
 		.sort()
@@ -567,7 +567,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 			.slice(0, inc)
 			.join('\n'))
 		.setThumbnail(user.avatar)
-		.setTitle(`${user.username}'${['s', 'z'].some(l => user.username.endsWith(l)) ? '' : 's'} Wishlist`);
+		.setTitle(`${formatPossessive(user.username)} Wishlist`);
 
 	const willUseButtons = cosmeticStrings.length > inc;
 

@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ApplicationCommandOptionType } from 'discord.js';
 import memberSchema from '../../schemas/members.js';
-import { sumMsgs } from '../../util/functions.js';
+import { formatPlural, sumMsgs } from '../../util/functions.js';
 import type { IMessage } from '../../util/types.js';
 
 export default new SlashCommand({
@@ -45,6 +45,6 @@ export default new SlashCommand({
 		const users = await Promise.all(sorted.slice(0, max).map(m => client.users.fetch(m.userId)));
 		const mapped = users.map(user => `${user.tag} (${user.id})`);
 
-		await interaction.editReply(`${max === 1 ? 'Most active user' : `Top ${max} most active users`} over the past${time === 1 ? '' : ` ${time}`} day${time === 1 ? '' : 's'}:\n${mapped.join('\n')}`);
+		await interaction.editReply(`${max === 1 ? 'Most active user' : `Top ${max} most active users`} over the past${time === 1 ? '' : ` ${time}`} ${formatPlural('day', time)}:\n${mapped.join('\n')}`);
 	}
 });

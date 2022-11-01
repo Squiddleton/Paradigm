@@ -60,6 +60,10 @@ export const createPaginationButtons = (): PaginationButtons => {
 	};
 };
 
+export const formatPlural = (singularStr: string, amount: number) => `${singularStr}${amount === 1 ? '' : 's'}`;
+
+export const formatPossessive = (str: string) => `${str}'${['s', 'z'].some(c => str.endsWith(c)) ? '' : 's'}`;
+
 export const getClientPermissions = (client: Client<true>, channel: AnyGuildTextChannel) => {
 	const permissions = channel.permissionsFor(client.user);
 	if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
@@ -244,7 +248,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
-	const newWinnersMessage = `the following new winner${amount !== 1 ? 's' : ''}:\n${winnersDisplay}`;
+	const newWinnersMessage = `the following new ${formatPlural('winner', amount)}:\n${winnersDisplay}`;
 
 	await message.reply(`This giveaway has been rerolled, so congratulations to ${newWinnersMessage}`);
 
@@ -309,7 +313,7 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 	const memberResult = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 	const embed = new TimestampedEmbed()
-		.setTitle(`${displayName}'${displayName.endsWith('s') ? '' : 's'} Milestones`)
+		.setTitle(`${formatPossessive(displayName)} Milestones`)
 		.setThumbnail(member.displayAvatarURL())
 		.setColor(user.accentColor ?? null);
 

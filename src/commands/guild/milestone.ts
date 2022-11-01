@@ -5,6 +5,7 @@ import memberSchema from '../../schemas/members.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
 import { grantMilestone } from '../../util/fortnite.js';
+import { formatPossessive } from '../../util/functions.js';
 import { isRarity } from '../../util/typeguards.js';
 
 export default new SlashCommand({
@@ -144,9 +145,8 @@ export default new SlashCommand({
 				return;
 			}
 			case 'list': {
-				const guildName = interaction.guild.name;
 				const embed = new TimestampedEmbed()
-					.setTitle(`${guildName}'${guildName.endsWith('s') ? '' : 's'} Milestones`)
+					.setTitle(`${formatPossessive(interaction.guild.name)} Milestones`)
 					.setThumbnail(interaction.guild.iconURL());
 
 				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
