@@ -16,7 +16,6 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 
 export class EpicError extends Error {
 	errorCode: string;
-	errorMessage: string;
 	messageVars: unknown[];
 	numericErrorCode: EpicErrorCode | number;
 	originatingService: string;
@@ -26,7 +25,6 @@ export class EpicError extends Error {
 	constructor(error: RawEpicError) {
 		super(error.errorMessage);
 		this.errorCode = error.errorCode;
-		this.errorMessage = error.errorMessage;
 		this.messageVars = error.messageVars;
 		this.numericErrorCode = error.numericErrorCode;
 		this.originatingService = error.originatingService;
