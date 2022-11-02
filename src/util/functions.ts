@@ -146,10 +146,9 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 			}
 			case 'last': {
 				index = inc * Math.floor(items.length / inc);
-				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
 				await int.update({
 					components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
-					embeds: [embed]
+					embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
 				});
 			}
 		}
