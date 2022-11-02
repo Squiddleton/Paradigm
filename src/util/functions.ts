@@ -103,7 +103,8 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 		switch (int.customId) {
 			case 'quit': {
 				await int.update({ components: [] });
-				return collector.stop();
+				collector.stop();
+				break;
 			}
 			case 'first': {
 				index = 0;
@@ -111,7 +112,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 					components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit]) ],
 					embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
 				});
-				return;
+				break;
 			}
 			case 'back': {
 				index -= inc;
@@ -121,13 +122,14 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
 						embeds: [embed]
 					});
-					return;
 				}
-				await int.update({
-					components: [row.setComponents([first, back, next.setDisabled(false), last.setDisabled(false), quit])],
-					embeds: [embed]
-				});
-				return;
+				else {
+					await int.update({
+						components: [row.setComponents([first, back, next.setDisabled(false), last.setDisabled(false), quit])],
+						embeds: [embed]
+					});
+				}
+				break;
 			}
 			case 'next': {
 				index += inc;
@@ -137,12 +139,14 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
 						embeds: [embed]
 					});
-					return;
 				}
-				await int.update({ components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(false), last.setDisabled(false), quit])],
-					embeds: [embed]
-				});
-				return;
+				else {
+					await int.update({
+						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(false), last.setDisabled(false), quit])],
+						embeds: [embed]
+					});
+				}
+				break;
 			}
 			case 'last': {
 				index = inc * Math.floor(items.length / inc);
