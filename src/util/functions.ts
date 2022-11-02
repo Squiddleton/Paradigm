@@ -102,7 +102,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	collector.on('collect', async int => {
 		switch (int.customId) {
 			case 'quit': {
-				await int.update({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
+				await int.update({ components: [] });
 				return collector.stop();
 			}
 			case 'first': {
@@ -157,7 +157,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 
 	collector.on('end', async (collected, reason) => {
 		if (reason === 'time') {
-			await interaction.editReply({ components: [row.setComponents(row.components.map(c => c.setDisabled(true)))] });
+			await interaction.editReply({ components: [] });
 		}
 	});
 };
