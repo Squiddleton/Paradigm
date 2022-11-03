@@ -61,7 +61,7 @@ export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) 
  * You must be logged in to the same Epic account at {@link https://www.epicgames.com} as the accountName
  *
  * @param accountName - The Epic account username
- * @param authorizationCode - The code obtained from {@link https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code here}
+ * @param authorizationCode - {@link https://www.epicgames.com/id/api/redirect?clientId=3446cd72694c4a4485d81b77adbb2141&responseType=code | The authorization code found here}
  * @returns Device auth credentials
  */
 export const getDeviceAuth = async (accountName: string, authorizationCode: string): Promise<DeviceAuth> => {

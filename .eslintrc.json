@@ -7,6 +7,7 @@
   },
   "plugins": [
     "@typescript-eslint",
+    "eslint-plugin-tsdoc",
     "import"
   ],
   "extends": [
@@ -73,6 +74,7 @@
     "@typescript-eslint/space-infix-ops": "error",
     "space-unary-ops": "error",
     "spaced-comment": "error",
+    "tsdoc/syntax": "error",
     "yoda": "error"
   },
   "settings": {
