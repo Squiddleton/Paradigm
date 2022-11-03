@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, Snowflake } from 'discord.js';
+import type { Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
@@ -71,14 +71,7 @@ export default new ClientEvent({
 					giveaway.completed = true;
 					giveaway.winners = winnerIds;
 
-					const row = new ActionRowBuilder<ButtonBuilder>({ components: [
-						new ButtonBuilder()
-							.setLabel('Enter')
-							.setCustomId('giveaway')
-							.setStyle(ButtonStyle.Success)
-							.setDisabled(true)
-					] });
-					await message.edit({ embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)], components: [row] });
+					await message.edit({ components: [], embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)] });
 
 					await guildSchema.updateOne(
 						{
