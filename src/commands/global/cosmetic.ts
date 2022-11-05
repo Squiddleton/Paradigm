@@ -5,6 +5,7 @@ import fortniteAPI from '../../clients/fortnite.js';
 import { DefaultCollectorTime, ErrorMessage, LanguageChoices } from '../../util/constants.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
+import type { ButtonOrMenu } from '../../util/types.js';
 
 export default new SlashCommand({
 	name: 'cosmetic',
@@ -67,7 +68,7 @@ export default new SlashCommand({
 		];
 
 		const message = await interaction.editReply({ components, embeds: [embed] });
-		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
+		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
 
 		collector
 			.on('collect', async i => {

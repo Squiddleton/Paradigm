@@ -11,7 +11,7 @@ import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCol
 import { epicFetch, getLevels } from './epic.js';
 import { createPaginationButtons, formatPossessive, linkEpicAccount, messageComponentCollectorFilter, noPunc, paginate, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
 import { isBackground } from './typeguards.js';
-import type { CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
+import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],
@@ -297,7 +297,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
 		const message = await interaction.fetchReply();
-		const collector = message.createMessageComponentCollector({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
+		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
 		const options: { [key: string]: string } = {};
 
 		collector.on('collect', async i => {

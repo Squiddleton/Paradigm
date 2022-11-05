@@ -1,5 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
-import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -40,6 +40,8 @@ export type AnyObject = Record<string, unknown>;
 export interface BlockList {
 	blockedUsers: string[];
 }
+
+export type ButtonOrMenu = ComponentType.Button | ComponentType.SelectMenu;
 
 export interface Config {
 	token: string;
