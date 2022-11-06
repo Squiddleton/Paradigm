@@ -82,7 +82,7 @@ export default new ClientEvent({
 						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfGuild);
 						const { guildId } = interaction;
 						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
-						const memberOption = interaction.options.data[0].options?.find(option => option.name === 'member')?.value;
+						const memberOption = interaction.options.get('member')?.value;
 						if (typeof memberOption === 'string') {
 							const memberResult = await memberSchema.findOne({ userId: memberOption, guildId });
 							if (memberResult !== null) {
