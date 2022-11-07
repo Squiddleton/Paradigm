@@ -1,5 +1,6 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
+import type { SnoowrapOptions } from 'snoowrap';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -59,12 +60,7 @@ export interface Config {
 	fortniteAPIKey: string;
 	imgurClientId: string;
 	mongoPath: string;
-	snoowrap: {
-		clientId: string;
-		clientSecret: string;
-		refreshToken: string;
-		userAgent: string;
-	};
+	snoowrap: SnoowrapOptions;
 }
 
 export interface CosmeticCache {
