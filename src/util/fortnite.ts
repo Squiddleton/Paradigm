@@ -116,7 +116,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				}
 
 				if (msgs.length !== 1 && g.wishlistChannelId !== null) {
-					msgs.push('\nIf you have purchased your item, use the `/wishlist remove` command.\nDo you want to create your own wishlist?  Check out `/wishlist add`!');
+					msgs.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
 					try {
 						const wishlistChannel = validateGuildChannel(client, g.wishlistChannelId);
 
