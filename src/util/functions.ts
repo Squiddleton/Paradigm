@@ -6,7 +6,7 @@ import userSchema from '../schemas/users';
 import { TimestampedEmbed } from './classes';
 import { AccessibleChannelPermissions, DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
-import type { AnyGuildTextChannel, IGiveaway, IMessage, PaginationButtons, Quantity, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import type { AnyGuildTextChannel, IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
@@ -171,16 +171,16 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
  * @returns An object with keys of each item and values of the item's quantity
  */
 export const quantity = (arr: string[]) => {
-	const counts: Quantity = {};
-	for (const item of arr) {
-		if (item in counts) {
-			counts[item]++;
+	const initial: Record<string, number> = {};
+	return arr.reduce((prev, curr) => {
+		if (curr in prev) {
+			prev[curr]++;
 		}
 		else {
-			counts[item] = 1;
+			prev[curr] = 1;
 		}
-	}
-	return counts;
+		return prev;
+	}, initial);
 };
 
 export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];

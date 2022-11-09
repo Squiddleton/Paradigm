@@ -271,8 +271,6 @@ export type Dimensions = { [K in Link]: [number, number, number, number] };
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
-export type Quantity = { [key: string]: number };
-
 export interface RawEpicError {
 	errorCode: string;
 	errorMessage: string;
