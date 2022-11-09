@@ -269,13 +269,7 @@ export type Link = keyof Links;
 
 export type Dimensions = { [K in Link]: [number, number, number, number] };
 
-export interface PaginationButtons {
-	first: ButtonBuilder;
-	back: ButtonBuilder;
-	next: ButtonBuilder;
-	last: ButtonBuilder;
-	quit: ButtonBuilder;
-}
+export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
 export type Quantity = { [key: string]: number };
 

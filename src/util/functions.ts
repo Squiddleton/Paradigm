@@ -34,30 +34,30 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 };
 
 export const createPaginationButtons = (): PaginationButtons => {
-	return {
-		first: new ButtonBuilder()
+	return [
+		new ButtonBuilder()
 			.setCustomId('first')
 			.setLabel('⏪')
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(true),
-		back: new ButtonBuilder()
+		new ButtonBuilder()
 			.setCustomId('back')
 			.setLabel('◀️')
 			.setStyle(ButtonStyle.Primary)
 			.setDisabled(true),
-		next: new ButtonBuilder()
+		new ButtonBuilder()
 			.setCustomId('next')
 			.setLabel('▶️')
 			.setStyle(ButtonStyle.Primary),
-		last: new ButtonBuilder()
+		new ButtonBuilder()
 			.setCustomId('last')
 			.setLabel('⏩')
 			.setStyle(ButtonStyle.Primary),
-		quit: new ButtonBuilder()
+		new ButtonBuilder()
 			.setCustomId('quit')
 			.setLabel('Quit')
 			.setStyle(ButtonStyle.Danger)
-	};
+	];
 };
 
 export const formatPlural = (singularStr: string, amount: number) => `${singularStr}${amount === 1 ? '' : 's'}`;
@@ -92,7 +92,7 @@ export const noPunc = (str: string) => str
 
 export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
 	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
-	const { first, back, next, last, quit } = buttons;
+	const [first, back, next, last, quit] = buttons;
 	let index = 0;
 	const collector = message.channel.createMessageComponentCollector({
 		componentType: ComponentType.Button,
@@ -298,9 +298,8 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const willUseButtons = entrants.length > inc;
 	const buttons = createPaginationButtons();
-	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
 
-	const msg = await interaction.reply({ components: willUseButtons ? [row] : [], embeds: [embed], fetchReply: true, ephemeral: true });
+	const msg = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
 
 	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Entrants', entrants, inc);
 };

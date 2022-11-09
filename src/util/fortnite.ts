@@ -552,7 +552,6 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	}
 
 	const inc = 25;
-	const buttons = createPaginationButtons();
 	const cosmeticStrings = userResult.wishlistCosmeticIds
 		.map(id => {
 			const cosmetic = cosmetics.find(c => c.id === id);
@@ -568,6 +567,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		.setTitle(`${formatPossessive(user.username)} Wishlist`);
 
 	const willUseButtons = cosmeticStrings.length > inc;
+	const buttons = createPaginationButtons();
 
 	const msg = await interaction.reply({
 		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [],
