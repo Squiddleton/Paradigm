@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { getRandomItem } from '@squiddleton/util';
 import imgurClient from '../../clients/imgur.js';
 import { BorisAlbumIds } from '../../util/constants.js';
-import { randomFromArray } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'boris',
@@ -13,6 +13,6 @@ export default new SlashCommand({
 			.flat()
 			.map(image => image.link);
 
-		await interaction.reply({ files: [randomFromArray(data)] });
+		await interaction.reply({ files: [getRandomItem(data)] });
 	}
 });

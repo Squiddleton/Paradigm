@@ -1,4 +1,5 @@
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { Image, createCanvas, loadImage } from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
 import fetch from 'node-fetch';
@@ -9,7 +10,7 @@ import userSchema from '../schemas/users.js';
 import { EpicError, TimestampedEmbed } from './classes.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
-import { createPaginationButtons, formatPossessive, linkEpicAccount, messageComponentCollectorFilter, noPunc, paginate, quantity, randomFromArray, removeDuplicates, sum, validateGuildChannel } from './functions.js';
+import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate, validateGuildChannel } from './functions.js';
 import { isBackground } from './typeguards.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
@@ -70,7 +71,7 @@ export const fetchShopNames = async (state: TimelineClientEvent) => {
 		.map(section => section.sectionDisplayName)
 		.filter((name): name is string => name !== undefined);
 
-	return Object.entries(quantity(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
+	return Object.entries(quantify(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
 };
 
 export const fetchStates = () => epicFetch<Timeline>(EpicEndpoint.Timeline).then(timeline => timeline.channels['client-events'].states);
@@ -87,8 +88,8 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 		}
 		catch {
 			const list = await fetchCosmetics(itemShopOnly);
-			input = noPunc(input);
-			return list.find(c => noPunc(c.name) === input) ?? null;
+			input = normalize(input);
+			return list.find(c => normalize(c.name) === input) ?? null;
 		}
 	}
 };
@@ -167,7 +168,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
-	const rawBackground = noBackground ? randomFromArray(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
+	const rawBackground = noBackground ? getRandomItem(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
 	const background = await loadImage(rawBackground);
 	const canvas = createCanvas(background.width, background.height);
 	const ctx = canvas.getContext('2d');
@@ -181,7 +182,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 			image = await loadImage(link);
 		}
 		else if (input !== null) {
-			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && noPunc(e.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
+			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && normalize(e.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic === undefined) {
 				throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', displayType));
 			}
@@ -230,7 +231,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	}
 
 	if (wrap) {
-		const oi = cosmetics.find(o => o.type.displayValue === 'Wrap' && noPunc(o.name.toLowerCase().replace(/ /g, '')) === noPunc(wrap));
+		const oi = cosmetics.find(o => o.type.displayValue === 'Wrap' && normalize(o.name.toLowerCase().replace(/ /g, '')) === normalize(wrap));
 		if (!oi) {
 			return 'Invalid wrap name provided.';
 		}
@@ -249,7 +250,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 	const handleVariants = (input: StringOption, displayValues: string[], displayType: string) => {
 		if (input !== null) {
-			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && noPunc(c.name.toLowerCase().replace(/ /g, '')) === noPunc(input));
+			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic !== undefined) {
 				const variants = cosmetic.variants?.[0];
 				if (variants) {
@@ -353,9 +354,9 @@ const formatLevels = (levels: Record<string, number>, name: string) => `\`${form
 		.sort()
 		.map(([k, v]) => {
 			const overallSeason = parseInt(k.match(/\d+/)![0]);
-			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum, 0));
+			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
 			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum, 0)}: ${Math.floor(v / 100)}`;
+			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
 		})
 		.join('\n')}`;
 

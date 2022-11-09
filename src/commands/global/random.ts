@@ -1,10 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { getRandomItem, normalize } from '@squiddleton/util';
 import { createCanvas, loadImage } from 'canvas';
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { BackgroundURL } from '../../util/constants.js';
 import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
-import { noPunc, randomFromArray } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'random',
@@ -38,22 +38,22 @@ export default new SlashCommand({
 		const cosmetics = await fetchCosmetics();
 		const type = interaction.options.getString('type');
 		if (type) {
-			await interaction.editReply({ embeds: [createCosmeticEmbed(randomFromArray(cosmetics.filter(i => i.type.value === type)))] });
+			await interaction.editReply({ embeds: [createCosmeticEmbed(getRandomItem(cosmetics.filter(i => i.type.value === type)))] });
 			return;
 		}
 
 		const bbs = cosmetics.filter(i => i.type.displayValue === 'Back Bling');
-		const bb = randomFromArray(bbs);
+		const bb = getRandomItem(bbs);
 		const gliders = cosmetics.filter(i => i.type.displayValue === 'Glider');
-		const glider = randomFromArray(gliders);
+		const glider = getRandomItem(gliders);
 		const hts = cosmetics.filter(i => i.type.displayValue === 'Harvesting Tool');
-		const ht = randomFromArray(hts);
+		const ht = getRandomItem(hts);
 		const ws = cosmetics.filter(i => i.type.displayValue === 'Wrap');
-		const wrap = randomFromArray(ws);
+		const wrap = getRandomItem(ws);
 		const outfits = cosmetics.filter(i => i.type.displayValue === 'Outfit');
-		const outfit = randomFromArray(outfits);
+		const outfit = getRandomItem(outfits);
 
-		const background = await loadImage(randomFromArray(Object.values(BackgroundURL)));
+		const background = await loadImage(getRandomItem(Object.values(BackgroundURL)));
 		const canvas = createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
@@ -73,13 +73,13 @@ export default new SlashCommand({
 		const w = await loadImage(wrap.images.featured ? wrap.images.featured : wrap.images.icon);
 		ctx.drawImage(w, background.width - (background.height * w.width / w.height / 2), background.height / 2, background.height * w.width / w.height / 2, background.height / 2);
 
-		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${noPunc(interaction.user.username)}sLoadout.png` });
+		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${normalize(interaction.user.username)}sLoadout.png` });
 
 		await interaction.editReply({
 			embeds: [
 				new TimestampedEmbed()
 					.setTitle('Randomly Generated Loadout')
-					.setImage(`attachment://${noPunc(interaction.user.username)}sLoadout.png`)
+					.setImage(`attachment://${normalize(interaction.user.username)}sLoadout.png`)
 					.setFields([
 						{ name: 'Outfit', value: outfit.name, inline: true },
 						{ name: 'Back Bling', value: bb.name, inline: true },

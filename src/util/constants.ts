@@ -1,5 +1,5 @@
+import { getEnumKeys } from '@squiddleton/util';
 import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable, PermissionFlagsBits, PermissionResolvable } from 'discord.js';
-import { getEnumKeys } from './functions';
 import type { StringChoices } from './types';
 
 export const AccessibleChannelPermissions: PermissionResolvable[] = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];

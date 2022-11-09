@@ -1,5 +1,6 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
+import { normalize, removeDuplicates } from '@squiddleton/util';
 import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, RESTJSONErrorCodes, User } from 'discord.js';
 import { Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
@@ -8,7 +9,7 @@ import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
-import { noPunc, removeDuplicates, sumMsgs } from '../util/functions.js';
+import { sumMsgs } from '../util/functions.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name;
 
@@ -35,7 +36,7 @@ export default new ClientEvent({
 
 		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
-			const input = value === '' ? 'a' : noPunc(value);
+			const input = value === '' ? 'a' : normalize(value);
 
 			try {
 				switch (name) {

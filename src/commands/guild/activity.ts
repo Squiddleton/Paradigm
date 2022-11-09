@@ -1,7 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { formatPlural } from '@squiddleton/util';
 import { ApplicationCommandOptionType } from 'discord.js';
 import memberSchema from '../../schemas/members.js';
-import { formatPlural, sumMsgs } from '../../util/functions.js';
+import { sumMsgs } from '../../util/functions.js';
 import type { IMessage } from '../../util/types.js';
 
 export default new SlashCommand({

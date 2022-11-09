@@ -1,4 +1,5 @@
 import { validateChannel } from '@squiddleton/discordjs-util';
+import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
@@ -60,17 +61,11 @@ export const createPaginationButtons = (): PaginationButtons => {
 	];
 };
 
-export const formatPlural = (singularStr: string, amount: number) => `${singularStr}${amount === 1 ? '' : 's'}`;
-
-export const formatPossessive = (str: string) => `${str}'${['s', 'z'].some(c => str.endsWith(c)) ? '' : 's'}`;
-
 export const getClientPermissions = (client: Client<true>, channel: AnyGuildTextChannel) => {
 	const permissions = channel.permissionsFor(client.user);
 	if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
 	return permissions;
 };
-
-export const getEnumKeys = (e: Record<string, any>) => Object.keys(e).filter(x => !(parseInt(x) >= 0));
 
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount) => {
 	await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
@@ -82,13 +77,6 @@ export const messageComponentCollectorFilter = (interaction: BaseInteraction) =>
 	i.reply({ content: 'Only the command user can use this.', ephemeral: true });
 	return false;
 };
-
-export const noPunc = (str: string) => str
-	.toLowerCase()
-	.normalize('NFD')
-	.replace(/\p{Diacritic}/gu, '')
-	.replaceAll('&', 'and')
-	.replace(/[^0-9a-z]/gi, '');
 
 export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
 	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
@@ -165,30 +153,6 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	});
 };
 
-/**
- *
- * @param arr - An array to receive a quantity of each item for
- * @returns An object with keys of each item and values of the item's quantity
- */
-export const quantity = (arr: string[]) => {
-	const initial: Record<string, number> = {};
-	return arr.reduce((prev, curr) => {
-		if (curr in prev) {
-			prev[curr]++;
-		}
-		else {
-			prev[curr] = 1;
-		}
-		return prev;
-	}, initial);
-};
-
-export const randomFromArray = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-
-export const removeDuplicates = <T>(arr: T[]) => Array.from(new Set(arr));
-
-export const sum = (previous: number, current: number) => previous + current;
-
 export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;
 
 export const validateGuildChannel = (client: Client<true>, channelId: Snowflake, checkPermissions = true): AnyGuildTextChannel => {
@@ -242,7 +206,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	}
 	const newWinners: Snowflake[] = [];
 	for (let i = 0; i < amount; i++) {
-		const newWinner = randomFromArray(eligibleEntrants);
+		const newWinner = getRandomItem(eligibleEntrants);
 		winners.push(newWinner);
 		newWinners.push(newWinner);
 	}
@@ -280,7 +244,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
-	const entrants = Object.entries(quantity(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
+	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
 
 	const embed = new TimestampedEmbed()
 		.setTitle(message.embeds[0].title)

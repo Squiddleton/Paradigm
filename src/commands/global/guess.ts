@@ -1,10 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { getRandomItem, normalize } from '@squiddleton/util';
 import { createCanvas, loadImage } from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { GuessCollectorTime, RarityColors } from '../../util/constants.js';
 import { fetchCosmetics } from '../../util/fortnite.js';
-import { noPunc, randomFromArray } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'guess',
@@ -13,7 +13,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const cosmetics = await fetchCosmetics();
 		const items = cosmetics.filter(i => i.type.displayValue === 'Outfit' && i.name !== 'TBD');
-		const cosmetic = randomFromArray(items);
+		const cosmetic = getRandomItem(items);
 		const image = cosmetic.images.featured ?? cosmetic.images.icon;
 
 		const background = await loadImage(image);
@@ -71,7 +71,7 @@ export default new SlashCommand({
 
 		const filter = (i: ModalSubmitInteraction) => {
 			if (i.customId !== interaction.id) return false;
-			if (noPunc(i.fields.getTextInputValue('outfit')) === noPunc(cosmetic.name)) return true;
+			if (normalize(i.fields.getTextInputValue('outfit')) === normalize(cosmetic.name)) return true;
 			i.reply({ content: 'Your guess is incorrect.', ephemeral: true });
 			return false;
 		};

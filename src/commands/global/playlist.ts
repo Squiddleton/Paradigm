@@ -1,8 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { normalize, removeDuplicates } from '@squiddleton/util';
 import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { TimestampedEmbed } from '../../util/classes.js';
-import { noPunc, removeDuplicates } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'playlist',
@@ -23,7 +23,7 @@ export default new SlashCommand({
 		const input = interaction.options.getString('playlist', true);
 		const playlists = await fortniteAPI.playlists();
 
-		const playlist = playlists.find(mode => [mode.name, mode.id].some(keyword => noPunc(keyword) === noPunc(input)));
+		const playlist = playlists.find(mode => [mode.name, mode.id].some(keyword => normalize(keyword) === normalize(input)));
 		if (playlist === undefined) {
 			await interaction.editReply('No playlist matches your query.');
 			return;

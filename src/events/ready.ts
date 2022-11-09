@@ -1,4 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
+import { getRandomItem } from '@squiddleton/util';
 import type { Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildSchema from '../schemas/guilds.js';
@@ -6,7 +7,7 @@ import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
 import { checkWishlists, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
-import { createGiveawayEmbed, randomFromArray, validateVisibleChannel } from '../util/functions.js';
+import { createGiveawayEmbed, validateVisibleChannel } from '../util/functions.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -64,7 +65,7 @@ export default new ClientEvent({
 					const entrantIds = entrantsInGuild.map(member => member.id);
 
 					for (let i = 0; i < giveaway.winnerNumber && i < entrantIds.length; i++) {
-						const winnerId = randomFromArray(entrantIds);
+						const winnerId = getRandomItem(entrantIds);
 						if (!winnerIds.includes(winnerId)) winnerIds.push(winnerId);
 					}
 
