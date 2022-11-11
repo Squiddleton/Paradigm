@@ -146,7 +146,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 				}
 			}
 		})
-		.on('end', async (collected, reason) => {
+		.once('end', async (collected, reason) => {
 			if (reason === 'time') {
 				await interaction.editReply({ components: [] });
 			}

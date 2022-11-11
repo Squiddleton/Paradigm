@@ -115,7 +115,7 @@ export default new SlashCommand({
 
 				await i.update({ components, embeds: [embed.setImage(optionChosen.image)] });
 			})
-			.on('end', async (collected, reason) => {
+			.once('end', async (collected, reason) => {
 				if (reason === 'time') await interaction.editReply({ components: [] });
 			});
 	}

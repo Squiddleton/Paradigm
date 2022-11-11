@@ -342,7 +342,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					}
 				}
 			})
-			.on('end', async (collected, reason) => {
+			.once('end', async (collected, reason) => {
 				if (reason === 'time') await interaction.editReply({ components: [], content, embeds });
 			});
 	}
