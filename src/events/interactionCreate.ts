@@ -41,8 +41,7 @@ export default new ClientEvent({
 			try {
 				switch (name) {
 					case 'cosmetic': {
-						const shopOnly = interaction.commandName === 'wishlist';
-						const cosmetics = await fetchCosmetics(shopOnly);
+						const cosmetics = await fetchCosmetics(interaction.commandName === 'wishlist');
 						const { ratings } = findBestMatch(input, cosmetics.map(mapByName));
 						const choices = ratings.sort(sortByRating).map(rating => {
 							const cosmetic = cosmetics.find(cos => cos.name === rating.target);
