@@ -301,50 +301,50 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
 		const options: { [key: string]: string } = {};
 
-		collector.on('collect', async i => {
-			if (i.customId === 'lock') {
-				await i.update({ components: [], content, embeds });
-				return;
-			}
-			await i.deferUpdate();
-
-			if (!i.isSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
-			const [value] = i.values;
-			const cosmetic = cosmetics.find(c => c.id === i.customId);
-			if (cosmetic) {
-				const variants = cosmetic.variants?.[0].options;
-				if (variants) {
-					const imageURL = value.startsWith('truedefault')
-						? cosmetic.images.featured ?? cosmetic.images.icon
-						: variants.find(option => option.tag === value)?.image;
-
-					if (imageURL === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
-
-					options[cosmetic.type.displayValue] = imageURL;
-
-					const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
-					components = components.map(row => {
-						const [menu] = row.components;
-						const menuJSON = menu.toJSON();
-						if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return row;
-
-						if (menu instanceof SelectMenuBuilder) {
-							menu.setOptions(value.startsWith('truedefault')
-								? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)]
-								: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(variant => ({ label: variant.name, value: variant.tag, default: variant.tag === value })).slice(0, 24)]
-							);
-						}
-						return row.setComponents([menu]);
-					});
-
-					await i.editReply({ attachments: [], content, files: [newAttachmentBuilder], components, embeds });
+		collector
+			.on('collect', async i => {
+				if (i.customId === 'lock') {
+					await i.update({ components: [], content, embeds });
+					return;
 				}
-			}
-		});
+				await i.deferUpdate();
 
-		collector.on('end', async (collected, reason) => {
-			if (reason === 'time') await interaction.editReply({ components: [], content, embeds });
-		});
+				if (!i.isSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
+				const [value] = i.values;
+				const cosmetic = cosmetics.find(c => c.id === i.customId);
+				if (cosmetic) {
+					const variants = cosmetic.variants?.[0].options;
+					if (variants) {
+						const imageURL = value.startsWith('truedefault')
+							? cosmetic.images.featured ?? cosmetic.images.icon
+							: variants.find(option => option.tag === value)?.image;
+
+						if (imageURL === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
+
+						options[cosmetic.type.displayValue] = imageURL;
+
+						const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
+						components = components.map(row => {
+							const [menu] = row.components;
+							const menuJSON = menu.toJSON();
+							if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return row;
+
+							if (menu instanceof SelectMenuBuilder) {
+								menu.setOptions(value.startsWith('truedefault')
+									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)]
+									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(variant => ({ label: variant.name, value: variant.tag, default: variant.tag === value })).slice(0, 24)]
+								);
+							}
+							return row.setComponents([menu]);
+						});
+
+						await i.editReply({ attachments: [], content, files: [newAttachmentBuilder], components, embeds });
+					}
+				}
+			})
+			.on('end', async (collected, reason) => {
+				if (reason === 'time') await interaction.editReply({ components: [], content, embeds });
+			});
 	}
 };
 

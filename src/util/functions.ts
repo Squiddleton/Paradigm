@@ -87,70 +87,70 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 		filter: (i) => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
 		time: DefaultCollectorTime
 	});
-	collector.on('collect', async int => {
-		switch (int.customId) {
-			case 'quit': {
-				await int.update({ components: [] });
-				collector.stop();
-				break;
-			}
-			case 'first': {
-				index = 0;
-				await int.update({
-					components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit]) ],
-					embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
-				});
-				break;
-			}
-			case 'back': {
-				index -= inc;
-				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
-				if (index === 0) {
-					await int.update({
-						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
-						embeds: [embed]
-					});
+	collector
+		.on('collect', async i => {
+			switch (i.customId) {
+				case 'quit': {
+					await i.update({ components: [] });
+					collector.stop();
+					break;
 				}
-				else {
-					await int.update({
-						components: [row.setComponents([first, back, next.setDisabled(false), last.setDisabled(false), quit])],
-						embeds: [embed]
+				case 'first': {
+					index = 0;
+					await i.update({
+						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit]) ],
+						embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
 					});
+					break;
 				}
-				break;
-			}
-			case 'next': {
-				index += inc;
-				embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
-				if (index + inc >= items.length) {
-					await int.update({
+				case 'back': {
+					index -= inc;
+					embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+					if (index === 0) {
+						await i.update({
+							components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
+							embeds: [embed]
+						});
+					}
+					else {
+						await i.update({
+							components: [row.setComponents([first, back, next.setDisabled(false), last.setDisabled(false), quit])],
+							embeds: [embed]
+						});
+					}
+					break;
+				}
+				case 'next': {
+					index += inc;
+					embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+					if (index + inc >= items.length) {
+						await i.update({
+							components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
+							embeds: [embed]
+						});
+					}
+					else {
+						await i.update({
+							components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(false), last.setDisabled(false), quit])],
+							embeds: [embed]
+						});
+					}
+					break;
+				}
+				case 'last': {
+					index = inc * Math.floor(items.length / inc);
+					await i.update({
 						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
-						embeds: [embed]
+						embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
 					});
 				}
-				else {
-					await int.update({
-						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(false), last.setDisabled(false), quit])],
-						embeds: [embed]
-					});
-				}
-				break;
 			}
-			case 'last': {
-				index = inc * Math.floor(items.length / inc);
-				await int.update({
-					components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
-					embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
-				});
+		})
+		.on('end', async (collected, reason) => {
+			if (reason === 'time') {
+				await interaction.editReply({ components: [] });
 			}
-		}
-	});
-
-	collector.on('end', async (collected, reason) => {
-		if (reason === 'time') {
-			await interaction.editReply({ components: [] });
-		}
-	});
+		});
 };
 
 export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;
