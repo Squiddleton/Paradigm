@@ -153,7 +153,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 		});
 };
 
-export const sumMsgs = (previous: number, current: IMessage) => previous + current.messages;
+export const sumMsgs = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
 
 export const validateGuildChannel = (client: Client<true>, channelId: Snowflake, checkPermissions = true): AnyGuildTextChannel => {
 	const channel = validateChannel(client, channelId);

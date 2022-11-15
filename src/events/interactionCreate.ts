@@ -170,7 +170,7 @@ export default new ClientEvent({
 				{},
 				{ new: true, upsert: true }
 			);
-			if (dailyMessages.reduce(sumMsgs, 0) < giveawayResult.messages) {
+			if (sumMsgs(dailyMessages) < giveawayResult.messages) {
 				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}

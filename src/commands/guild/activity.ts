@@ -38,9 +38,7 @@ export default new SlashCommand({
 		const max = interaction.options.getInteger('max') ?? 10;
 		const memberResults = await memberSchema.find();
 
-		const combineMsgs = (msgs: IMessage[]) => msgs
-			.filter(m => (31 - m.day) <= time)
-			.reduce(sumMsgs, 0);
+		const combineMsgs = (messages: IMessage[]) => sumMsgs(messages.filter(m => (31 - m.day) <= time));
 
 		const sorted = memberResults.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
 		const users = await Promise.all(sorted.slice(0, max).map(m => client.users.fetch(m.userId)));
