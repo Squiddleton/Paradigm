@@ -40,8 +40,8 @@ export default new SlashCommand({
 
 		const combineMsgs = (messages: IMessage[]) => sumMsgs(messages.filter(m => (31 - m.day) <= time));
 
-		const sorted = memberResults.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
-		const users = await Promise.all(sorted.slice(0, max).map(m => client.users.fetch(m.userId)));
+		const sortedResults = memberResults.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
+		const users = await Promise.all(sortedResults.slice(0, max).map(result => client.users.fetch(result.userId)));
 		const mapped = users.map(user => `${user.tag} (${user.id})`);
 
 		await interaction.editReply(`${max === 1 ? 'Most active user' : `Top ${max} most active users`} over the past${time === 1 ? '' : ` ${time}`} ${formatPlural('day', time)}:\n${mapped.join('\n')}`);
