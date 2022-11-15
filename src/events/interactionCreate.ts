@@ -9,7 +9,7 @@ import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
-import { sumMsgs } from '../util/functions.js';
+import { sumMessages } from '../util/functions.js';
 
 const mapByName = (item: Cosmetic | Playlist) => item.name;
 
@@ -170,7 +170,7 @@ export default new ClientEvent({
 				{},
 				{ new: true, upsert: true }
 			);
-			if (sumMsgs(dailyMessages) < giveawayResult.messages) {
+			if (sumMessages(dailyMessages) < giveawayResult.messages) {
 				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}

@@ -2,7 +2,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPlural } from '@squiddleton/util';
 import { ApplicationCommandOptionType } from 'discord.js';
 import memberSchema from '../../schemas/members.js';
-import { sumMsgs } from '../../util/functions.js';
+import { sumMessages } from '../../util/functions.js';
 import type { IMessage } from '../../util/types.js';
 
 export default new SlashCommand({
@@ -38,9 +38,9 @@ export default new SlashCommand({
 		const max = interaction.options.getInteger('max') ?? 10;
 		const memberResults = await memberSchema.find();
 
-		const combineMsgs = (messages: IMessage[]) => sumMsgs(messages.filter(m => (31 - m.day) <= time));
+		const combineMessages = (messages: IMessage[]) => sumMessages(messages.filter(m => (31 - m.day) <= time));
 
-		const sortedResults = memberResults.sort((a, b) => combineMsgs(b.dailyMessages) - combineMsgs(a.dailyMessages));
+		const sortedResults = memberResults.sort((a, b) => combineMessages(b.dailyMessages) - combineMessages(a.dailyMessages));
 		const users = await Promise.all(sortedResults.slice(0, max).map(result => client.users.fetch(result.userId)));
 		const mapped = users.map(user => `${user.tag} (${user.id})`);
 
