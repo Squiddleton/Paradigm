@@ -12,7 +12,7 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		const cosmetics = await fetchCosmetics();
-		const items = cosmetics.filter(i => i.type.displayValue === 'Outfit' && i.name !== 'TBD');
+		const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
 		const cosmetic = getRandomItem(items);
 		const image = cosmetic.images.featured ?? cosmetic.images.icon;
 

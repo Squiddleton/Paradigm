@@ -15,8 +15,8 @@ export default new SlashCommand({
 					.setTitle('Artemis')
 					.setImage(map.images.pois)
 					.setFields([
-						{ name: 'Named POIs', value: map.pois.filter(poi => !poi.id.includes('UnNamedPOI')).length.toString(), inline: true },
-						{ name: 'Landmarks', value: map.pois.filter(poi => poi.id.includes('UnNamedPOI')).length.toString(), inline: true }
+						{ name: 'Named POIs', value: map.pois.filter(p => !p.id.includes('UnNamedPOI')).length.toString(), inline: true },
+						{ name: 'Landmarks', value: map.pois.filter(p => p.id.includes('UnNamedPOI')).length.toString(), inline: true }
 					])
 					.setColor('Blue')
 			]

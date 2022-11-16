@@ -19,7 +19,7 @@ const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.targe
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
 	const cosmetics = await fetchCosmetics();
-	const { ratings } = findBestMatch(input, cosmetics.filter(i => i.type.displayValue === type).map(mapByName));
+	const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName));
 	const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 	await interaction.respond(choices);
 };
@@ -43,9 +43,9 @@ export default new ClientEvent({
 					case 'cosmetic': {
 						const cosmetics = await fetchCosmetics(interaction.commandName === 'wishlist');
 						const { ratings } = findBestMatch(input, cosmetics.map(mapByName));
-						const choices = ratings.sort(sortByRating).map(rating => {
-							const cosmetic = cosmetics.find(cos => cos.name === rating.target);
-							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', rating.target));
+						const choices = ratings.sort(sortByRating).map(r => {
+							const cosmetic = cosmetics.find(c => c.name === r.target);
+							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', r.target));
 							return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
 						}).slice(0, 25);
 						await interaction.respond(choices);

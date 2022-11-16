@@ -38,19 +38,19 @@ export default new SlashCommand({
 		const cosmetics = await fetchCosmetics();
 		const type = interaction.options.getString('type');
 		if (type) {
-			await interaction.editReply({ embeds: [createCosmeticEmbed(getRandomItem(cosmetics.filter(i => i.type.value === type)))] });
+			await interaction.editReply({ embeds: [createCosmeticEmbed(getRandomItem(cosmetics.filter(c => c.type.value === type)))] });
 			return;
 		}
 
-		const bbs = cosmetics.filter(i => i.type.displayValue === 'Back Bling');
+		const bbs = cosmetics.filter(c => c.type.displayValue === 'Back Bling');
 		const bb = getRandomItem(bbs);
-		const gliders = cosmetics.filter(i => i.type.displayValue === 'Glider');
+		const gliders = cosmetics.filter(c => c.type.displayValue === 'Glider');
 		const glider = getRandomItem(gliders);
-		const hts = cosmetics.filter(i => i.type.displayValue === 'Harvesting Tool');
+		const hts = cosmetics.filter(c => c.type.displayValue === 'Harvesting Tool');
 		const ht = getRandomItem(hts);
-		const ws = cosmetics.filter(i => i.type.displayValue === 'Wrap');
+		const ws = cosmetics.filter(c => c.type.displayValue === 'Wrap');
 		const wrap = getRandomItem(ws);
-		const outfits = cosmetics.filter(i => i.type.displayValue === 'Outfit');
+		const outfits = cosmetics.filter(c => c.type.displayValue === 'Outfit');
 		const outfit = getRandomItem(outfits);
 
 		const background = await loadImage(getRandomItem(Object.values(BackgroundURL)));

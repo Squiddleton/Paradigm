@@ -34,7 +34,7 @@ export default new SlashCommand({
 					description: 'The milestone\'s rarity',
 					type: ApplicationCommandOptionType.String,
 					required: true,
-					choices: Rarities.map(rarity => ({ name: rarity, value: rarity }))
+					choices: Rarities.map(r => ({ name: r, value: r }))
 				}
 			]
 		},

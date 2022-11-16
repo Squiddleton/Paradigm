@@ -57,12 +57,12 @@ export default new SlashCommand({
 						.setLabel('Lock Image In')
 						.setStyle(ButtonStyle.Danger)
 				),
-			...variants.slice(0, 4).map(variant => new ActionRowBuilder<SelectMenuBuilder>()
+			...variants.slice(0, 4).map(v => new ActionRowBuilder<SelectMenuBuilder>()
 				.setComponents(new SelectMenuBuilder()
-					.setCustomId(variant.channel)
+					.setCustomId(v.channel)
 					.setMinValues(1)
-					.setPlaceholder((variant.type ?? variant.channel).toUpperCase())
-					.setOptions(variant.options.slice(0, 25).map(option => ({ label: option.name.toUpperCase(), value: option.tag })))
+					.setPlaceholder((v.type ?? v.channel).toUpperCase())
+					.setOptions(v.options.slice(0, 25).map(o => ({ label: o.name.toUpperCase(), value: o.tag })))
 				)
 			)
 		];
@@ -76,10 +76,10 @@ export default new SlashCommand({
 					switch (i.customId) {
 						case 'featured': {
 							for (const component of components) {
-								component.setComponents(component.components.map(menu => {
-									return menu instanceof SelectMenuBuilder
-										? menu.setOptions(menu.options.map(option => ({ label: option.toJSON().label, value: option.toJSON().value })))
-										: menu;
+								component.setComponents(component.components.map(c => {
+									return c instanceof SelectMenuBuilder
+										? c.setOptions(c.options.map(o => ({ label: o.toJSON().label, value: o.toJSON().value })))
+										: c;
 								}
 								));
 							}
@@ -102,13 +102,13 @@ export default new SlashCommand({
 				if (optionChosen === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', `${optionChosen}`));
 
 				for (const component of components) {
-					component.setComponents(component.components.map(menu => {
-						return menu instanceof SelectMenuBuilder
-							? menu.setOptions(menu.options.map(o => {
+					component.setComponents(component.components.map(c => {
+						return c instanceof SelectMenuBuilder
+							? c.setOptions(c.options.map(o => {
 								const option = o.toJSON();
-								return { label: option.label, value: option.value, default: menu.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
+								return { label: option.label, value: option.value, default: c.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
 							}))
-							: menu;
+							: c;
 					}
 					));
 				}

@@ -46,7 +46,7 @@ export default new ClientEvent({
 
 		schedule('*/1 * * * *', async () => {
 			const guildResults = await guildSchema.find();
-			const giveaways = guildResults.map(g => g.giveaways).flat().filter(giveaway => !giveaway.completed && giveaway.endTime <= (Date.now() / 1000));
+			const giveaways = guildResults.map(r => r.giveaways).flat().filter(g => !g.completed && g.endTime <= (Date.now() / 1000));
 
 			for (const giveaway of giveaways) {
 				try {
@@ -62,7 +62,7 @@ export default new ClientEvent({
 
 					const winnerIds: Snowflake[] = [];
 					const entrantsInGuild = await giveawayChannel.guild.members.fetch({ user: giveaway.entrants });
-					const entrantIds = entrantsInGuild.map(member => member.id);
+					const entrantIds = entrantsInGuild.map(m => m.id);
 
 					for (let i = 0; i < giveaway.winnerNumber && i < entrantIds.length; i++) {
 						const winnerId = getRandomItem(entrantIds);

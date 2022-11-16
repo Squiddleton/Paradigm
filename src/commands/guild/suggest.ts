@@ -37,7 +37,7 @@ export default new SlashCommand({
 		await interaction.deferReply({ ephemeral: true });
 
 		const { url } = interaction.options.getAttachment('image', true);
-		if (!['gif', 'webp'].some(ending => url.endsWith(ending))) {
+		if (!['gif', 'webp'].some(ext => url.endsWith(ext))) {
 			try {
 				await loadImage(url);
 			}

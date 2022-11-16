@@ -24,10 +24,10 @@ const itemShopFilter = (cosmetic: Cosmetic) => {
 
 	return cosmetic.gameplayTags !== null &&
 	!cosmetic.gameplayTags.includes('Cosmetics.QuestsMetaData.Season10.Visitor') &&
-	!['_Sync', '_Owned', '_Follower'].some(end => cosmetic.id.endsWith(end)) &&
+	!['_Sync', '_Owned', '_Follower'].some(w => cosmetic.id.endsWith(w)) &&
 	((cosmetic.gameplayTags.includes('Cosmetics.Source.ItemShop')) ||
 	(!['Cosmetics.Source.Promo', 'Cosmetics.Source.Granted.SaveTheWorld', 'Cosmetics.Source.testing', 'Cosmetics.QuestsMetaData.Achievements.Umbrella', 'Cosmetics.Source.MandosBountyLTM'].some(tag => cosmetic.gameplayTags?.includes(tag)) &&
-	!cosmetic.gameplayTags.some(tag => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(word => tag.includes(word))) &&
+	!cosmetic.gameplayTags.some(t => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(w => t.includes(w))) &&
 	!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
 };
 
@@ -45,7 +45,7 @@ export const fetchItemShop = async () => {
 	const rawAPI = await fortniteAPI.shop({ combined: true });
 
 	const withoutDupes: Cosmetic[] = [];
-	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(entry => entry.items).flat();
+	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(e => e.items).flat();
 
 	for (const item of withDupes) {
 		if (!withoutDupes.some(c => c.id === item.id)) {
@@ -63,13 +63,13 @@ export const fetchShopNames = async (state: TimelineClientEvent) => {
 
 	const namesWithoutQuantity = shopIds
 		.map(id => {
-			const returned = shopSections.find(section => section.sectionId === id);
+			const returned = shopSections.find(s => s.sectionId === id);
 			if (returned === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', 'undefined'));
 			return returned;
 		})
 		.sort((a, b) => b.landingPriority - a.landingPriority)
-		.map(section => section.sectionDisplayName)
-		.filter((name): name is string => name !== undefined);
+		.map(s => s.sectionDisplayName)
+		.filter((s): s is string => s !== undefined);
 
 	return Object.entries(quantify(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
 };
@@ -96,7 +96,7 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 
 export const checkWishlists = async (client: Client<true>, debug = false) => {
 	const entries = await fetchItemShop();
-	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(cosmetic => cosmetic.id) } });
+	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
 	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
 	for (const g of guildResults) {
@@ -110,7 +110,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
-					const items = removeDuplicates(entries.filter(item => user.wishlistCosmeticIds.includes(item.id)).map(item => item.name));
+					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => c.name));
 					if (items.length > 0) {
 						msgs.push(`<@${user._id}>: ${items.join(', ')}`);
 					}
@@ -182,7 +182,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 			image = await loadImage(link);
 		}
 		else if (input !== null) {
-			const cosmetic = cosmetics.find(e => displayValues.includes(e.type.displayValue) && normalize(e.name.toLowerCase().replace(/ /g, '')) === normalize(input));
+			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic === undefined) {
 				throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', displayType));
 			}
@@ -231,11 +231,11 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	}
 
 	if (wrap) {
-		const oi = cosmetics.find(o => o.type.displayValue === 'Wrap' && normalize(o.name.toLowerCase().replace(/ /g, '')) === normalize(wrap));
-		if (!oi) {
+		const cosmetic = cosmetics.find(c => c.type.displayValue === 'Wrap' && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(wrap));
+		if (!cosmetic) {
 			return 'Invalid wrap name provided.';
 		}
-		const wrapImg = await loadImage(oi.images.featured ?? oi.images.icon);
+		const wrapImg = await loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
 		ctx.drawImage(wrapImg, background.width - (background.height * wrapImg.width / wrapImg.height / 2), background.height / 2, background.height * wrapImg.width / wrapImg.height / 2, background.height / 2);
 	}
 
@@ -262,7 +262,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 									.setMinValues(1)
 									.setOptions([
 										{ label: `Default ${displayType}`, value: 'truedefault', default: true },
-										...variants.options.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)
+										...variants.options.map(o => ({ label: o.name, value: o.tag })).slice(0, 24)
 									])
 							]
 						})
@@ -317,25 +317,25 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					if (variants) {
 						const imageURL = value.startsWith('truedefault')
 							? cosmetic.images.featured ?? cosmetic.images.icon
-							: variants.find(option => option.tag === value)?.image;
+							: variants.find(v => v.tag === value)?.image;
 
 						if (imageURL === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
 
 						options[cosmetic.type.displayValue] = imageURL;
 
 						const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
-						components = components.map(row => {
-							const [menu] = row.components;
+						components = components.map(c => {
+							const [menu] = c.components;
 							const menuJSON = menu.toJSON();
-							if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return row;
+							if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return c;
 
 							if (menu instanceof SelectMenuBuilder) {
 								menu.setOptions(value.startsWith('truedefault')
-									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(variant => ({ label: variant.name, value: variant.tag })).slice(0, 24)]
-									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(variant => ({ label: variant.name, value: variant.tag, default: variant.tag === value })).slice(0, 24)]
+									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(v => ({ label: v.name, value: v.tag })).slice(0, 24)]
+									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(v => ({ label: v.name, value: v.tag, default: v.tag === value })).slice(0, 24)]
 								);
 							}
-							return row.setComponents([menu]);
+							return c.setComponents([menu]);
 						});
 
 						await i.editReply({ attachments: [], content, files: [newAttachmentBuilder], components, embeds });
@@ -477,10 +477,10 @@ export const postShopSections = async (client: Client<true>, currentNamesOrUndef
 	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
 
 	const formattedNames = currentNames
-		.map(name => `${cachedNames.includes(name) ? ' ' : '+'} ${name}`)
+		.map(n => `${cachedNames.includes(n) ? ' ' : '+'} ${n}`)
 		.concat(cachedNames
-			.filter(name => !currentNames.includes(name))
-			.map(name => `- ${name}`));
+			.filter(n => !currentNames.includes(n))
+			.map(n => `- ${n}`));
 
 	const guildResults = await guildSchema.find({ shopSectionsChannelId: { $ne: null } });
 	for (const { shopSectionsChannelId } of guildResults) {

@@ -12,7 +12,7 @@ export enum BackgroundURL {
 	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
 }
 
-export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(background => ({ name: background, value: background }));
+export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b => ({ name: b, value: b }));
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
@@ -94,7 +94,7 @@ export const LanguageChoices: StringChoices = Object.entries({
 	tr: 'Türkçe',
 	'zh-CN': '官话',
 	'zh-Hant': '官話'
-}).map(([key, value]) => ({ name: value, value: key }));
+}).map(([k, v]) => ({ name: v, value: k }));
 
 export const LoadoutImageOptions: ApplicationCommandOptionData[] = [
 	{
@@ -184,4 +184,4 @@ export enum UnitsToMS {
 	Days = 86400
 }
 
-export const UnitChoices: StringChoices = getEnumKeys(UnitsToMS).map(unit => ({ name: unit, value: unit }));
+export const UnitChoices: StringChoices = getEnumKeys(UnitsToMS).map(u => ({ name: u, value: u }));

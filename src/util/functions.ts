@@ -29,7 +29,7 @@ export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messa
 					{ name: 'Time', value: `Ends ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
 		);
-	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(role => `${guild.roles.cache.get(role.id)?.name}: +${role.amount} Entries`).join('\n'), inline: true });
+	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(r => `${guild.roles.cache.get(r.id)?.name}: +${r.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
 };
@@ -211,7 +211,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		newWinners.push(newWinner);
 	}
 
-	const winnersDisplay = newWinners.map((w, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${w}> (${w})`).join('\n');
+	const winnersDisplay = newWinners.map((id, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${id}> (${id})`).join('\n');
 
 	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
@@ -254,10 +254,10 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		.setFields([
 			{ name: 'Message', value: `[Link](${message.url})`, inline: true },
 			{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
-			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((w, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${w}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
+			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${id}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
 			{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
-			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(role => `${interaction.guild.roles.cache.get(role.id)?.name}: ${role.amount} Entries`).join('\n'), inline: true }
+			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(r => `${interaction.guild.roles.cache.get(r.id)?.name}: ${r.amount} Entries`).join('\n'), inline: true }
 		]);
 
 	const willUseButtons = entrants.length > inc;
