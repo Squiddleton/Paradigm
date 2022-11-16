@@ -99,8 +99,8 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
 	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
-	for (const g of guildResults) {
-		const guild = client.guilds.cache.get(g._id);
+	for (const guildResult of guildResults) {
+		const guild = client.guilds.cache.get(guildResult._id);
 		if (guild !== undefined) {
 			const members = userResults.length > 100
 				? (await guild.members.fetch()).filter(m => userResults.some(u => u._id === m.id))
@@ -116,10 +116,10 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 					}
 				}
 
-				if (msgs.length !== 1 && g.wishlistChannelId !== null) {
+				if (msgs.length !== 1 && guildResult.wishlistChannelId !== null) {
 					msgs.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
 					try {
-						const wishlistChannel = validateGuildChannel(client, g.wishlistChannelId);
+						const wishlistChannel = validateGuildChannel(client, guildResult.wishlistChannelId);
 
 						const fullMsg = msgs.join('\n');
 						if (debug) {
@@ -132,7 +132,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 						}
 					}
 					catch (error) {
-						console.error('An error has occured while posting a wishlist announcement', g, error);
+						console.error('An error has occured while posting a wishlist announcement', guildResult, error);
 					}
 				}
 			}
