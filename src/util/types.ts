@@ -45,6 +45,7 @@ export interface BlockList {
 export type ButtonOrMenu = ComponentType.Button | ComponentType.SelectMenu;
 
 export interface Config {
+	/** The Discord bot token */
 	token: string;
 	/** The channel to access with Client#devChannel */
 	devChannelId: Snowflake;
@@ -52,14 +53,19 @@ export interface Config {
 	devGuildId: Snowflake;
 	/** The guild to deploy all commands with the "Exclusive" scope */
 	exclusiveGuildId: Snowflake;
+	/** Device authentications for multiple devices/accounts */
 	epicDeviceAuth: {
 		device1: DeviceAuth;
 		device2: DeviceAuth;
 		alt?: DeviceAuth;
 	};
+	/** A key for Fortnite-API.com */
 	fortniteAPIKey: string;
+	/** An Imgur client id */
 	imgurClientId: string;
+	/** The MongoDB path to connect to */
 	mongoPath: string;
+	/** Options for a Snoowrap client construction */
 	snoowrap: SnoowrapOptions;
 }
 
