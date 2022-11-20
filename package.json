@@ -17,29 +17,29 @@
   "license": "MIT",
   "dependencies": {
     "@rmp135/imgur": "^0.6.0",
-    "@squiddleton/discordjs-util": "^1.0.0",
-    "@squiddleton/fortnite-api": "^1.0.0",
-    "@squiddleton/util": "^1.0.0",
-    "canvas": "^2.9.3",
-    "discord.js": "^14.1.1",
-    "mongoose": "^6.5.0",
-    "node-cron": "^3.0.1",
+    "@squiddleton/discordjs-util": "^1.0.1",
+    "@squiddleton/fortnite-api": "^1.0.1",
+    "@squiddleton/util": "^1.0.1",
+    "canvas": "^2.10.2",
+    "discord.js": "^14.6.0",
+    "mongoose": "^6.7.2",
+    "node-cron": "^3.0.2",
     "node-fetch": "^2.6.7",
     "snoostorm": "^1.5.2",
     "snoowrap": "^1.23.0",
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {
-    "@types/node": "^18.0.6",
-    "@types/node-cron": "^3.0.2",
+    "@types/node": "^18.11.9",
+    "@types/node-cron": "^3.0.6",
     "@types/node-fetch": "^2.6.2",
     "@types/string-similarity": "^4.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.30.7",
-    "@typescript-eslint/parser": "^5.30.7",
-    "eslint": "^8.20.0",
-    "eslint-import-resolver-typescript": "^3.5.1",
+    "@typescript-eslint/eslint-plugin": "^5.43.0",
+    "@typescript-eslint/parser": "^5.43.0",
+    "eslint": "^8.28.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-tsdoc": "^0.2.17",
-    "typescript": "^4.7.4"
+    "typescript": "^4.9.3"
   }
 }
