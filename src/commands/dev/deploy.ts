@@ -1,6 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { DiscordClient } from '../../util/classes.js';
-import { ErrorMessage } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'deploy',
@@ -8,8 +7,7 @@ export default new SlashCommand({
 	scope: 'Dev',
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
-
-		if (!DiscordClient.isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
+		DiscordClient.assertReadyClient(client);
 		await client.deploy();
 
 		await interaction.editReply('Deployed all application commands.');

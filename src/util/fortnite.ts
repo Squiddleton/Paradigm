@@ -7,10 +7,10 @@ import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
-import { EpicError, TimestampedEmbed } from './classes.js';
+import { DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
-import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate, validateGuildChannel } from './functions.js';
+import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
 import { isBackground } from './typeguards.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 
@@ -94,7 +94,7 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 	}
 };
 
-export const checkWishlists = async (client: Client<true>, debug = false) => {
+export const checkWishlists = async (client: DiscordClient<true>, debug = false) => {
 	const entries = await fetchItemShop();
 	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
 	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
@@ -119,7 +119,7 @@ export const checkWishlists = async (client: Client<true>, debug = false) => {
 				if (msgs.length !== 1 && guildResult.wishlistChannelId !== null) {
 					msgs.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
 					try {
-						const wishlistChannel = validateGuildChannel(client, guildResult.wishlistChannelId);
+						const wishlistChannel = client.getGuildChannel(guildResult.wishlistChannelId);
 
 						const fullMsg = msgs.join('\n');
 						if (debug) {
@@ -472,7 +472,7 @@ export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneN
 	{ upsert: true }
 );
 
-export const postShopSections = async (client: Client<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
+export const postShopSections = async (client: DiscordClient<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
 	const [oldState, newState] = await fetchStates();
 	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
 
@@ -486,7 +486,7 @@ export const postShopSections = async (client: Client<true>, currentNamesOrUndef
 	for (const { shopSectionsChannelId } of guildResults) {
 		if (shopSectionsChannelId !== null) {
 			try {
-				const channel = validateGuildChannel(client, shopSectionsChannelId);
+				const channel = client.getGuildChannel(shopSectionsChannelId);
 				await channel.send({
 					embeds: [
 						new EmbedBuilder()

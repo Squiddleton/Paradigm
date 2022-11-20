@@ -1,13 +1,12 @@
-import { validateChannel } from '@squiddleton/discordjs-util';
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, ChatInputCommandInteraction, Client, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, PermissionFlagsBits, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
+import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
 import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
-import { TimestampedEmbed } from './classes';
-import { AccessibleChannelPermissions, DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
+import { DiscordClient, TimestampedEmbed } from './classes';
+import { DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
 import { isRarity } from './typeguards.js';
-import type { AnyGuildTextChannel, IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
@@ -61,10 +60,13 @@ export const createPaginationButtons = (): PaginationButtons => {
 	];
 };
 
-export const getClientPermissions = (client: Client<true>, channel: AnyGuildTextChannel) => {
-	const permissions = channel.permissionsFor(client.user);
-	if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
-	return permissions;
+export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMenu, channelId: Snowflake, messageId: Snowflake) => {
+	if (interaction.isContextMenuCommand()) return interaction.targetMessage;
+	const { client } = interaction;
+	DiscordClient.assertReadyClient(client);
+	const giveawayChannel = client.getVisibleChannel(channelId);
+	const message = await giveawayChannel.messages.fetch(messageId);
+	return message;
 };
 
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount) => {
@@ -153,34 +155,6 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 		});
 };
 
-export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
-
-export const validateGuildChannel = (client: Client<true>, channelId: Snowflake, checkPermissions = true): AnyGuildTextChannel => {
-	const channel = validateChannel(client, channelId);
-	if (channel.type === ChannelType.DM) throw new Error(`The channel "${channelId}" is actually the DM channel for recipient "${channel.recipientId}"`);
-
-	if (checkPermissions) {
-		const permissions = getClientPermissions(client, channel);
-		if (!permissions.has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
-	}
-	return channel;
-};
-
-export const validateVisibleChannel = (client: Client<true>, channelId: Snowflake) => {
-	const channel = validateGuildChannel(client, channelId, false);
-	const permissions = getClientPermissions(client, channel);
-	if (!permissions.has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
-	return channel;
-};
-
-export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMenu, channelId: Snowflake, messageId: Snowflake) => {
-	if (interaction.isContextMenuCommand()) return interaction.targetMessage;
-
-	const giveawayChannel = validateVisibleChannel(interaction.client, channelId);
-	const message = await giveawayChannel.messages.fetch(messageId);
-	return message;
-};
-
 export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => {
 	await interaction.deferReply({ ephemeral: true });
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
@@ -267,6 +241,8 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Entrants', entrants, inc);
 };
+
+export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
 
 export const viewMilestones = async (interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction) => {
 	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);

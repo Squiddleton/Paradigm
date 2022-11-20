@@ -30,7 +30,7 @@ export default new ClientEvent({
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
-		if (!DiscordClient.isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
+		DiscordClient.assertReadyClient(client);
 		const { owner } = client.application;
 		if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 

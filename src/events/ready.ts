@@ -5,18 +5,16 @@ import { schedule } from 'node-cron';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
-import { ErrorMessage } from '../util/constants.js';
 import { checkWishlists, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
-import { createGiveawayEmbed, validateVisibleChannel } from '../util/functions.js';
+import { createGiveawayEmbed } from '../util/functions.js';
 
 export default new ClientEvent({
 	name: 'ready',
 	once: true,
 	async execute(client) {
 		await client.application.fetch();
-
+		DiscordClient.assertReadyClient(client);
 		const readyMessage = `${client.user.username} is ready!`;
-		if (!DiscordClient.isReadyClient(client)) throw new Error(ErrorMessage.UnreadyClient);
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
@@ -50,7 +48,7 @@ export default new ClientEvent({
 
 			for (const giveaway of giveaways) {
 				try {
-					const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
+					const giveawayChannel = client.getVisibleChannel(giveaway.channelId);
 					let message: Message;
 					try {
 						message = await giveawayChannel.messages.fetch(giveaway.messageId);

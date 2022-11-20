@@ -1,13 +1,13 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import config from '../config';
-import { TimestampedEmbed } from '../util/classes';
+import { DiscordClient, TimestampedEmbed } from '../util/classes';
 import { DiscordIds } from '../util/constants';
-import { validateGuildChannel } from '../util/functions';
 
 export default new ClientEvent({
 	name: 'messageReactionAdd',
 	async execute(reaction, user) {
 		const { client } = reaction;
+		DiscordClient.assertReadyClient(client);
 		if (reaction.partial) {
 			try {
 				await reaction.fetch();
@@ -20,7 +20,7 @@ export default new ClientEvent({
 		const { message } = reaction;
 		if (message.guildId === config.exclusiveGuildId) {
 			const toString = reaction.emoji.toString();
-			const logChannel = validateGuildChannel(client, DiscordIds.Channels.Logs);
+			const logChannel = client.getGuildChannel(DiscordIds.Channels.Logs);
 
 			await logChannel.send({
 				embeds: [

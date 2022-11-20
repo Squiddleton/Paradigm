@@ -1,8 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { loadImage } from 'canvas';
 import { ApplicationCommandOptionType, Message } from 'discord.js';
+import { DiscordClient } from '../../util/classes';
 import { DiscordIds, ErrorMessage } from '../../util/constants';
-import { validateGuildChannel } from '../../util/functions';
 import type { AnyGuildTextChannel } from '../../util/types';
 
 export default new SlashCommand({
@@ -35,6 +35,7 @@ export default new SlashCommand({
 	scope: 'Exclusive',
 	async execute(interaction, client) {
 		await interaction.deferReply({ ephemeral: true });
+		DiscordClient.assertReadyClient(client);
 
 		const { url } = interaction.options.getAttachment('image', true);
 		if (!['gif', 'webp'].some(ext => url.endsWith(ext))) {
@@ -53,7 +54,7 @@ export default new SlashCommand({
 		const submissionChannelId = DiscordIds.Channels.Submissions;
 		let submissionChannel: AnyGuildTextChannel;
 		try {
-			submissionChannel = validateGuildChannel(client, submissionChannelId);
+			submissionChannel = client.getGuildChannel(submissionChannelId);
 		}
 		catch (error) {
 			if (error instanceof Error && error.message === ErrorMessage.MissingPermissions.replace('{channelId}', submissionChannelId)) {

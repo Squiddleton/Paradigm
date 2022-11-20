@@ -1,8 +1,9 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
+import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
-import { areMismatchedBonusRoles, createGiveawayEmbed, rerollGiveaway, reviewGiveaway, validateVisibleChannel } from '../../util/functions.js';
+import { areMismatchedBonusRoles, createGiveawayEmbed, rerollGiveaway, reviewGiveaway } from '../../util/functions.js';
 import { isUnit } from '../../util/typeguards.js';
 import type { IBonusRole, IGiveaway } from '../../util/types.js';
 
@@ -180,6 +181,7 @@ export default new SlashCommand({
 	scope: 'Guild',
 	permissions: PermissionFlagsBits.ManageGuild,
 	async execute(interaction, client) {
+		DiscordClient.assertReadyClient(client);
 		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 
 		switch (interaction.options.getSubcommand()) {
@@ -212,7 +214,7 @@ export default new SlashCommand({
 				}
 
 				try {
-					const giveawayChannel = validateVisibleChannel(client, giveaway.channelId);
+					const giveawayChannel = client.getVisibleChannel(giveaway.channelId);
 					try {
 						const giveawayMessage = await giveawayChannel.messages.fetch(messageId);
 

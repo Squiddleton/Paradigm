@@ -11,7 +11,8 @@ export default new ClientEvent({
 	name: 'messageCreate',
 	async execute(message) {
 		const { client } = message;
-		if (message.inGuild() && DiscordClient.isReadyClient(client)) {
+		DiscordClient.assertReadyClient(client);
+		if (message.inGuild()) {
 			const { guildId } = message;
 			const exclusiveGuildId = client.exclusiveGuildId;
 			const isBot = message.author.bot;
