@@ -17,15 +17,13 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		if (channel.type === ChannelType.DM) throw new Error(`The channel "${channelId}" is actually the DM channel for recipient "${channel.recipientId}"`);
 
 		if (checkPermissions) {
-			const permissions = this.getPermissions(channel);
-			if (!permissions.has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
+			if (!this.getPermissions(channel).has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
 		}
 		return channel;
 	}
 	getVisibleChannel(channelId: Snowflake) {
 		const channel = this.getGuildChannel(channelId, false);
-		const permissions = this.getPermissions(channel);
-		if (!permissions.has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
+		if (!this.getPermissions(channel).has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
 		return channel;
 	}
 	get devChannel() {
