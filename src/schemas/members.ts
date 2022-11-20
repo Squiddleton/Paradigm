@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 import type { IMessage } from '../util/types.js';
 
-const messageSchema = new mongoose.Schema<IMessage>({
+const messageSchema = new Schema<IMessage>({
 	day: {
 		type: Number,
 		required: true
@@ -12,7 +12,7 @@ const messageSchema = new mongoose.Schema<IMessage>({
 	}
 });
 
-const memberSchema = new mongoose.Schema({
+const memberSchema = new Schema({
 	userId: {
 		type: String,
 		required: true
@@ -33,4 +33,4 @@ const memberSchema = new mongoose.Schema({
 	}
 });
 
-export default mongoose.model('members', memberSchema);
+export default model('members', memberSchema);

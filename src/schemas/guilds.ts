@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 import type { IBonusRole, IGiveaway, IGuild, IMilestone } from '../util/types.js';
 
-const bonusRoleSchema = new mongoose.Schema<IBonusRole>({
+const bonusRoleSchema = new Schema<IBonusRole>({
 	id: {
 		type: String,
 		required: true
@@ -12,7 +12,7 @@ const bonusRoleSchema = new mongoose.Schema<IBonusRole>({
 	}
 });
 
-const giveawaySchema = new mongoose.Schema<IGiveaway>({
+const giveawaySchema = new Schema<IGiveaway>({
 	messageId: {
 		type: String,
 		required: true
@@ -53,7 +53,7 @@ const giveawaySchema = new mongoose.Schema<IGiveaway>({
 	winners: [String]
 });
 
-const milestoneSchema = new mongoose.Schema<IMilestone>({
+const milestoneSchema = new Schema<IMilestone>({
 	name: {
 		type: String,
 		required: true
@@ -68,7 +68,7 @@ const milestoneSchema = new mongoose.Schema<IMilestone>({
 	}
 });
 
-const guildSchema = new mongoose.Schema<IGuild>({
+const guildSchema = new Schema<IGuild>({
 	_id: {
 		type: String,
 		required: true
@@ -93,4 +93,4 @@ const guildSchema = new mongoose.Schema<IGuild>({
 	}
 });
 
-export default mongoose.model('guilds', guildSchema);
+export default model<IGuild>('guilds', guildSchema);
