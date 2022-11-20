@@ -241,6 +241,13 @@ export interface IGuild {
 	wishlistChannelId: Snowflake | null;
 }
 
+export interface IMember {
+	userId: Snowflake;
+	guildId: Snowflake;
+	dailyMessages: IMessage[];
+	milestones: string[];
+}
+
 export interface IMessage {
 	day: number;
 	messages: number;
@@ -253,9 +260,9 @@ export interface IMilestone {
 }
 
 export interface IUser {
-	userId: Snowflake;
-	guildId: Snowflake;
-	messages: IMessage[];
+	_id: Snowflake;
+	epicAccountId: string;
+	wishlistCosmeticIds: string[];
 }
 
 export interface LevelCommandOptions {

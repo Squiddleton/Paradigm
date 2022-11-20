@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { IMessage } from '../util/types.js';
+import type { IMember, IMessage } from '../util/types.js';
 
 const messageSchema = new Schema<IMessage>({
 	day: {
@@ -12,7 +12,7 @@ const messageSchema = new Schema<IMessage>({
 	}
 });
 
-const memberSchema = new Schema({
+const memberSchema = new Schema<IMember>({
 	userId: {
 		type: String,
 		required: true
@@ -33,4 +33,4 @@ const memberSchema = new Schema({
 	}
 });
 
-export default model('members', memberSchema);
+export default model<IMember>('members', memberSchema);
