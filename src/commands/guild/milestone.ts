@@ -87,21 +87,18 @@ export default new SlashCommand({
 		switch (interaction.options.getSubcommand()) {
 			case 'create': {
 				const name = interaction.options.getString('name', true);
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
-				if (milestones.some(m => m.name === name)) {
+				const guildResult = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				if (guildResult.milestones.some(m => m.name === name)) {
 					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
 					return;
 				}
 
-				await guildSchema.findByIdAndUpdate(guildId, {
-					$push: {
-						milestones: {
-							name,
-							description: interaction.options.getString('description', true),
-							rarity: interaction.options.getString('rarity', true)
-						}
-					}
+				guildResult.milestones.push({
+					name,
+					description: interaction.options.getString('description', true),
+					rarity: interaction.options.getString('rarity', true)
 				});
+				await guildResult.save();
 				await interaction.reply(`You created the following milestone: \`${name}\`.`);
 				return;
 			}

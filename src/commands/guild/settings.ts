@@ -69,17 +69,15 @@ export default new SlashCommand({
 				break;
 			}
 			case 'view': {
-				const guildResult = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
-				const { shopSectionsChannelId, wishlistChannelId } = guildResult;
-
+				const { giveaways, milestones, shopSectionsChannelId, wishlistChannelId } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				await interaction.reply({
 					embeds: [
 						new TimestampedEmbed()
 							.setTitle(`${interaction.guild.name} Server Settings`)
 							.setThumbnail(interaction.guild.iconURL())
 							.setFields(
-								{ name: 'Total Giveaways', value: guildResult.giveaways.length.toString(), inline: true },
-								{ name: 'Total Milestones', value: guildResult.milestones.length.toString(), inline: true },
+								{ name: 'Total Giveaways', value: giveaways.length.toString(), inline: true },
+								{ name: 'Total Milestones', value: milestones.length.toString(), inline: true },
 								{ name: 'Shop Sections Channel', value: shopSectionsChannelId === null ? 'None' : `<#${shopSectionsChannelId}>`, inline: true },
 								{ name: 'Wishlist Channel', value: wishlistChannelId === null ? 'None' : `<#${wishlistChannelId}>`, inline: true }
 							)
