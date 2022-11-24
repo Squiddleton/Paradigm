@@ -1,6 +1,6 @@
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { createCanvas, loadImage } from 'canvas';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { GuessCollectorTime, RarityColors } from '../../util/constants.js';
@@ -31,7 +31,7 @@ export default new SlashCommand({
 		}
 		ctx.putImageData(imgData, 0, 0);
 
-		const silhouette = new AttachmentBuilder(canvas.toBuffer(), { name: 'outfit.png' });
+		const silhouette = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'outfit.png' });
 
 		const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
 			new ButtonBuilder()

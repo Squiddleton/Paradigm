@@ -1,5 +1,5 @@
+import { loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { loadImage } from 'canvas';
 import { ApplicationCommandOptionType, Message } from 'discord.js';
 import { DiscordClient } from '../../util/classes';
 import { DiscordIds, ErrorMessage } from '../../util/constants';

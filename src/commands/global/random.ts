@@ -1,6 +1,6 @@
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { createCanvas, loadImage } from 'canvas';
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { BackgroundURL } from '../../util/constants.js';
@@ -73,7 +73,7 @@ export default new SlashCommand({
 		const w = await loadImage(wrap.images.featured ? wrap.images.featured : wrap.images.icon);
 		ctx.drawImage(w, background.width - (background.height * w.width / w.height / 2), background.height / 2, background.height * w.width / w.height / 2, background.height / 2);
 
-		const attachment = new AttachmentBuilder(canvas.toBuffer(), { name: `${normalize(interaction.user.username)}sLoadout.png` });
+		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: `${normalize(interaction.user.username)}sLoadout.png` });
 
 		await interaction.editReply({
 			embeds: [
