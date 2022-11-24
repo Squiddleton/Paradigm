@@ -2,7 +2,6 @@ import { Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
-import fetch from 'node-fetch';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';

@@ -1,4 +1,3 @@
-import fetch, { BodyInit, RequestInit, Response } from 'node-fetch';
 import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 import { EpicError } from './classes.js';
