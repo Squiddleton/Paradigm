@@ -1,6 +1,6 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
-import { normalize, removeDuplicates } from '@squiddleton/util';
+import { removeDuplicates } from '@squiddleton/util';
 import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, RESTJSONErrorCodes, User } from 'discord.js';
 import { Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
@@ -36,17 +36,22 @@ export default new ClientEvent({
 
 		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
-			const input = value === '' ? 'a' : normalize(value);
+			const input = value === '' ? 'a' : value;
 
 			try {
 				switch (name) {
 					case 'cosmetic': {
 						const cosmetics = await fetchCosmetics(interaction.commandName === 'wishlist');
-						const { ratings } = findBestMatch(input, cosmetics.map(mapByName));
-						const choices = ratings.sort(sortByRating).map(r => {
-							const cosmetic = cosmetics.find(c => c.name === r.target);
-							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', r.target));
-							return { name: `${cosmetic.name} (${cosmetic.type.displayValue})`, value: cosmetic.id };
+						const { ratings } = findBestMatch(input, cosmetics.map(c => `${c.name} (${c.type.displayValue})`));
+						const choices = ratings.sort(sortByRating).map(({ target }) => {
+							const targetStrings = target.split('(');
+							const typeWithParen = targetStrings.pop();
+							if (typeWithParen === undefined) throw new TypeError(`The target ${target} was unexpected`);
+							const cosmeticName = targetStrings.join('(').trim();
+							const cosmeticType = typeWithParen.replace(')', '');
+							const cosmetic = cosmetics.find(c => c.name === cosmeticName && c.type.displayValue === cosmeticType);
+							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', target));
+							return { name: target, value: cosmetic.id };
 						}).slice(0, 25);
 						await interaction.respond(choices);
 						break;
