@@ -57,7 +57,7 @@ export enum EpicEndpoint {
 	MCP = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{accountId}/client/{operation}?profileId={profile}&rvn=-1',
 	Stats = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/account/${accountId},',
 	Timeline = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
-	Website = 'https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game'
+	Website = 'https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game?lang=en-US'
 }
 
 export enum EpicErrorCode {
