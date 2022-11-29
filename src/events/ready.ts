@@ -28,7 +28,7 @@ export default new ClientEvent({
 		}, { timezone: 'America/New_York' });
 
 		let cachedStates = await fetchStates();
-		setInterval(async () => {
+		schedule('*/3 * * * *', async () => {
 			const currentStates = await fetchStates();
 
 			if (currentStates.length === 2 && cachedStates.length === 1) { // A new (future) state has been added
@@ -40,7 +40,7 @@ export default new ClientEvent({
 				}
 			}
 			cachedStates = currentStates;
-		}, 300000);
+		});
 
 		schedule('*/1 * * * *', async () => {
 			const guildResults = await guildSchema.find();
