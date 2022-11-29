@@ -5,7 +5,7 @@ import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 
 const checkError = async <Res>(raw: Response) => {
-	const res = await raw.json() as Res | RawEpicError;
+	const res: Res | RawEpicError = await raw.json();
 	if (EpicError.isRawEpicError(res)) {
 		throw new EpicError(res);
 	}
