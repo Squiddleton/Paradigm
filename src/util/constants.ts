@@ -16,7 +16,7 @@ export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b
 
 export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
 
-export const ChapterLengths = [10, 8];
+export const ChapterLengths = [10, 8, 4];
 
 /**
  * 60 minutes * (60 seconds / minute) * (1,000 milliseconds / second)
@@ -173,7 +173,7 @@ export enum RarityOrdering {
 export const Rarities = getEnumKeys(RarityOrdering);
 
 export const Seasons = Array.from({
-	length: 22 // Increment this value every season
+	length: 23 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 export const TextBasedChannelTypes = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
