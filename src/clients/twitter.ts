@@ -1,5 +1,5 @@
 import type { Client } from 'discord.js';
-import Twit from 'twit';
+import Twit, { Twitter } from 'twit';
 import config from '../config';
 import { DiscordIds } from '../util/constants';
 
@@ -21,7 +21,7 @@ export const handleTwitter = (client: Client) => {
 	const stream = twitClient.stream('statuses/filter', {
 		follow: accounts
 	});
-	stream.on('tweet', async tweet => {
+	stream.on('tweet', async (tweet: Twitter.Status) => {
 		if (accounts.includes(tweet.user.id_str)) {
 			const channel = client.channels.cache.get(DiscordIds.Channels.LeakPosts);
 			if (channel !== undefined && channel.isTextBased()) {
