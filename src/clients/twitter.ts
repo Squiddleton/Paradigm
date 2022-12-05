@@ -1,12 +1,13 @@
 import type { Client } from 'discord.js';
-import Twit, { Twitter } from 'twit';
+import { ETwitterStreamEvent, TwitterApi } from 'twitter-api-v2';
 import config from '../config';
 import { DiscordIds } from '../util/constants';
 
-const twitClient = new Twit(config.twitter);
-export default twitClient;
+const twitterClient = new TwitterApi(config.twitter);
+const readOnlyClient = twitterClient.readOnly;
+export default readOnlyClient;
 
-export const handleTwitter = (client: Client) => {
+export const handleTwitter = async (client: Client) => {
 	const accounts = [
 		'1049367321201074177',
 		'1142888473625530370',
@@ -18,10 +19,8 @@ export const handleTwitter = (client: Client) => {
 		'1032390010165575682'
 	];
 
-	const stream = twitClient.stream('statuses/filter', {
-		follow: accounts
-	});
-	stream.on('tweet', async (tweet: Twitter.Status) => {
+	const stream = await readOnlyClient.v1.filterStream({ follow: accounts });
+	stream.on(ETwitterStreamEvent.Data, async tweet => {
 		if (accounts.includes(tweet.user.id_str)) {
 			const channel = client.channels.cache.get(DiscordIds.Channels.LeakPosts);
 			if (channel !== undefined && channel.isTextBased()) {

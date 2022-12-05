@@ -27,7 +27,8 @@
     "snoostorm": "^1.5.2",
     "snoowrap": "^1.23.0",
     "string-similarity": "^4.0.4",
-    "twit": "^2.2.11"
+    "twit": "^2.2.11",
+    "twitter-api-v2": "^1.12.9"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

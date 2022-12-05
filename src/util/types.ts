@@ -1,7 +1,7 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { SnoowrapOptions } from 'snoowrap';
-import type Twit from 'twit';
+import type { TwitterApiTokens } from 'twitter-api-v2';
 import type { EpicErrorCode } from './constants';
 
 export interface AccessTokenAndId {
@@ -69,7 +69,7 @@ export interface Config {
 	/** Options for a Snoowrap client construction */
 	snoowrap: SnoowrapOptions;
 	/** Options for a Twitter client construction */
-	twitter: Twit.Options;
+	twitter: TwitterApiTokens;
 }
 
 export interface CosmeticCache {
