@@ -27,6 +27,7 @@ export const DefaultCollectorTime = 180000;
 
 export const DiscordIds = {
 	Channels: {
+		LeakPosts: '819870118720438273',
 		Logs: '488112900276224010',
 		ShopPosts: '489836390759268353',
 		Submissions: '895024792439251064'

@@ -1,6 +1,7 @@
 import type { Client } from 'discord.js';
 import Twit from 'twit';
 import config from '../config';
+import { DiscordIds } from '../util/constants';
 
 const twitClient = new Twit(config.twitter);
 export default twitClient;
@@ -22,7 +23,7 @@ export const handleTwitter = (client: Client) => {
 	});
 	stream.on('tweet', async tweet => {
 		if (accounts.includes(tweet.user.id_str)) {
-			const channel = client.channels.cache.get('819870118720438273');
+			const channel = client.channels.cache.get(DiscordIds.Channels.LeakPosts);
 			if (channel !== undefined && channel.isTextBased()) {
 				await channel.send(`https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`);
 			}
