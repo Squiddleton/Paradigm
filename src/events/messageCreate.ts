@@ -35,7 +35,7 @@ export default new ClientEvent({
 
 			if (guildId === exclusiveGuildId) {
 				if (!isBot) {
-					if (message.channelId === DiscordIds.Channels.Submissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.Roles.Mod)) {
+					if (message.channelId === DiscordIds.ChannelId.Submissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.RoleId.Mod)) {
 						const msg = await message.reply(denySubmissionMessage).catch(() => null);
 						if (msg) {
 							await message.delete().catch(() => message.reply('I am unable to delete this message without the Manage Messages permission.'));
@@ -45,7 +45,7 @@ export default new ClientEvent({
 						}
 					}
 				}
-				else if (message.channelId === DiscordIds.Channels.ShopPosts && message.author.id === DiscordIds.Users.Catalyst && message.mentions.roles.has(DiscordIds.Roles.ItemShop) && message.createdAt.getHours() !== 0) {
+				else if (message.channelId === DiscordIds.ChannelId.ShopPosts && message.author.id === DiscordIds.UserId.Catalyst && message.mentions.roles.has(DiscordIds.RoleId.ItemShop) && message.createdAt.getHours() !== 0) {
 					await checkWishlists(client);
 				}
 			}

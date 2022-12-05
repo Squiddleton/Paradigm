@@ -51,7 +51,7 @@ export default new SlashCommand({
 		const submissionName = interaction.options.getString('name', true);
 		const type = interaction.options.getString('type', true);
 
-		const submissionChannelId = DiscordIds.Channels.Submissions;
+		const submissionChannelId = DiscordIds.ChannelId.Submissions;
 		let submissionChannel: AnyGuildTextChannel;
 		try {
 			submissionChannel = client.getGuildChannel(submissionChannelId);
@@ -71,8 +71,8 @@ export default new SlashCommand({
 		catch {
 			message = await submissionChannel.send(`Submission by ${interaction.user.toString()}\n${submissionName} (${type})\n${url}`);
 		}
-		await message.react('492412118952574997');
-		await message.react('492412142306197504');
+		await message.react(DiscordIds.EmojiId.Upvote);
+		await message.react(DiscordIds.EmojiId.Downvote);
 
 		await interaction.editReply('You have successfully submitted your suggestion.');
 	}

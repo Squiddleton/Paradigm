@@ -22,7 +22,7 @@ export const handleTwitter = async (client: Client) => {
 	const stream = await readOnlyClient.v1.filterStream({ follow: accounts });
 	stream.on(ETwitterStreamEvent.Data, async tweet => {
 		if (accounts.includes(tweet.user.id_str)) {
-			const channel = client.channels.cache.get(DiscordIds.Channels.LeakPosts);
+			const channel = client.channels.cache.get(DiscordIds.ChannelId.LeakPosts);
 			if (channel !== undefined && channel.isTextBased()) {
 				await channel.send(`https://twitter.com/${tweet.user.screen_name}/status/${tweet.id_str}`);
 			}

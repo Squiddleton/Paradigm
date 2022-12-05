@@ -1,9 +1,8 @@
 import { readdirSync } from 'node:fs';
 import { ClientEvent, ContextMenu, ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
-import config from '../config.js';
 import { DiscordClient } from '../util/classes.js';
-import { ErrorMessage } from '../util/constants.js';
+import { DiscordIds, ErrorMessage } from '../util/constants.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
@@ -19,7 +18,7 @@ const client = new DiscordClient({
 		parse: ['users']
 	},
 	commands,
-	devGuildId: config.devGuildId,
+	devGuildId: DiscordIds.GuildId.Dev,
 	events: readdirSync('./dist/events').filter(file => file.endsWith('.js')).map(file => {
 		const { default: event } = require(`../events/${file}`);
 		if (event instanceof ClientEvent) {
@@ -29,7 +28,7 @@ const client = new DiscordClient({
 			throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 		}
 	}),
-	exclusiveGuildId: config.exclusiveGuildId,
+	exclusiveGuildId: DiscordIds.GuildId.RFortniteBR,
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,

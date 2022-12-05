@@ -1,5 +1,4 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import config from '../config';
 import { DiscordClient, TimestampedEmbed } from '../util/classes';
 import { DiscordIds } from '../util/constants';
 
@@ -18,9 +17,9 @@ export default new ClientEvent({
 			}
 		}
 		const { message } = reaction;
-		if (message.guildId === config.exclusiveGuildId) {
+		if (message.guildId === DiscordIds.GuildId.RFortniteBR) {
 			const toString = reaction.emoji.toString();
-			const logChannel = client.getGuildChannel(DiscordIds.Channels.Logs);
+			const logChannel = client.getGuildChannel(DiscordIds.ChannelId.Logs);
 
 			await logChannel.send({
 				embeds: [

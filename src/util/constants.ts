@@ -25,21 +25,38 @@ export const CosmeticCacheUpdateThreshold = 3600000;
 
 export const DefaultCollectorTime = 180000;
 
-export const DiscordIds = {
-	Channels: {
-		LeakPosts: '819870118720438273',
-		Logs: '488112900276224010',
-		ShopPosts: '489836390759268353',
-		Submissions: '895024792439251064'
-	},
-	Roles: {
-		ItemShop: '568590143640961037',
-		Mod: '544952148790738954'
-	},
-	Users: {
-		Catalyst: '848452706791981056'
+export namespace DiscordIds {
+	export enum ChannelId {
+		BRLeaks = '509930374021775394',
+		BRSpeculation = '785210975733284915',
+		Dev = '713250274214543360',
+		General = '488040333310164992',
+		LeakPosts = '819870118720438273',
+		LeaksDiscussion = '509936143169748992',
+		Logs = '488112900276224010',
+		RegularApplications = '886083204690370630',
+		SaltySprings = '488988723049136133',
+		ShopPosts = '489836390759268353',
+		StickerEmojiSubmissions = '895024792439251064',
+		STWCreativeLeaks = '740607796898168913',
+		Submissions = '895024792439251064'
 	}
-} as const;
+	export enum EmojiId {
+		Downvote = '492412142306197504',
+		Upvote = '492412118952574997'
+	}
+	export enum GuildId {
+		Dev = '614918461453238357',
+		RFortniteBR = '486932163636232193'
+	}
+	export enum RoleId {
+		ItemShop = '568590143640961037',
+		Mod = '544952148790738954'
+	}
+	export enum UserId {
+		Catalyst = '848452706791981056'
+	}
+}
 
 /**
  * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64

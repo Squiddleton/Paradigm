@@ -1,7 +1,6 @@
 import { Client as UtilClient, validateChannel } from '@squiddleton/discordjs-util';
 import { Client as BaseClient, ChannelType, EmbedBuilder, EmbedData, PermissionFlagsBits, PermissionsBitField, Snowflake } from 'discord.js';
-import config from '../config';
-import { AccessibleChannelPermissions, EpicErrorCode, ErrorMessage } from './constants';
+import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage } from './constants';
 import type { AnyGuildTextChannel, RawEpicError } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
@@ -27,7 +26,7 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		return channel;
 	}
 	get devChannel() {
-		return this.getGuildChannel(config.devChannelId);
+		return this.getGuildChannel(DiscordIds.ChannelId.Dev);
 	}
 	static assertReadyClient(client: BaseClient): asserts client is DiscordClient<true> {
 		if (!client.isReady()) throw new Error(ErrorMessage.UnreadyClient);

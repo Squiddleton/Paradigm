@@ -48,12 +48,6 @@ export type ButtonOrMenu = ComponentType.Button | ComponentType.SelectMenu;
 export interface Config {
 	/** The Discord bot token */
 	token: string;
-	/** The channel to access with Client#devChannel */
-	devChannelId: Snowflake;
-	/** The guild to deploy all commands */
-	devGuildId: Snowflake;
-	/** The guild to deploy all commands with the "Exclusive" scope */
-	exclusiveGuildId: Snowflake;
 	/** Device authentications for multiple devices/accounts */
 	epicDeviceAuth: {
 		device1: DeviceAuth;
