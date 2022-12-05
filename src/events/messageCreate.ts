@@ -35,7 +35,7 @@ export default new ClientEvent({
 
 			if (guildId === exclusiveGuildId) {
 				if (!isBot) {
-					if (message.channelId === DiscordIds.ChannelId.Submissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.RoleId.Mod)) {
+					if (message.channelId === DiscordIds.ChannelId.StickerEmojiSubmissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.RoleId.Mod)) {
 						const msg = await message.reply(denySubmissionMessage).catch(() => null);
 						if (msg) {
 							await message.delete().catch(() => message.reply('I am unable to delete this message without the Manage Messages permission.'));

@@ -51,7 +51,7 @@ export default new SlashCommand({
 		const submissionName = interaction.options.getString('name', true);
 		const type = interaction.options.getString('type', true);
 
-		const submissionChannelId = DiscordIds.ChannelId.Submissions;
+		const submissionChannelId = DiscordIds.ChannelId.StickerEmojiSubmissions;
 		let submissionChannel: AnyGuildTextChannel;
 		try {
 			submissionChannel = client.getGuildChannel(submissionChannelId);

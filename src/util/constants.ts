@@ -38,8 +38,7 @@ export namespace DiscordIds {
 		SaltySprings = '488988723049136133',
 		ShopPosts = '489836390759268353',
 		StickerEmojiSubmissions = '895024792439251064',
-		STWCreativeLeaks = '740607796898168913',
-		Submissions = '895024792439251064'
+		STWCreativeLeaks = '740607796898168913'
 	}
 	export enum EmojiId {
 		Downvote = '492412142306197504',
