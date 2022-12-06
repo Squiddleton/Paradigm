@@ -27,14 +27,12 @@
     "snoostorm": "^1.5.2",
     "snoowrap": "^1.23.0",
     "string-similarity": "^4.0.4",
-    "twit": "^2.2.11",
     "twitter-api-v2": "^1.12.9"
   },
   "devDependencies": {
     "@types/node": "^18.11.11",
     "@types/node-cron": "^3.0.6",
     "@types/string-similarity": "^4.0.0",
-    "@types/twit": "^2.2.31",
     "@typescript-eslint/eslint-plugin": "^5.45.1",
     "@typescript-eslint/parser": "^5.45.1",
     "eslint": "^8.29.0",
