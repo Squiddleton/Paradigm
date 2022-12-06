@@ -1,8 +1,8 @@
 import { getEnumKeys } from '@squiddleton/util';
-import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable, PermissionFlagsBits, PermissionResolvable } from 'discord.js';
+import { ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, ColorResolvable, PermissionFlagsBits } from 'discord.js';
 import type { StringChoices } from './types';
 
-export const AccessibleChannelPermissions: PermissionResolvable[] = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
+export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
 
 export enum BackgroundURL {
 	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
