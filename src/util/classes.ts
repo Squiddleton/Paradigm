@@ -1,6 +1,6 @@
 import { Client as UtilClient, validateChannel } from '@squiddleton/discordjs-util';
-import { Client as BaseClient, ChannelType, EmbedBuilder, EmbedData, PermissionFlagsBits, PermissionsBitField, Snowflake } from 'discord.js';
-import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage } from './constants';
+import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, EmbedData, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
+import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage, NitroRolesIds } from './constants';
 import type { AnyGuildTextChannel, RawEpicError } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
@@ -24,6 +24,26 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		const channel = this.getGuildChannel(channelId, false);
 		if (!this.getPermissions(channel).has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
 		return channel;
+	}
+	async sendNitroRoleMenu() {
+		const channel = this.getGuildChannel(DiscordIds.ChannelId.RoleAssignment);
+		const nitroRoles = NitroRolesIds.map(id => {
+			const role = channel.guild.roles.cache.get(id);
+			if (role === undefined) throw new Error(`No Nitro role was found for id "${id}"`);
+			return role;
+		});
+
+		const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
+			new StringSelectMenuBuilder()
+				.setCustomId('nitro-roles')
+				.setPlaceholder('Add a Nitro color role!')
+				.setOptions(nitroRoles.map(role => ({
+					label: role.id === DiscordIds.RoleId.NitroBooster ? 'Remove Colors' : role.name,
+					value: role.id
+				})))
+		);
+
+		await channel.send({ components: [row] });
 	}
 	get devChannel() {
 		return this.getGuildChannel(DiscordIds.ChannelId.Dev);

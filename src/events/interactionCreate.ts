@@ -1,13 +1,13 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, RESTJSONErrorCodes, User } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, User } from 'discord.js';
 import { Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
-import { ErrorMessage } from '../util/constants.js';
+import { DiscordIds, ErrorMessage, NitroRolesIds } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import { sumMessages } from '../util/functions.js';
 
@@ -201,6 +201,27 @@ export default new ClientEvent({
 				{ $push: { 'giveaways.$.entrants': { $each: entries } } }
 			);
 			await interaction.editReply(`You have successfully entered${entries.length === 1 ? '' : ` ${entries.length} times due to your roles`}. Check back when the giveaway ends to see if you won.`);
+		}
+
+		else if (interaction.isStringSelectMenu() && interaction.customId === 'nitro-roles' && interaction.inCachedGuild()) {
+			if (!interaction.member.roles.cache.hasAny(DiscordIds.RoleId.Mod, DiscordIds.RoleId.NitroBooster)) {
+				await interaction.reply({ content: 'Only Nitro Boosters can use this.', ephemeral: true });
+				return;
+			}
+			else if (interaction.channel !== null && !client.getPermissions(interaction.channel).has(PermissionFlagsBits.ManageRoles)) {
+				await interaction.reply({ content: 'Please tell a mod to grant this bot the Manage Roles permission.', ephemeral: true });
+				return;
+			}
+
+			const roleId = interaction.values[0];
+			await interaction.member.roles.remove(NitroRolesIds.filter(id => id !== DiscordIds.RoleId.NitroBooster));
+			if (roleId === DiscordIds.RoleId.NitroBooster) {
+				await interaction.reply({ content: 'Your Nitro role color has been removed.', ephemeral: true });
+			}
+			else {
+				await interaction.member.roles.add(roleId);
+				await interaction.reply({ content: `You have received the role ${interaction.guild.roles.cache.get(roleId)}.`, ephemeral: true });
+			}
 		}
 	}
 });

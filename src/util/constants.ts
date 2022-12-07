@@ -35,6 +35,7 @@ export namespace DiscordIds {
 		LeaksDiscussion = '509936143169748992',
 		Logs = '488112900276224010',
 		RegularApplications = '886083204690370630',
+		RoleAssignment = '879930518228050010',
 		SaltySprings = '488988723049136133',
 		ShopPosts = '489836390759268353',
 		StickerEmojiSubmissions = '895024792439251064',
@@ -50,7 +51,30 @@ export namespace DiscordIds {
 	}
 	export enum RoleId {
 		ItemShop = '568590143640961037',
-		Mod = '544952148790738954'
+		Mod = '544952148790738954',
+		NitroBooster = '585533593565003819',
+		NitroBlack = '628072223923765289',
+		NitroBrown = '879076851207782431',
+		NitroRed = '879080226930434078',
+		NitroDarkOrange = '919964691504189533',
+		NitroOrange = '657690317734019114',
+		NitroYellow = '908041595281100872',
+		NitroGreen = '879079946037903380',
+		NitroSandGreen = '915657915191410768',
+		NitroTurquoise = '879077880330584124',
+		NitroBlue = '628078100176961536',
+		NitroDarkBlue = '915657649331273778',
+		NitroIndigo = '919964517922930699',
+		NitroCovenPurple = '919964437631365251',
+		NitroBossanovaPurple = '879077641330765894',
+		NitroCosmicPurple = '879080322661228604',
+		NitroAffairPurple = '879078048241188875',
+		NitroPurple = '628071774034067467',
+		NitroPsychicPink = '919964627775918120',
+		NitroPink = '628072263593492493',
+		NitroLondonPurple = '879080042578182215',
+		NitroSalmonPink = '915657840272764929',
+		NitroWhite = '923702586673102918'
 	}
 	export enum UserId {
 		Catalyst = '848452706791981056'
@@ -156,6 +180,31 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'Epic', value: 'epic' },
 	{ name: 'Xbox', value: 'xbl' },
 	{ name: 'PlayStation', value: 'psn' }
+];
+
+export const NitroRolesIds = [
+	DiscordIds.RoleId.NitroBooster,
+	DiscordIds.RoleId.NitroBlack,
+	DiscordIds.RoleId.NitroBrown,
+	DiscordIds.RoleId.NitroRed,
+	DiscordIds.RoleId.NitroDarkOrange,
+	DiscordIds.RoleId.NitroOrange,
+	DiscordIds.RoleId.NitroYellow,
+	DiscordIds.RoleId.NitroGreen,
+	DiscordIds.RoleId.NitroSandGreen,
+	DiscordIds.RoleId.NitroTurquoise,
+	DiscordIds.RoleId.NitroBlue,
+	DiscordIds.RoleId.NitroDarkBlue,
+	DiscordIds.RoleId.NitroIndigo,
+	DiscordIds.RoleId.NitroCovenPurple,
+	DiscordIds.RoleId.NitroBossanovaPurple,
+	DiscordIds.RoleId.NitroCosmicPurple,
+	DiscordIds.RoleId.NitroAffairPurple,
+	DiscordIds.RoleId.NitroPurple,
+	DiscordIds.RoleId.NitroPink,
+	DiscordIds.RoleId.NitroLondonPurple,
+	DiscordIds.RoleId.NitroSalmonPink,
+	DiscordIds.RoleId.NitroWhite
 ];
 
 export const RarityColors: Record<string, ColorResolvable> = {
