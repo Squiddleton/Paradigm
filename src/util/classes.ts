@@ -37,9 +37,9 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 			new StringSelectMenuBuilder()
 				.setCustomId('nitro-roles')
 				.setPlaceholder('Add a Nitro color role!')
-				.setOptions(nitroRoles.map(role => ({
-					label: role.id === DiscordIds.RoleId.NitroBooster ? 'Remove Colors' : role.name,
-					value: role.id
+				.setOptions(nitroRoles.map(r => ({
+					label: r.id === DiscordIds.RoleId.NitroBooster ? 'Remove Colors' : r.name.replace('Nitro ', ''),
+					value: r.id
 				})))
 		);
 
