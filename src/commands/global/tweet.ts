@@ -1,5 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ApplicationCommandOptionType } from 'discord.js';
+import readOnlyClient from '../../clients/twitter.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { LoadoutImageOptions } from '../../util/constants.js';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
@@ -33,8 +34,10 @@ export default new SlashCommand({
 			return;
 		}
 
+		const twitterUser = await readOnlyClient.v1.user({ screen_name: 'FortniteGame' });
+
 		const embed = new TimestampedEmbed()
-			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: 'https://pbs.twimg.com/profile_images/1571377748999913474/ffSqYla1_400x400.jpg' })
+			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: twitterUser.profile_image_url_https })
 			.setDescription(text === null ? `Grab the @${interaction.inCachedGuild() ? interaction.member.displayName : interaction.user.username} locker bundle for a limited time!` : `${text.slice(0, 4000)}`)
 			.setFields([
 				{ name: 'Retweets', value: '498', inline: true },
