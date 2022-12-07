@@ -1,7 +1,7 @@
 import { Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, SelectMenuBuilder, Snowflake, codeBlock, time } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, Snowflake, StringSelectMenuBuilder, codeBlock, time } from 'discord.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
@@ -255,7 +255,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					components.push(
 						new ActionRowBuilder({
 							components: [
-								new SelectMenuBuilder()
+								new StringSelectMenuBuilder()
 									.setCustomId(cosmetic.id)
 									.setMinValues(1)
 									.setOptions([
@@ -327,7 +327,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 							const menuJSON = menu.toJSON();
 							if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.SelectMenu && menuJSON.custom_id !== cosmetic.id)) return c;
 
-							if (menu instanceof SelectMenuBuilder) {
+							if (menu instanceof StringSelectMenuBuilder) {
 								menu.setOptions(value.startsWith('truedefault')
 									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(v => ({ label: v.name, value: v.tag })).slice(0, 24)]
 									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(v => ({ label: v.name, value: v.tag, default: v.tag === value })).slice(0, 24)]

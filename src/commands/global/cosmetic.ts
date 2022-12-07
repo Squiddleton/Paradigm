@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Language } from '@squiddleton/fortnite-api';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, SelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { DefaultCollectorTime, ErrorMessage, LanguageChoices } from '../../util/constants.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
@@ -57,8 +57,8 @@ export default new SlashCommand({
 						.setLabel('Lock Image In')
 						.setStyle(ButtonStyle.Danger)
 				),
-			...variants.slice(0, 4).map(v => new ActionRowBuilder<SelectMenuBuilder>()
-				.setComponents(new SelectMenuBuilder()
+			...variants.slice(0, 4).map(v => new ActionRowBuilder<StringSelectMenuBuilder>()
+				.setComponents(new StringSelectMenuBuilder()
 					.setCustomId(v.channel)
 					.setMinValues(1)
 					.setPlaceholder((v.type ?? v.channel).toUpperCase())
@@ -77,7 +77,7 @@ export default new SlashCommand({
 						case 'featured': {
 							for (const component of components) {
 								component.setComponents(component.components.map(c => {
-									return c instanceof SelectMenuBuilder
+									return c instanceof StringSelectMenuBuilder
 										? c.setOptions(c.options.map(o => ({ label: o.toJSON().label, value: o.toJSON().value })))
 										: c;
 								}
@@ -103,7 +103,7 @@ export default new SlashCommand({
 
 				for (const component of components) {
 					component.setComponents(component.components.map(c => {
-						return c instanceof SelectMenuBuilder
+						return c instanceof StringSelectMenuBuilder
 							? c.setOptions(c.options.map(o => {
 								const option = o.toJSON();
 								return { label: option.label, value: option.value, default: c.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
