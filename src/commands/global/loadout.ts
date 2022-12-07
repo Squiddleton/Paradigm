@@ -27,7 +27,7 @@ export default new SlashCommand({
 			return;
 		}
 
-		return createStyleListeners(interaction, attachment, outfit, backbling, harvestingtool, glider, wrap, chosenBackground, []);
+		return createStyleListeners(interaction, attachment, outfit, backbling, harvestingtool, glider, wrap, chosenBackground);
 	}
 });
 
