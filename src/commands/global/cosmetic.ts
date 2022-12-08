@@ -2,7 +2,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Language } from '@squiddleton/fortnite-api';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
-import { DefaultCollectorTime, ErrorMessage, LanguageChoices } from '../../util/constants.js';
+import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import type { ButtonOrMenu } from '../../util/types.js';
@@ -68,7 +68,7 @@ export default new SlashCommand({
 		];
 
 		const message = await interaction.editReply({ components, embeds: [embed] });
-		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
+		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 
 		collector
 			.on('collect', async i => {

@@ -4,7 +4,7 @@ import guildSchema from '../schemas/guilds';
 import memberSchema from '../schemas/members';
 import userSchema from '../schemas/users';
 import { DiscordClient, TimestampedEmbed } from './classes';
-import { DefaultCollectorTime, ErrorMessage, RarityOrdering } from './constants.js';
+import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 
@@ -87,7 +87,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	const collector = message.channel.createMessageComponentCollector({
 		componentType: ComponentType.Button,
 		filter: (i) => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
-		time: DefaultCollectorTime
+		time: Time.CollectorDefault
 	});
 	collector
 		.on('collect', async i => {

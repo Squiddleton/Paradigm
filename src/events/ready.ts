@@ -32,12 +32,14 @@ export default new ClientEvent({
 			const currentStates = await fetchStates();
 
 			if (currentStates.length === 2 && cachedStates.length === 1) { // A new (future) state has been added
+				console.log('A new state has been added');
 				const cachedNames = await fetchShopNames(cachedStates[0]);
 				const currentNames = await fetchShopNames(currentStates[1]);
 
-				if (cachedNames.join() !== currentNames.join()) { // The shop tabs have changed
-					await postShopSections(client, currentNames, cachedNames);
-				}
+				await postShopSections(client, currentNames, cachedNames);
+			}
+			else if (currentStates.length === 1 && cachedStates.length === 2) {
+				console.log('An old state has been removed', new Date());
 			}
 			cachedStates = currentStates;
 		});

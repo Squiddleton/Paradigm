@@ -18,13 +18,6 @@ export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqr
 
 export const ChapterLengths = [10, 8, 4];
 
-/**
- * 60 minutes * (60 seconds / minute) * (1,000 milliseconds / second)
- */
-export const CosmeticCacheUpdateThreshold = 3600000;
-
-export const DefaultCollectorTime = 180000;
-
 export namespace DiscordIds {
 	export enum ChannelId {
 		BRLeaks = '509930374021775394',
@@ -116,8 +109,6 @@ export enum ErrorMessage {
 	UnknownGiveaway = 'No giveaway was found with that message id',
 	UnreadyClient = 'The Client should be ready but is not'
 }
-
-export const GuessCollectorTime = 60000;
 
 export const LanguageChoices: StringChoices = Object.entries({
 	ar: 'اَلْعَرَبِيَّةُ',
@@ -218,6 +209,15 @@ export const Seasons = Array.from({
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 export const TextBasedChannelTypes = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
+
+export enum Time {
+	/** 3 minutes */
+	CollectorDefault = 180000,
+	/** 1 hour */
+	CosmeticCacheUpdate = 3600000,
+	/** 1 minute */
+	GuessCollector = 60000
+}
 
 export enum UnitsToMS {
 	Minutes = 60,

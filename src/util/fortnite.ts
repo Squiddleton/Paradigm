@@ -7,7 +7,7 @@ import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import userSchema from '../schemas/users.js';
 import { DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
-import { BackgroundURL, ChapterLengths, CosmeticCacheUpdateThreshold, DefaultCollectorTime, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors } from './constants.js';
+import { BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
 import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
 import { isBackground } from './typeguards.js';
@@ -32,7 +32,7 @@ const itemShopFilter = (cosmetic: Cosmetic) => {
 
 export const fetchCosmetics = async (itemShopOnly = false) => {
 	const now = Date.now();
-	if ((cosmeticCache.lastUpdatedTimestamp + CosmeticCacheUpdateThreshold) < now) {
+	if ((cosmeticCache.lastUpdatedTimestamp + Time.CosmeticCacheUpdate) < now) {
 		cosmeticCache.cosmetics = await fortniteAPI.listCosmetics();
 		cosmeticCache.lastUpdatedTimestamp = now;
 	}
@@ -295,7 +295,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
 		const message = await interaction.fetchReply();
-		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: DefaultCollectorTime });
+		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 		const options: { [key: string]: string } = {};
 
 		collector
