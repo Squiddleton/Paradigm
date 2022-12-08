@@ -40,15 +40,15 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 				)
 		);
 
-		return { channel, row };
+		return { channel, components: [row] };
 	}
 	async editNitroRoleMenu(messageId: Snowflake) {
-		const { channel, row } = this.#getNitroRoleMenu();
-		await channel.messages.edit(messageId, { components: [row] });
+		const { channel, components } = this.#getNitroRoleMenu();
+		await channel.messages.edit(messageId, { components });
 	}
 	async sendNitroRoleMenu() {
-		const { channel, row } = this.#getNitroRoleMenu();
-		await channel.send({ components: [row] });
+		const { channel, components } = this.#getNitroRoleMenu();
+		await channel.send({ components });
 	}
 	get devChannel() {
 		return this.getGuildChannel(DiscordIds.ChannelId.Dev);
