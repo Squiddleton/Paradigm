@@ -369,7 +369,7 @@ const handleLevelsError = (e: unknown) => {
 		}
 	}
 	if (e instanceof EpicError) {
-		if (e.numericErrorCode === EpicErrorCode.InvalidGrant) {
+		if (e.raw.numericErrorCode === EpicErrorCode.InvalidGrant) {
 			console.error('The main Epic account credentials must be updated.');
 			return 'This bot\'s Epic account credentials must be updated; please try again later.';
 		}

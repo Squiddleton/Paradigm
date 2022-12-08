@@ -1,6 +1,6 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, EmbedData, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
-import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage } from './constants';
+import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
 import type { AnyGuildTextChannel, RawEpicError } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
@@ -64,22 +64,10 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 }
 
 export class EpicError extends Error {
-	errorCode: string;
-	messageVars: unknown[];
-	numericErrorCode: EpicErrorCode | number;
-	originatingService: string;
-	intent: string;
-	errorDescription: string | null;
-	error: string | null;
+	raw: RawEpicError;
 	constructor(error: RawEpicError) {
 		super(error.errorMessage);
-		this.errorCode = error.errorCode;
-		this.messageVars = error.messageVars;
-		this.numericErrorCode = error.numericErrorCode;
-		this.originatingService = error.originatingService;
-		this.intent = error.intent;
-		this.errorDescription = error.error_description ?? null;
-		this.error = error.error ?? null;
+		this.raw = error;
 	}
 	static isRawEpicError(obj: any): obj is RawEpicError {
 		return 'errorCode' in obj;
