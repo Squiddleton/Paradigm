@@ -7,7 +7,7 @@ import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
 import memberSchema from '../schemas/members.js';
 import { DiscordClient } from '../util/classes.js';
-import { DiscordIds, ErrorMessage, NitroRolesIds } from '../util/constants.js';
+import { DiscordIds, ErrorMessage } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import { sumMessages } from '../util/functions.js';
 
@@ -214,7 +214,7 @@ export default new ClientEvent({
 			}
 
 			const roleId = interaction.values[0];
-			await interaction.member.roles.remove(NitroRolesIds.filter(id => id !== DiscordIds.RoleId.NitroBooster));
+			await interaction.member.roles.remove(client.nitroRoles.filter(r => r.id !== DiscordIds.RoleId.NitroBooster));
 			if (roleId === DiscordIds.RoleId.NitroBooster) {
 				await interaction.reply({ content: 'Your Nitro role color has been removed.', ephemeral: true });
 			}

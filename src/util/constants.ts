@@ -182,31 +182,6 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'PlayStation', value: 'psn' }
 ];
 
-export const NitroRolesIds = [
-	DiscordIds.RoleId.NitroBooster,
-	DiscordIds.RoleId.NitroBlack,
-	DiscordIds.RoleId.NitroBrown,
-	DiscordIds.RoleId.NitroRed,
-	DiscordIds.RoleId.NitroDarkOrange,
-	DiscordIds.RoleId.NitroOrange,
-	DiscordIds.RoleId.NitroYellow,
-	DiscordIds.RoleId.NitroGreen,
-	DiscordIds.RoleId.NitroSandGreen,
-	DiscordIds.RoleId.NitroTurquoise,
-	DiscordIds.RoleId.NitroBlue,
-	DiscordIds.RoleId.NitroDarkBlue,
-	DiscordIds.RoleId.NitroIndigo,
-	DiscordIds.RoleId.NitroCovenPurple,
-	DiscordIds.RoleId.NitroBossanovaPurple,
-	DiscordIds.RoleId.NitroCosmicPurple,
-	DiscordIds.RoleId.NitroAffairPurple,
-	DiscordIds.RoleId.NitroPurple,
-	DiscordIds.RoleId.NitroPink,
-	DiscordIds.RoleId.NitroLondonPurple,
-	DiscordIds.RoleId.NitroSalmonPink,
-	DiscordIds.RoleId.NitroWhite
-];
-
 export const RarityColors: Record<string, ColorResolvable> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,

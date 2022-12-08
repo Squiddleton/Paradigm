@@ -1,6 +1,6 @@
-import { Client as UtilClient, validateChannel } from '@squiddleton/discordjs-util';
+import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, EmbedData, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
-import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage, NitroRolesIds } from './constants';
+import { AccessibleChannelPermissions, DiscordIds, EpicErrorCode, ErrorMessage } from './constants';
 import type { AnyGuildTextChannel, RawEpicError } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
@@ -25,28 +25,38 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		if (!this.getPermissions(channel).has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
 		return channel;
 	}
-	async sendNitroRoleMenu() {
+	#getNitroRoleMenu() {
 		const channel = this.getGuildChannel(DiscordIds.ChannelId.RoleAssignment);
-		const nitroRoles = NitroRolesIds.map(id => {
-			const role = channel.guild.roles.cache.get(id);
-			if (role === undefined) throw new Error(`No Nitro role was found for id "${id}"`);
-			return role;
-		});
 
 		const row = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(
 			new StringSelectMenuBuilder()
 				.setCustomId('nitro-roles')
 				.setPlaceholder('Add a Nitro color role!')
-				.setOptions(nitroRoles.map(r => ({
-					label: r.id === DiscordIds.RoleId.NitroBooster ? 'Remove Colors' : r.name.replace('Nitro ', ''),
-					value: r.id
-				})))
+				.setOptions(
+					this.nitroRoles.map(r => ({
+						label: r.id === DiscordIds.RoleId.NitroBooster ? 'Remove Colors' : r.name.replace('Nitro ', ''),
+						value: r.id
+					}))
+				)
 		);
 
+		return { channel, row };
+	}
+	async editNitroRoleMenu(messageId: Snowflake) {
+		const { channel, row } = this.#getNitroRoleMenu();
+		await channel.messages.edit(messageId, { components: [row] });
+	}
+	async sendNitroRoleMenu() {
+		const { channel, row } = this.#getNitroRoleMenu();
 		await channel.send({ components: [row] });
 	}
 	get devChannel() {
 		return this.getGuildChannel(DiscordIds.ChannelId.Dev);
+	}
+	get nitroRoles() {
+		DiscordClient.assertReadyClient(this);
+		const guild = validateGuild(this, DiscordIds.GuildId.RFortniteBR);
+		return guild.roles.cache.sort((a, b) => b.position - a.position).filter(r => r.name.includes('Nitro '));
 	}
 	static assertReadyClient(client: BaseClient): asserts client is DiscordClient<true> {
 		if (!client.isReady()) throw new Error(ErrorMessage.UnreadyClient);
