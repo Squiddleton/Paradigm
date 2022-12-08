@@ -232,7 +232,8 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		[wrap, 'Wrap', ['Wrap']]
 	];
 	for (const arg of args) {
-		await handleImage(...arg);
+		const returned = await handleImage(...arg);
+		if (returned !== undefined) return returned;
 	}
 
 	return new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
