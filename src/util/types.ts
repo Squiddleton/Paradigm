@@ -273,6 +273,7 @@ export interface Links {
 	'Back Bling'?: string;
 	'Harvesting Tool'?: string;
 	Glider?: string;
+	Wrap?: string;
 }
 
 export type Link = keyof Links;

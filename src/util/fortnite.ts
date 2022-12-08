@@ -182,7 +182,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		else if (input !== null) {
 			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic === undefined) {
-				throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', displayType));
+				return `No ${displayType} matches your query.`;
 			}
 			image = await loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
 		}
@@ -212,6 +212,12 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 					0,
 					background.height * image.width / image.height / 2,
 					background.height / 2
+				],
+				Wrap: [
+					background.width - (background.height * image.width / image.height / 2),
+					background.height / 2,
+					background.height * image.width / image.height / 2,
+					background.height / 2
 				]
 			};
 			ctx.drawImage(image, ...dimensions[displayType]);
@@ -222,19 +228,11 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		[outfit, 'Outfit', ['Outfit']],
 		[backbling, 'Back Bling', ['Back Bling', 'Pet']],
 		[harvestingtool, 'Harvesting Tool', ['Harvesting Tool']],
-		[glider, 'Glider', ['Glider']]
+		[glider, 'Glider', ['Glider']],
+		[wrap, 'Wrap', ['Wrap']]
 	];
 	for (const arg of args) {
 		await handleImage(...arg);
-	}
-
-	if (wrap) {
-		const cosmetic = cosmetics.find(c => c.type.displayValue === 'Wrap' && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(wrap));
-		if (!cosmetic) {
-			return 'Invalid wrap name provided.';
-		}
-		const wrapImg = await loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
-		ctx.drawImage(wrapImg, background.width - (background.height * wrapImg.width / wrapImg.height / 2), background.height / 2, background.height * wrapImg.width / wrapImg.height / 2, background.height / 2);
 	}
 
 	return new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
