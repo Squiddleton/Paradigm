@@ -18,7 +18,10 @@ export default new ClientEvent({
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
+		// Specific times
+		let postedShopSections = false;
 		schedule('30 0 0 * * *', async () => {
+			postedShopSections = false;
 			await checkWishlists(client);
 		}, { timezone: 'Etc/UTC' });
 
@@ -27,19 +30,16 @@ export default new ClientEvent({
 			await memberSchema.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });
 
+		// Intervals
 		let cachedStates = await fetchStates();
 		schedule('*/3 * * * *', async () => {
 			const currentStates = await fetchStates();
 
-			if (currentStates.length === 2 && cachedStates.length === 1) { // A new (future) state has been added
-				console.log('A new state has been added');
+			if (currentStates.length === 2 && cachedStates.length === 1 && !postedShopSections) {
+				postedShopSections = true;
 				const cachedNames = await fetchShopNames(cachedStates[0]);
 				const currentNames = await fetchShopNames(currentStates[1]);
-
 				await postShopSections(client, currentNames, cachedNames);
-			}
-			else if (currentStates.length === 1 && cachedStates.length === 2) {
-				console.log('An old state has been removed', new Date());
 			}
 			cachedStates = currentStates;
 		});
