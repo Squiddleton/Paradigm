@@ -208,7 +208,7 @@ export default new ClientEvent({
 				await interaction.reply({ content: 'Only Nitro Boosters can use this.', ephemeral: true });
 				return;
 			}
-			else if (interaction.channel !== null && !client.getPermissions(interaction.channel).has(PermissionFlagsBits.ManageRoles)) {
+			else if (!interaction.appPermissions?.has(PermissionFlagsBits.ManageRoles)) {
 				await interaction.reply({ content: 'Please tell a mod to grant this bot the Manage Roles permission.', ephemeral: true });
 				return;
 			}
