@@ -292,9 +292,8 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 	const content = embeds.length > 0 ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null;
 
-	await interaction.editReply({ components, content, files: [attachment], embeds });
+	const message = await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
-		const message = await interaction.fetchReply();
 		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 		const options: { [key: string]: string } = {};
 
