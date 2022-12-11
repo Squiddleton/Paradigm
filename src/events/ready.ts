@@ -19,13 +19,13 @@ export default new ClientEvent({
 		console.log(readyMessage);
 
 		// Specific times
-		let postedShopSections = false;
 		schedule('30 0 0 * * *', async () => {
-			postedShopSections = false;
 			await checkWishlists(client);
 		}, { timezone: 'Etc/UTC' });
 
+		let postedShopSections = false;
 		schedule('0 0 * * *', async () => {
+			postedShopSections = false;
 			await memberSchema.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberSchema.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });
