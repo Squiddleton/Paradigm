@@ -5,11 +5,16 @@ import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
 import type { AccessTokenAndId, AccessTokenResponse, AuthorizationCodeResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, Stats } from './types.js';
 
 const checkError = async <Res>(raw: Response) => {
-	const res: Res | RawEpicError = await raw.json();
-	if (EpicError.isRawEpicError(res)) {
-		throw new EpicError(res);
+	if (raw.ok) {
+		const res: Res | RawEpicError = await raw.json();
+		if (EpicError.isRawEpicError(res)) {
+			throw new EpicError(res);
+		}
+		return res;
 	}
-	return res;
+	else {
+		throw new Error(`Unexpected Epic response status: [${raw.status}] ${raw.statusText}`);
+	}
 };
 
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({

@@ -55,7 +55,10 @@ export const fetchItemShop = async () => {
 };
 
 export const fetchShopNames = async (state: TimelineClientEvent) => {
-	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => r.json());
+	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => {
+		if (!r.ok) throw new Error(`Unexpected Fortnite website response status: [${r.status}] ${r.statusText}`);
+		return r.json();
+	});
 	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
 
 	const shopIds = Object.keys(state.state.sectionStoreEnds);
