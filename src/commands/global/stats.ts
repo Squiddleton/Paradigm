@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import type { AccountType, Input, TimeWindow } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
 import { getStatsImage } from '../../util/fortnite.js';
@@ -47,9 +48,9 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		const accountName = interaction.options.getString('player');
-		const accountType = (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn';
-		const input = (interaction.options.getString('input') ?? 'all') as 'all' | 'keyboardMouse' | 'gamepad' | 'touch';
-		const timeWindow = (interaction.options.getString('timewindow') ?? 'lifetime') as 'lifetime' | 'season';
+		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
+		const input = (interaction.options.getString('input') ?? 'all') as Input;
+		const timeWindow = (interaction.options.getString('timewindow') ?? 'lifetime') as TimeWindow;
 		await getStatsImage(interaction, {
 			targetUser: interaction.user,
 			accountName,

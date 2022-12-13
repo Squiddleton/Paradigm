@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
 import { getLevelsString } from '../../util/fortnite.js';
@@ -28,7 +29,7 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		const accountName = interaction.options.getString('player');
-		const accountType = (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn';
+		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		const { account, ...content } = await getLevelsString(interaction.client, {
 			targetUser: interaction.user,

@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite';
 import { handleStatsError } from '../../util/fortnite';
@@ -32,7 +33,7 @@ export default new SlashCommand({
 
 		let account: StatsEpicAccount;
 		try {
-			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') ?? 'epic') as 'epic' | 'xbl' | 'psn' });
+			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') ?? 'epic') as AccountType });
 			account = stats.account;
 		}
 		catch (error) {
