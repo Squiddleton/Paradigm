@@ -24,8 +24,7 @@
     "discord.js": "^14.7.1",
     "mongoose": "^6.8.0",
     "node-cron": "^3.0.2",
-    "string-similarity": "^4.0.4",
-    "twitter-api-v2": "^1.12.9"
+    "string-similarity": "^4.0.4"
   },
   "devDependencies": {
     "@types/node": "^18.11.12",
