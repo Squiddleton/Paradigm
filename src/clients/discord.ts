@@ -51,7 +51,7 @@ const client = new DiscordClient({
 	],
 	presence: {
 		activities: [{
-			name: 'Nothing is Inevitable',
+			name: 'Rip & Tear',
 			type: ActivityType.Listening
 		}]
 	}
