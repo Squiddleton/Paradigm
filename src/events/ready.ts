@@ -36,10 +36,9 @@ export default new ClientEvent({
 			const currentStates = await fetchStates();
 
 			if (currentStates.length === 2 && cachedStates.length === 1 && !postedShopSections) {
-				postedShopSections = true;
 				const cachedNames = await fetchShopNames(cachedStates[0]);
 				const currentNames = await fetchShopNames(currentStates[1]);
-				await postShopSections(client, currentNames, cachedNames);
+				postedShopSections = await postShopSections(client, currentNames, cachedNames);
 			}
 			cachedStates = currentStates;
 		});

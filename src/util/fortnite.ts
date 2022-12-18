@@ -475,11 +475,20 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 	const [oldState, newState] = await fetchStates();
 	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
 
-	const formattedNames = currentNames
-		.map(n => `${cachedNames.includes(n) ? ' ' : '+'} ${n}`)
-		.concat(cachedNames
-			.filter(n => !currentNames.includes(n))
-			.map(n => `- ${n}`));
+	const addedNames = currentNames
+		.filter(n => !cachedNames.includes(n))
+		.map(n => `+ ${n}`);
+	const removedNames = cachedNames
+		.filter(n => !currentNames.includes(n))
+		.map(n => `- ${n}`);
+
+	if ([addedNames, removedNames].every(names => names.length === 0)) return false;
+
+	const keptNames = currentNames
+		.filter(n => cachedNames.includes(n))
+		.map(n => `  ${n}`);
+
+	const formattedNames = addedNames.concat(keptNames, removedNames);
 
 	const guildResults = await guildSchema.find({ shopSectionsChannelId: { $ne: null } });
 	for (const { shopSectionsChannelId } of guildResults) {
@@ -500,6 +509,7 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 			}
 		}
 	}
+	return true;
 };
 
 const getUserProperties = async (interaction: CommandInteraction): Promise<DisplayUserProperties> => {
