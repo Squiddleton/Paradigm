@@ -86,7 +86,13 @@ export default new ClientEvent({
 					case 'milestone': {
 						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfGuild);
 						const { guildId } = interaction;
-						let milestones = (await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true })).milestones.map(m => m.name);
+						const guildResult = await guildSchema.findById(guildId);
+						if (guildResult === null) {
+							await interaction.respond([]);
+							return;
+						}
+
+						let milestones = guildResult.milestones.map(m => m.name);
 						const memberOption = interaction.options.get('member')?.value;
 						if (typeof memberOption === 'string') {
 							const memberResult = await memberSchema.findOne({ userId: memberOption, guildId });
@@ -95,9 +101,13 @@ export default new ClientEvent({
 							}
 						}
 
-						const { ratings } = findBestMatch(input, milestones.length > 0 ? milestones : ['None']);
+						if (milestones.length === 0) {
+							await interaction.respond([]);
+							return;
+						}
+						const { ratings } = findBestMatch(input, milestones);
 						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
-						await interaction.respond(choices[0]?.name === 'None' ? [] : choices);
+						await interaction.respond(choices);
 						break;
 					}
 				}
@@ -134,7 +144,7 @@ export default new ClientEvent({
 					{
 						date: new Date().toLocaleString('en-us', { timeZone: 'America/New_York' }),
 						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
-						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message' } (${interaction.channelId})`,
+						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message'} (${interaction.channelId})`,
 						user: `${interaction.user.tag} (${userId})`,
 						options: interaction.options.data
 					},
