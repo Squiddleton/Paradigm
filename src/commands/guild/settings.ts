@@ -79,8 +79,8 @@ export default new SlashCommand({
 							.setFields(
 								{ name: 'Total Giveaways', value: giveaways.length.toString(), inline: true },
 								{ name: 'Total Milestones', value: milestones.length.toString(), inline: true },
-								{ name: 'Shop Sections Channel', value: shopSectionsChannelId === null ? 'None' : `<#${shopSectionsChannelId}>`, inline: true },
-								{ name: 'Wishlist Channel', value: wishlistChannelId === null ? 'None' : `<#${wishlistChannelId}>`, inline: true }
+								{ name: 'Leaked Shop Sections', value: shopSectionsChannelId === null ? 'No Channel Set' : `<#${shopSectionsChannelId}>`, inline: true },
+								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : `<#${wishlistChannelId}>`, inline: true }
 							)
 					],
 					ephemeral: true
