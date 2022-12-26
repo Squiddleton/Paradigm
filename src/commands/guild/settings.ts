@@ -56,8 +56,12 @@ export default new SlashCommand({
 					}
 					const permissions = channel.permissionsFor(interaction.client.user);
 					if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
-					if (!permissions.has(AccessibleChannelPermissions)) {
+					if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
 						await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
+						return;
+					}
+					else if (customId === 'shopSectionsChannelId' && !permissions.has([...AccessibleChannelPermissions, PermissionFlagsBits.EmbedLinks])) {
+						await channelInteraction.reply({ content: `I need the View Channel, Send Messages, and Embed Links permissions in ${channel} to set it.`, ephemeral: true });
 						return;
 					}
 
