@@ -2,12 +2,7 @@ import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
-export interface AccessTokenAndId {
-	accessToken: string;
-	accountId: string;
-}
-
-export interface AccessTokenResponse {
+export interface BaseAccessTokenResponse {
 	access_token: string;
 	expires_in: number;
 	expires_at: DateString;
@@ -22,18 +17,26 @@ export interface AccessTokenResponse {
 	displayName: string;
 	app: string;
 	in_app_id: string;
+}
+
+export interface DeviceAuthAccessTokenResponse extends BaseAccessTokenResponse {
 	device_id: string;
 }
 
-export type AnyGuildTextChannel = Exclude<TextBasedChannel, DMChannel | PartialDMChannel>;
-
-export interface AuthorizationCodeResponse extends AccessTokenResponse {
+export interface AuthorizationCodeAccessTokenResponse extends DeviceAuthAccessTokenResponse {
 	scope: unknown[];
 	ext_auth_id: string;
 	ext_auth_type: string;
 	ext_auth_method: string;
 	ext_auth_display_name: string;
 }
+
+export interface RefreshTokenAccessTokenResponse extends Omit<BaseAccessTokenResponse, 'device_id'> {
+	product_id: string;
+	application_id: string;
+}
+
+export type AnyGuildTextChannel = Exclude<TextBasedChannel, DMChannel | PartialDMChannel>;
 
 export type AnyObject = Record<string, unknown>;
 
@@ -147,6 +150,11 @@ export interface MOTD {
 		spotlight: boolean;
 	};
 	platform: string;
+}
+
+export interface RefreshTokenBody {
+	grant_type: 'refresh_token';
+	refresh_token: string;
 }
 
 export interface ShopSection {
