@@ -22,12 +22,12 @@ const itemShopFilter = (cosmetic: Cosmetic) => {
 	if (cosmetic.shopHistory?.length) return true;
 
 	return cosmetic.gameplayTags !== null &&
-	!cosmetic.gameplayTags.includes('Cosmetics.QuestsMetaData.Season10.Visitor') &&
-	!['_Sync', '_Owned', '_Follower'].some(w => cosmetic.id.endsWith(w)) &&
-	((cosmetic.gameplayTags.includes('Cosmetics.Source.ItemShop')) ||
-	(!['Cosmetics.Source.Promo', 'Cosmetics.Source.Granted.SaveTheWorld', 'Cosmetics.Source.testing', 'Cosmetics.QuestsMetaData.Achievements.Umbrella', 'Cosmetics.Source.MandosBountyLTM'].some(tag => cosmetic.gameplayTags?.includes(tag)) &&
-	!cosmetic.gameplayTags.some(t => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(w => t.includes(w))) &&
-	!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
+		!cosmetic.gameplayTags.includes('Cosmetics.QuestsMetaData.Season10.Visitor') &&
+		!['_Sync', '_Owned', '_Follower'].some(w => cosmetic.id.endsWith(w)) &&
+		((cosmetic.gameplayTags.includes('Cosmetics.Source.ItemShop')) ||
+			(!['Cosmetics.Source.Promo', 'Cosmetics.Source.Granted.SaveTheWorld', 'Cosmetics.Source.testing', 'Cosmetics.QuestsMetaData.Achievements.Umbrella', 'Cosmetics.Source.MandosBountyLTM'].some(tag => cosmetic.gameplayTags?.includes(tag)) &&
+				!cosmetic.gameplayTags.some(t => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(w => t.includes(w))) &&
+				!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
 };
 
 export const fetchCosmetics = async (itemShopOnly = false) => {
@@ -156,7 +156,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
 		]);
-		// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
+	// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
 		const debut = cosmetic.shopHistory[0];
 		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))})\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
@@ -308,7 +308,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 				}
 				await i.deferUpdate();
 
-				if (!i.isSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
+				if (!i.isStringSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
 				const [value] = i.values;
 				const cosmetic = cosmetics.find(c => c.id === i.customId);
 				if (cosmetic) {
@@ -347,17 +347,16 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-const formatLevels = (levels: Record<string, number>, name: string) => `\`${formatPossessive(name)}\` **Battle Pass Levels**\n\n${
-	Object
-		.entries(levels)
-		.sort()
-		.map(([k, v]) => {
-			const overallSeason = parseInt(k.match(/\d+/)![0]);
-			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
-			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
-		})
-		.join('\n')}`;
+const formatLevels = (levels: Record<string, number>, name: string) => `\`${formatPossessive(name)}\` **Battle Pass Levels**\n\n${Object
+	.entries(levels)
+	.sort()
+	.map(([k, v]) => {
+		const overallSeason = parseInt(k.match(/\d+/)![0]);
+		const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
+		const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+		return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
+	})
+	.join('\n')}`;
 
 const handleLevelsError = (e: unknown) => {
 	if (e instanceof FortniteAPIError) {
