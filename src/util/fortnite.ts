@@ -119,39 +119,40 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 
 				if (msgs.length !== 1 && guildResult.wishlistChannelId !== null) {
 					const channel = client.channels.cache.get(guildResult.wishlistChannelId);
-					if (channel === undefined) {
-						console.log(`Wishlist channel ${guildResult.wishlistChannelId} (Guild ${guildResult._id}) is uncached and has been unbound.`);
+					const unbindChannel = async (reason: string) => {
+						console.log(reason);
 						guildResult.wishlistChannelId = null;
 						await guildResult.save();
+					};
+					if (channel === undefined) {
+						await unbindChannel(`Wishlist channel ${guildResult.wishlistChannelId} (Guild ${guildResult._id}) is uncached and has been unbound.`);
 						continue;
 					}
 					else if (!channel.isTextBased() || channel.isDMBased()) {
-						console.log(`Wishlist channel ${channel.id} is not text-based or is DM-based and has been unbound.`);
-						guildResult.wishlistChannelId = null;
-						await guildResult.save();
+						await unbindChannel(`Wishlist channel ${channel.id} is not text-based or is DM-based and has been unbound.`);
 						continue;
 					}
 					const permissions = client.getPermissions(channel);
 					if (!permissions.has(AccessibleChannelPermissions)) {
-						console.log(`Wishlist channel ${channel.id} is missing the necessary client permissions and has been unbound.`);
-						guildResult.wishlistChannelId = null;
-						await guildResult.save();
+						await unbindChannel(`Wishlist channel ${channel.id} is missing the necessary client permissions and has been unbound.`);
 						continue;
 					}
+
 					msgs.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
-					try {
-						const fullMsg = msgs.join('\n');
-						if (debug) {
-							console.log(fullMsg);
-						}
-						else {
+
+					const fullMsg = msgs.join('\n');
+					if (debug) {
+						console.log(fullMsg);
+					}
+					else {
+						try {
 							for (const message of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
 								await channel.send(message);
 							}
 						}
-					}
-					catch (error) {
-						console.error('An error has occured while posting a wishlist announcement', guildResult, error);
+						catch (error) {
+							console.error('An error has occured while posting a wishlist announcement', guildResult, error);
+						}
 					}
 				}
 			}
@@ -512,23 +513,22 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 		const { shopSectionsChannelId } = guildResult;
 		if (shopSectionsChannelId !== null) {
 			const channel = client.channels.cache.get(shopSectionsChannelId);
-			if (channel === undefined) {
-				console.log(`Shop section channel ${shopSectionsChannelId} (Guild ${guildResult._id}) is uncached and has been unbound.`);
+			const unbindChannel = async (reason: string) => {
+				console.log(reason);
 				guildResult.shopSectionsChannelId = null;
 				await guildResult.save();
+			};
+			if (channel === undefined) {
+				await unbindChannel(`Shop section channel ${shopSectionsChannelId} (Guild ${guildResult._id}) is uncached and has been unbound.`);
 				continue;
 			}
 			else if (!channel.isTextBased() || channel.isDMBased()) {
-				console.log(`Shop section channel ${channel.id} is not text-based or is DM-based and has been unbound.`);
-				guildResult.shopSectionsChannelId = null;
-				await guildResult.save();
+				await unbindChannel(`Shop section channel ${channel.id} is not text-based or is DM-based and has been unbound.`);
 				continue;
 			}
 			const permissions = client.getPermissions(channel);
 			if (!permissions.has([...AccessibleChannelPermissions, PermissionFlagsBits.EmbedLinks])) {
-				console.log(`Shop section channel ${channel.id} is missing the necessary client permissions and has been unbound.`);
-				guildResult.shopSectionsChannelId = null;
-				await guildResult.save();
+				await unbindChannel(`Shop section channel ${channel.id} is missing the necessary client permissions and has been unbound.`);
 				continue;
 			}
 
