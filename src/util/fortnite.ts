@@ -98,14 +98,15 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 export const checkWishlists = async (client: DiscordClient<true>, debug = false) => {
 	const entries = await fetchItemShop();
 	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
+	const userIds = userResults.map(u => u._id);
 	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
 
 	for (const guildResult of guildResults) {
 		const guild = client.guilds.cache.get(guildResult._id);
 		if (guild !== undefined) {
 			const members = userResults.length > 100
-				? (await guild.members.fetch()).filter(m => userResults.some(u => u._id === m.id))
-				: await guild.members.fetch({ user: userResults.map(u => u._id) });
+				? (await guild.members.fetch()).filter(m => userIds.includes(m.id))
+				: await guild.members.fetch({ user: userIds });
 
 			if (members.size !== 0) {
 				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
