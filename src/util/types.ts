@@ -260,7 +260,7 @@ export interface IMilestone {
 
 export interface IUser {
 	_id: Snowflake;
-	epicAccountId: string;
+	epicAccountId: string | null;
 	wishlistCosmeticIds: string[];
 }
 
