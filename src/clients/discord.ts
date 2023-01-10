@@ -46,6 +46,7 @@ const client = new DiscordClient({
 		ReactionUserManager: 10
 	}),
 	partials: [
+		Partials.Channel,
 		Partials.Message,
 		Partials.Reaction
 	],
