@@ -1,10 +1,10 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, GuildBasedChannel, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
 import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
 import type { AnyGuildTextChannel, RawEpicError } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
-	getPermissions(channel: AnyGuildTextChannel): PermissionsBitField {
+	getPermissions(channel: GuildBasedChannel): PermissionsBitField {
 		DiscordClient.assertReadyClient(this);
 		const permissions = channel.permissionsFor(this.user);
 		if (permissions === null) throw new Error(ErrorMessage.UncachedClient);

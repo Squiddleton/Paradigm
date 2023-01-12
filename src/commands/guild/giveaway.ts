@@ -295,8 +295,7 @@ export default new SlashCommand({
 				if (!isUnit(units)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', units));
 				const endTime = startTime + (giveawayTime * UnitsToMS[units]);
 
-				const permissions = channel.permissionsFor(client.user);
-				if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
+				const permissions = client.getPermissions(channel);
 				if (!permissions.has([...AccessibleChannelPermissions, PermissionsBitField.Flags.EmbedLinks])) {
 					await interaction.reply({ content: 'The View Channel, Send Messages, and Embed Links permissions in the selected channel are required to use this command.', ephemeral: true });
 					return;
@@ -319,12 +318,14 @@ export default new SlashCommand({
 					winners: []
 				};
 
-				const row = new ActionRowBuilder<ButtonBuilder>({ components: [
-					new ButtonBuilder()
-						.setLabel('Enter')
-						.setCustomId('giveaway')
-						.setStyle(ButtonStyle.Success)
-				] });
+				const row = new ActionRowBuilder<ButtonBuilder>({
+					components: [
+						new ButtonBuilder()
+							.setLabel('Enter')
+							.setCustomId('giveaway')
+							.setStyle(ButtonStyle.Success)
+					]
+				});
 				const message = await channel.send({ components: [row], embeds: [createGiveawayEmbed(withoutMessage, interaction.guild)] });
 
 				const giveaway: IGiveaway = {

@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, PermissionFlagsBits } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
-import { TimestampedEmbed } from '../../util/classes.js';
+import { DiscordClient, TimestampedEmbed } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 
@@ -22,8 +22,9 @@ export default new SlashCommand({
 	],
 	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
-	async execute(interaction) {
+	async execute(interaction, client) {
 		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+		DiscordClient.assertReadyClient(client);
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
@@ -54,8 +55,7 @@ export default new SlashCommand({
 					else if (channel.isDMBased()) {
 						throw new Error(`The channel ${channel.id} is from a DM.`);
 					}
-					const permissions = channel.permissionsFor(interaction.client.user);
-					if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
+					const permissions = client.getPermissions(channel);
 					if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
 						await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
 						return;
