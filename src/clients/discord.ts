@@ -28,7 +28,7 @@ const client = new DiscordClient({
 			throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 		}
 	}),
-	exclusiveGuildId: DiscordIds.GuildId.RFortniteBR,
+	exclusiveGuildId: DiscordIds.GuildId.FortniteBR,
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,

@@ -55,7 +55,7 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 	}
 	get nitroRoles() {
 		DiscordClient.assertReadyClient(this);
-		const guild = validateGuild(this, DiscordIds.GuildId.RFortniteBR);
+		const guild = validateGuild(this, DiscordIds.GuildId.FortniteBR);
 		return guild.roles.cache.sort((a, b) => b.position - a.position).filter(r => r.name.includes('Nitro '));
 	}
 	static assertReadyClient(client: BaseClient): asserts client is DiscordClient<true> {

@@ -17,7 +17,7 @@ export default new ClientEvent({
 			}
 		}
 		const { message } = reaction;
-		if (message.guildId === DiscordIds.GuildId.RFortniteBR) {
+		if (message.guildId === DiscordIds.GuildId.FortniteBR) {
 			const toString = reaction.emoji.toString();
 			const logChannel = client.getGuildChannel(DiscordIds.ChannelId.Logs);
 

@@ -40,7 +40,7 @@ export namespace DiscordIds {
 	}
 	export enum GuildId {
 		Dev = '614918461453238357',
-		RFortniteBR = '486932163636232193'
+		FortniteBR = '486932163636232193'
 	}
 	export enum RoleId {
 		ItemShop = '568590143640961037',
