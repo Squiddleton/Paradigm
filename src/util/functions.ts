@@ -10,7 +10,7 @@ import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu,
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
-export const createGiveawayEmbed = (giveaway: IGiveaway | Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
+export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new TimestampedEmbed()
 		.setTitle(giveaway.text)
 		.setThumbnail(guild.iconURL())
@@ -100,7 +100,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 				case 'first': {
 					index = 0;
 					await i.update({
-						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit]) ],
+						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
 						embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
 					});
 					break;
