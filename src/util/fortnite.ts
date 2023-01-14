@@ -475,7 +475,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			await interaction.editReply({ files: [image] });
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) {
-				await linkEpicAccount(interaction, account);
+				await linkEpicAccount(interaction, account, true);
 			}
 		}
 		catch (error) {

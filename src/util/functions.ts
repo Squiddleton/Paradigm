@@ -69,9 +69,9 @@ export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMen
 	return message;
 };
 
-export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount) => {
+export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
 	await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
-	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral: true });
+	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
 export const messageComponentCollectorFilter = (interaction: BaseInteraction) => (i: MessageComponentInteraction) => {
