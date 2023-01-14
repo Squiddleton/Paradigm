@@ -1,7 +1,7 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, User } from 'discord.js';
+import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, Snowflake, User } from 'discord.js';
 import { Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
 import guildSchema from '../schemas/guilds.js';
@@ -200,9 +200,8 @@ export default new ClientEvent({
 			const entries = [userId];
 			for (const role of giveawayResult.bonusRoles) {
 				if (interaction.member.roles.cache.has(role.id)) {
-					for (let i = 0; i < role.amount; i++) {
-						entries.push(userId);
-					}
+					const bonusEntries: Snowflake[] = new Array(role.amount).fill(userId);
+					entries.push(...bonusEntries);
 				}
 			}
 
