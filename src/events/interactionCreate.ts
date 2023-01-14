@@ -198,15 +198,11 @@ export default new ClientEvent({
 			}
 
 			const entries = [userId];
-			const [role1, role2] = giveawayResult.bonusRoles;
-			if (role1 !== undefined && interaction.member.roles.cache.has(role1.id)) {
-				for (let i = 0; i < role1.amount; i++) {
-					entries.push(userId);
-				}
-			}
-			if (role2 !== undefined && interaction.member.roles.cache.has(role2.id)) {
-				for (let i = 0; i < role2.amount; i++) {
-					entries.push(userId);
+			for (const role of giveawayResult.bonusRoles) {
+				if (interaction.member.roles.cache.has(role.id)) {
+					for (let i = 0; i < role.amount; i++) {
+						entries.push(userId);
+					}
 				}
 			}
 
