@@ -8,7 +8,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const user = await userSchema.findById(interaction.user.id);
 		if (user === null || user.epicAccountId === null) {
-			await interaction.reply({ content: 'You have not linked your account with <link:1032454252024565821>.', ephemeral: true });
+			await interaction.reply({ content: 'You have not linked your account with </link:1032454252024565821>.', ephemeral: true });
 		}
 		else {
 			user.epicAccountId = null;

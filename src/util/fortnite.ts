@@ -453,10 +453,10 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 		const userResult = await userSchema.findById(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
 			if (content !== undefined) {
-				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with <link:1032454252024565821>.`);
+				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
 			}
 			else {
-				await interaction.editReply('No player username was provided, and you have not linked your account with <link:1032454252024565821>.');
+				await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
 			}
 			return;
 		}
