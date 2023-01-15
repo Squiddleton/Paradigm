@@ -29,7 +29,7 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply();
 
 		let account: StatsEpicAccount;
 		try {
