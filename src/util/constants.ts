@@ -32,7 +32,8 @@ export namespace DiscordIds {
 		SaltySprings = '488988723049136133',
 		ShopPosts = '489836390759268353',
 		StickerEmojiSubmissions = '895024792439251064',
-		STWCreativeLeaks = '740607796898168913'
+		STWCreativeLeaks = '740607796898168913',
+		UserCommands = '742803449493717134'
 	}
 	export enum EmojiId {
 		Downvote = '492412142306197504',
@@ -41,6 +42,9 @@ export namespace DiscordIds {
 	export enum GuildId {
 		Dev = '614918461453238357',
 		FortniteBR = '486932163636232193'
+	}
+	export enum MessageId {
+		CommandList = '1064964139094650971'
 	}
 	export enum RoleId {
 		ItemShop = '568590143640961037',
