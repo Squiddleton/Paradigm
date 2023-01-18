@@ -44,7 +44,7 @@ export interface BlockList {
 	blockedUsers: string[];
 }
 
-export type ButtonOrMenu = ComponentType.Button | ComponentType.SelectMenu;
+export type ButtonOrMenu = ComponentType.Button | ComponentType.StringSelect;
 
 export interface Config {
 	/** The Discord bot token */
