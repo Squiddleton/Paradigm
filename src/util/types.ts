@@ -1,5 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
-import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, DMChannel, MessageContextMenuCommandInteraction, PartialDMChannel, Snowflake, TextBasedChannel, User } from 'discord.js';
+import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { EpicErrorCode } from './constants';
 
 export interface BaseAccessTokenResponse {
@@ -36,7 +36,7 @@ export interface RefreshTokenAccessTokenResponse extends Omit<BaseAccessTokenRes
 	application_id: string;
 }
 
-export type AnyGuildTextChannel = Exclude<TextBasedChannel, DMChannel | PartialDMChannel>;
+export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
 export type AnyObject = Record<string, unknown>;
 
