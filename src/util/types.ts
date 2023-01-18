@@ -31,7 +31,7 @@ export interface AuthorizationCodeAccessTokenResponse extends DeviceAuthAccessTo
 	ext_auth_display_name: string;
 }
 
-export interface RefreshTokenAccessTokenResponse extends Omit<BaseAccessTokenResponse, 'device_id'> {
+export interface RefreshTokenAccessTokenResponse extends BaseAccessTokenResponse {
 	product_id: string;
 	application_id: string;
 }
