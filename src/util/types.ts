@@ -1,6 +1,5 @@
 import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
-import type { EpicErrorCode } from './constants';
 
 export interface BaseAccessTokenResponse {
 	access_token: string;
@@ -288,7 +287,7 @@ export interface RawEpicError {
 	errorCode: string;
 	errorMessage: string;
 	messageVars: string[];
-	numericErrorCode: EpicErrorCode | number;
+	numericErrorCode: number;
 	originatingService: string;
 	intent: string;
 	error_description?: string;
