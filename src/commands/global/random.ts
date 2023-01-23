@@ -1,10 +1,13 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import type { Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { BackgroundURL } from '../../util/constants.js';
 import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
+
+const getImage = (cosmetic: Cosmetic) => cosmetic.images.featured ? cosmetic.images.featured : cosmetic.images.icon;
 
 export default new SlashCommand({
 	name: 'random',
@@ -42,51 +45,48 @@ export default new SlashCommand({
 			return;
 		}
 
-		const bbs = cosmetics.filter(c => c.type.displayValue === 'Back Bling');
-		const bb = getRandomItem(bbs);
-		const gliders = cosmetics.filter(c => c.type.displayValue === 'Glider');
-		const glider = getRandomItem(gliders);
-		const hts = cosmetics.filter(c => c.type.displayValue === 'Harvesting Tool');
-		const ht = getRandomItem(hts);
-		const ws = cosmetics.filter(c => c.type.displayValue === 'Wrap');
-		const wrap = getRandomItem(ws);
-		const outfits = cosmetics.filter(c => c.type.displayValue === 'Outfit');
-		const outfit = getRandomItem(outfits);
+		const backBling = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Back Bling'));
+		const glider = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Glider'));
+		const harvestingTool = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Harvesting Tool'));
+		const wrap = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Wrap'));
+		const outfit = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Outfit'));
 
 		const background = await loadImage(getRandomItem(Object.values(BackgroundURL)));
 		const canvas = createCanvas(background.width, background.height);
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-		const o = await loadImage(outfit.images.featured ? outfit.images.featured : outfit.images.icon);
-		ctx.drawImage(o, (background.width - (background.height * o.width / o.height)) / 2, 0, background.height * o.width / o.height, background.height);
+		const outfitImage = await loadImage(getImage(outfit));
+		ctx.drawImage(outfitImage, (background.width - (background.height * outfitImage.width / outfitImage.height)) / 2, 0, background.height * outfitImage.width / outfitImage.height, background.height);
 
-		const b = await loadImage(bb.images.featured ? bb.images.featured : bb.images.icon);
-		ctx.drawImage(b, 0, 0, background.height * b.width / b.height / 2, background.height / 2);
+		const backBlingImage = await loadImage(getImage(backBling));
+		ctx.drawImage(backBlingImage, 0, 0, background.height * backBlingImage.width / backBlingImage.height / 2, background.height / 2);
 
-		const h = await loadImage(ht.images.featured ? ht.images.featured : ht.images.icon);
-		ctx.drawImage(h, 0, background.height / 2, background.height * h.width / h.height / 2, background.height / 2);
+		const harvestingToolImage = await loadImage(getImage(harvestingTool));
+		ctx.drawImage(harvestingToolImage, 0, background.height / 2, background.height * harvestingToolImage.width / harvestingToolImage.height / 2, background.height / 2);
 
-		const g = await loadImage(glider.images.featured ? glider.images.featured : glider.images.icon);
-		ctx.drawImage(g, background.width - (background.height * g.width / g.height / 2), 0, background.height * g.width / g.height / 2, background.height / 2);
+		const gliderImage = await loadImage(getImage(glider));
+		ctx.drawImage(gliderImage, background.width - (background.height * gliderImage.width / gliderImage.height / 2), 0, background.height * gliderImage.width / gliderImage.height / 2, background.height / 2);
 
-		const w = await loadImage(wrap.images.featured ? wrap.images.featured : wrap.images.icon);
-		ctx.drawImage(w, background.width - (background.height * w.width / w.height / 2), background.height / 2, background.height * w.width / w.height / 2, background.height / 2);
+		const wrapImage = await loadImage(getImage(wrap));
+		ctx.drawImage(wrapImage, background.width - (background.height * wrapImage.width / wrapImage.height / 2), background.height / 2, background.height * wrapImage.width / wrapImage.height / 2, background.height / 2);
 
-		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: `${normalize(interaction.user.username)}sLoadout.png` });
+		const attachmentName = `${normalize(interaction.user.username)}sLoadout.png`;
+
+		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: attachmentName });
 
 		await interaction.editReply({
 			embeds: [
 				new TimestampedEmbed()
 					.setTitle('Randomly Generated Loadout')
-					.setImage(`attachment://${normalize(interaction.user.username)}sLoadout.png`)
-					.setFields([
+					.setImage(`attachment://${attachmentName}`)
+					.setFields(
 						{ name: 'Outfit', value: outfit.name, inline: true },
-						{ name: 'Back Bling', value: bb.name, inline: true },
-						{ name: 'Harvesting Tool', value: ht.name, inline: true },
+						{ name: 'Back Bling', value: backBling.name, inline: true },
+						{ name: 'Harvesting Tool', value: harvestingTool.name, inline: true },
 						{ name: 'Glider', value: glider.name, inline: true },
 						{ name: 'Wrap', value: wrap.name, inline: true }
-					])
+					)
 			],
 			files: [attachment]
 		});
