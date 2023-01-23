@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, PermissionFlagsBits } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
 import guildSchema from '../../schemas/guilds.js';
 import { DiscordClient, TimestampedEmbed } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
@@ -44,33 +44,39 @@ export default new SlashCommand({
 				const message = await interaction.reply({ components: [shopSectionsRow, wishlistRow], content: 'Select the channels for the following automatic messages.' });
 
 				const collector = message.createMessageComponentCollector({ componentType: ComponentType.ChannelSelect, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
-				collector.on('collect', async channelInteraction => {
-					const { customId } = channelInteraction;
-					const channel = channelInteraction.channels.first();
-					if (channel === undefined) {
-						await guildSchema.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });
-						await channelInteraction.reply({ content: 'That channel has been unset.', ephemeral: true });
-						return;
-					}
-					else if (channel.isDMBased()) {
-						throw new Error(`The channel ${channel.id} is from a DM.`);
-					}
-					const permissions = client.getPermissions(channel);
-					if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
-						await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
-						return;
-					}
-					else if (customId === 'shopSectionsChannelId' && !permissions.has([...AccessibleChannelPermissions, PermissionFlagsBits.EmbedLinks])) {
-						await channelInteraction.reply({ content: `I need the View Channel, Send Messages, and Embed Links permissions in ${channel} to set it.`, ephemeral: true });
-						return;
-					}
+				collector
+					.on('collect', async channelInteraction => {
+						const { customId } = channelInteraction;
+						const channel = channelInteraction.channels.first();
+						if (channel === undefined) {
+							await guildSchema.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });
+							await channelInteraction.reply({ content: 'That channel has been unset.', ephemeral: true });
+							return;
+						}
+						else if (channel.isDMBased()) {
+							throw new Error(`The channel ${channel.id} is from a DM.`);
+						}
+						const permissions = client.getPermissions(channel);
+						if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
+							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
+							return;
+						}
+						else if (customId === 'shopSectionsChannelId' && !permissions.has([...AccessibleChannelPermissions, PermissionFlagsBits.EmbedLinks])) {
+							await channelInteraction.reply({ content: `I need the View Channel, Send Messages, and Embed Links permissions in ${channel} to set it.`, ephemeral: true });
+							return;
+						}
 
-					await guildSchema.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
-					await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
-				});
-				collector.on('end', () => {
-					interaction.deleteReply();
-				});
+						await guildSchema.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
+						await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
+					})
+					.on('end', async () => {
+						try {
+							await interaction.deleteReply();
+						}
+						catch (e) {
+							if (!(e instanceof DiscordAPIError) || e.code !== RESTJSONErrorCodes.UnknownMessage) throw e;
+						}
+					});
 				break;
 			}
 			case 'view': {
