@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
-import guildSchema from '../../schemas/guilds.js';
+import guildModel from '../../models/guilds.js';
 import { DiscordClient, TimestampedEmbed } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
@@ -49,7 +49,7 @@ export default new SlashCommand({
 						const { customId } = channelInteraction;
 						const channel = channelInteraction.channels.first();
 						if (channel === undefined) {
-							await guildSchema.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });
+							await guildModel.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });
 							await channelInteraction.reply({ content: 'That channel has been unset.', ephemeral: true });
 							return;
 						}
@@ -66,7 +66,7 @@ export default new SlashCommand({
 							return;
 						}
 
-						await guildSchema.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
+						await guildModel.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
 						await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
 					})
 					.on('end', async () => {
@@ -80,7 +80,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'view': {
-				const { giveaways, milestones, shopSectionsChannelId, wishlistChannelId } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const { giveaways, milestones, shopSectionsChannelId, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				await interaction.reply({
 					embeds: [
 						new TimestampedEmbed()

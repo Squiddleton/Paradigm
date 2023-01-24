@@ -2,8 +2,8 @@ import { ClientEvent } from '@squiddleton/discordjs-util';
 import { getRandomItem } from '@squiddleton/util';
 import type { Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
-import guildSchema from '../schemas/guilds.js';
-import memberSchema from '../schemas/members.js';
+import guildModel from '../models/guilds.js';
+import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { checkWishlists, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
@@ -26,8 +26,8 @@ export default new ClientEvent({
 		let postedShopSections = false;
 		schedule('0 0 * * *', async () => {
 			postedShopSections = false;
-			await memberSchema.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
-			await memberSchema.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
+			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
+			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 		}, { timezone: 'America/New_York' });
 
 		// Intervals
@@ -44,7 +44,7 @@ export default new ClientEvent({
 		});
 
 		schedule('*/1 * * * *', async () => {
-			const guildResults = await guildSchema.find();
+			const guildResults = await guildModel.find();
 			const giveaways = guildResults.map(r => r.giveaways).flat().filter(g => !g.completed && g.endTime <= (Date.now() / 1000));
 
 			for (const giveaway of giveaways) {
@@ -73,7 +73,7 @@ export default new ClientEvent({
 
 					await message.edit({ components: [], embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)] });
 
-					await guildSchema.updateOne(
+					await guildModel.updateOne(
 						{
 							_id: message.guildId,
 							'giveaways.messageId': giveaway.messageId

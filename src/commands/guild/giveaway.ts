@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
-import guildSchema from '../../schemas/guilds.js';
+import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
 import { areMismatchedBonusRoles, createGiveawayEmbed, rerollGiveaway, reviewGiveaway } from '../../util/functions.js';
@@ -202,7 +202,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const { giveaways } = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
+				const { giveaways } = await guildModel.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = giveaways.find(g => g.messageId === messageId);
 				if (giveaway === undefined) {
 					await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, ephemeral: true });
@@ -239,7 +239,7 @@ export default new SlashCommand({
 							if (role2 !== null && role2Amount !== null) giveaway.bonusRoles.push({ id: role2.id, amount: role2Amount });
 						}
 
-						await guildSchema.findOneAndUpdate(
+						await guildModel.findOneAndUpdate(
 							{
 								_id: interaction.guildId,
 								'giveaways.messageId': messageId
@@ -333,7 +333,7 @@ export default new SlashCommand({
 					...withoutMessage
 				};
 
-				await guildSchema.findByIdAndUpdate(
+				await guildModel.findByIdAndUpdate(
 					interaction.guildId,
 					{ $push: { giveaways: giveaway } },
 					{ upsert: true }

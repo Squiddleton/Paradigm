@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPlural } from '@squiddleton/util';
 import { ApplicationCommandOptionType } from 'discord.js';
-import memberSchema from '../../schemas/members.js';
+import memberModel from '../../models/members.js';
 import { sumMessages } from '../../util/functions.js';
 import type { IMessage } from '../../util/types.js';
 
@@ -36,7 +36,7 @@ export default new SlashCommand({
 
 		const time = interaction.options.getInteger('time', true);
 		const max = interaction.options.getInteger('max') ?? 10;
-		const memberResults = await memberSchema.find();
+		const memberResults = await memberModel.find();
 
 		const combineMessages = (messages: IMessage[]) => sumMessages(messages.filter(m => (31 - m.day) <= time));
 

@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import memberSchema from '../schemas/members.js';
+import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds } from '../util/constants.js';
 import { checkWishlists } from '../util/fortnite.js';
@@ -18,14 +18,14 @@ export default new ClientEvent({
 			const isBot = message.author.bot;
 
 			if (!isBot) {
-				const memberResult = await memberSchema.findOneAndUpdate(
+				const memberResult = await memberModel.findOneAndUpdate(
 					{ userId: message.author.id, guildId, 'dailyMessages.day': 30 },
 					{ $inc: { 'dailyMessages.$.messages': 1 } }
 				);
 				if (memberResult === null) {
 					const msgObject: IMessage = { day: 30, messages: 1 };
 
-					await memberSchema.updateOne(
+					await memberModel.updateOne(
 						{ userId: message.author.id, guildId },
 						{ $push: { dailyMessages: msgObject } },
 						{ upsert: true }

@@ -9,9 +9,9 @@ import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilt
 import { isBackground } from './typeguards.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
-import guildSchema from '../schemas/guilds.js';
-import memberSchema from '../schemas/members.js';
-import userSchema from '../schemas/users.js';
+import guildModel from '../models/guilds.js';
+import memberModel from '../models/members.js';
+import userModel from '../models/users.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],
@@ -97,9 +97,9 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 
 export const checkWishlists = async (client: DiscordClient<true>, debug = false) => {
 	const entries = await fetchItemShop();
-	const userResults = await userSchema.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
+	const userResults = await userModel.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
 	const userIds = userResults.map(u => u._id);
-	const guildResults = await guildSchema.find({ wishlistChannelId: { $ne: null } });
+	const guildResults = await guildModel.find({ wishlistChannelId: { $ne: null } });
 
 	for (const guildResult of guildResults) {
 		const guild = client.guilds.cache.get(guildResult._id);
@@ -407,7 +407,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	const { accountName, accountType } = options;
 
 	if (accountName === null) {
-		const userResult = await userSchema.findById(options.targetUser.id);
+		const userResult = await userModel.findById(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
 			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
 		}
@@ -450,7 +450,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
 	if (options.accountName === null) {
-		const userResult = await userSchema.findById(options.targetUser.id);
+		const userResult = await userModel.findById(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
 			if (content !== undefined) {
 				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
@@ -484,7 +484,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	}
 };
 
-export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberSchema.updateOne(
+export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberModel.updateOne(
 	{ userId, guildId },
 	{ $addToSet: { milestones: milestoneName } },
 	{ upsert: true }
@@ -509,7 +509,7 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 
 	const formattedNames = addedNames.concat(keptNames, removedNames);
 
-	const guildResults = await guildSchema.find({ shopSectionsChannelId: { $ne: null } });
+	const guildResults = await guildModel.find({ shopSectionsChannelId: { $ne: null } });
 	for (const guildResult of guildResults) {
 		const { shopSectionsChannelId } = guildResult;
 		if (shopSectionsChannelId !== null) {
@@ -594,7 +594,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	const cosmetics = await fetchCosmetics();
 	const user = await getUserProperties(interaction);
 
-	const userResult = await userSchema.findById(user.id);
+	const userResult = await userModel.findById(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {
 		await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
 		return;

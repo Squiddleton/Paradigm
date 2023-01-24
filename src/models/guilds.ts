@@ -93,4 +93,5 @@ const guildSchema = new Schema<IGuild>({
 	}
 });
 
-export default model<IGuild>('guilds', guildSchema);
+const guildModel = model<IGuild>('guilds', guildSchema);
+export default guildModel;

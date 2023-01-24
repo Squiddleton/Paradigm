@@ -33,4 +33,5 @@ const memberSchema = new Schema<IMember>({
 	}
 });
 
-export default model<IMember>('members', memberSchema);
+const memberModel = model<IMember>('members', memberSchema);
+export default memberModel;

@@ -4,8 +4,8 @@ import { removeDuplicates } from '@squiddleton/util';
 import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, Snowflake, User } from 'discord.js';
 import { Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
-import guildSchema from '../schemas/guilds.js';
-import memberSchema from '../schemas/members.js';
+import guildModel from '../models/guilds.js';
+import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
@@ -86,7 +86,7 @@ export default new ClientEvent({
 					case 'milestone': {
 						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfGuild);
 						const { guildId } = interaction;
-						const guildResult = await guildSchema.findById(guildId);
+						const guildResult = await guildModel.findById(guildId);
 						if (guildResult === null) {
 							await interaction.respond([]);
 							return;
@@ -95,7 +95,7 @@ export default new ClientEvent({
 						let milestones = guildResult.milestones.map(m => m.name);
 						const memberOption = interaction.options.get('member')?.value;
 						if (typeof memberOption === 'string') {
-							const memberResult = await memberSchema.findOne({ userId: memberOption, guildId });
+							const memberResult = await memberModel.findOne({ userId: memberOption, guildId });
 							if (memberResult !== null) {
 								milestones = milestones.filter(m => !memberResult.milestones.includes(m));
 							}
@@ -177,7 +177,7 @@ export default new ClientEvent({
 				return;
 			}
 
-			const guildResult = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+			const guildResult = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 			const giveawayResult = guildResult.giveaways.find(g => g.messageId === messageId);
 			if (giveawayResult === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', messageId));
@@ -187,7 +187,7 @@ export default new ClientEvent({
 				return;
 			}
 
-			const { dailyMessages } = await memberSchema.findOneAndUpdate(
+			const { dailyMessages } = await memberModel.findOneAndUpdate(
 				{ userId, guildId },
 				{},
 				{ new: true, upsert: true }
@@ -205,7 +205,7 @@ export default new ClientEvent({
 				}
 			}
 
-			await guildSchema.updateOne(
+			await guildModel.updateOne(
 				{
 					_id: guildId,
 					'giveaways.messageId': interaction.message.id

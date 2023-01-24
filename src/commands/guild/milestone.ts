@@ -1,8 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPossessive } from '@squiddleton/util';
 import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
-import guildSchema from '../../schemas/guilds.js';
-import memberSchema from '../../schemas/members.js';
+import guildModel from '../../models/guilds.js';
+import memberModel from '../../models/members.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
 import { grantMilestone } from '../../util/fortnite.js';
@@ -87,7 +87,7 @@ export default new SlashCommand({
 		switch (interaction.options.getSubcommand()) {
 			case 'create': {
 				const name = interaction.options.getString('name', true);
-				const guildResult = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const guildResult = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				if (guildResult.milestones.some(m => m.name === name)) {
 					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
 					return;
@@ -105,7 +105,7 @@ export default new SlashCommand({
 			case 'delete': {
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const guildResult = await guildSchema.findOneAndUpdate(
+				const guildResult = await guildModel.findOneAndUpdate(
 					{ _id: guildId, 'milestones.name': milestoneName },
 					{ $pull: { milestones: { name: milestoneName } } });
 				if (guildResult === null) {
@@ -114,7 +114,7 @@ export default new SlashCommand({
 				}
 
 				await interaction.deferReply();
-				await memberSchema.updateMany(
+				await memberModel.updateMany(
 					{ guildId },
 					{ $pull: { milestones: milestoneName } }
 				);
@@ -130,7 +130,7 @@ export default new SlashCommand({
 				}
 				const milestoneName = interaction.options.getString('milestone', true);
 
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const { milestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				const milestone = milestones.find(m => m.name === milestoneName);
 				if (milestone === undefined) {
 					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
@@ -146,7 +146,7 @@ export default new SlashCommand({
 					.setTitle(`${formatPossessive(interaction.guild.name)} Milestones`)
 					.setThumbnail(interaction.guild.iconURL());
 
-				const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const { milestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 				if (milestones.length === 0) {
 					embed.setDescription('No milestones');

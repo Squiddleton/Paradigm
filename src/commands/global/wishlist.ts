@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ApplicationCommandOptionType } from 'discord.js';
-import guildSchema from '../../schemas/guilds.js';
-import userSchema from '../../schemas/users.js';
+import guildModel from '../../models/guilds.js';
+import userModel from '../../models/users.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
 
 export default new SlashCommand({
@@ -61,7 +61,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const userResult = await userSchema.findByIdAndUpdate(
+				const userResult = await userModel.findByIdAndUpdate(
 					userId,
 					{ $addToSet: { wishlistCosmeticIds: cosmetic.id } },
 					{ upsert: true }
@@ -71,7 +71,7 @@ export default new SlashCommand({
 					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
 
 				if (interaction.inCachedGuild()) {
-					const guildResult = await guildSchema.findById(interaction.guildId);
+					const guildResult = await guildModel.findById(interaction.guildId);
 					if (guildResult === null || guildResult.wishlistChannelId === null) {
 						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set one.', ephemeral: true });
 					}
@@ -90,7 +90,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const userResult = await userSchema.findById(userId);
+				const userResult = await userModel.findById(userId);
 				if (userResult === null) {
 					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
 					return;
@@ -100,7 +100,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				await userSchema.findByIdAndUpdate(
+				await userModel.findByIdAndUpdate(
 					userId,
 					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
 				);

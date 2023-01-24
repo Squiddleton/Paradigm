@@ -1,12 +1,12 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
-import guildSchema from '../schemas/guilds';
-import memberSchema from '../schemas/members';
-import userSchema from '../schemas/users';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import guildModel from '../models/guilds';
+import memberModel from '../models/members';
+import userModel from '../models/users';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
@@ -70,7 +70,7 @@ export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMen
 };
 
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
-	await userSchema.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
+	await userModel.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
@@ -160,7 +160,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
 	const amount = interaction.isChatInputCommand() ? (interaction.options.getInteger('amount') ?? 1) : 1;
 
-	const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
+	const guildResult = await guildModel.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 
 	const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 	if (giveaway === undefined) {
@@ -193,7 +193,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	await message.reply(`This giveaway has been rerolled, so congratulations to ${newWinnersMessage}`);
 
-	await guildSchema.findOneAndUpdate(
+	await guildModel.findOneAndUpdate(
 		{
 			_id: interaction.guildId,
 			'giveaways.messageId': messageId
@@ -208,7 +208,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 	const inc = 20;
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
-	const guildResult = await guildSchema.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
+	const guildResult = await guildModel.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 	const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 
 	if (giveaway === undefined) {
@@ -252,7 +252,7 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 	const { displayName } = member;
 	const user = await member.user.fetch();
 
-	const memberResult = await memberSchema.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
+	const memberResult = await memberModel.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 	const embed = new TimestampedEmbed()
 		.setTitle(`${formatPossessive(displayName)} Milestones`)
@@ -263,7 +263,7 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 		embed.setDescription('No milestones');
 	}
 	else {
-		const { milestones } = await guildSchema.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+		const { milestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
 		let i = 0;
 		for (const milestone of memberResult.milestones.sort((a, b) => {
