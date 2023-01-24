@@ -37,7 +37,8 @@ export default new SlashCommand({
 					.setDescription(cosmetics
 						.sort((a, b) => cosmeticToAddedTime(a) - cosmeticToAddedTime(b))
 						.map(c => `${c.name} (${c.type.displayValue})`)
-						.join('\n'))
+						.join('\n')
+					)
 			]
 		});
 	}
