@@ -28,7 +28,7 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
 					{ name: 'Time', value: `Ends ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
 		);
-	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(r => `${guild.roles.cache.get(r.id)?.name}: +${r.amount} Entries`).join('\n'), inline: true });
+	if (giveaway.bonusRoles.length > 0) embed.addFields({ name: 'Role Bonuses', value: giveaway.bonusRoles.map(r => `${guild.roles.cache.get(r.id)?.name ?? 'Deleted Role'}: +${r.amount} Entries`).join('\n'), inline: true });
 
 	return embed;
 };
@@ -231,7 +231,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${id}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
 			{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
-			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(r => `${interaction.guild.roles.cache.get(r.id)?.name}: ${r.amount} Entries`).join('\n'), inline: true }
+			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(r => `${interaction.guild.roles.cache.get(r.id)?.name ?? 'Deleted Role'}: ${r.amount} Entries`).join('\n'), inline: true }
 		]);
 
 	const willUseButtons = entrants.length > inc;
