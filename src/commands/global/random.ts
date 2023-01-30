@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
-import { getRandomItem, normalize } from '@squiddleton/util';
+import { getRandomItem } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { BackgroundURL } from '../../util/constants.js';
@@ -71,15 +71,14 @@ export default new SlashCommand({
 		const wrapImage = await loadImage(getImage(wrap));
 		ctx.drawImage(wrapImage, background.width - (background.height * wrapImage.width / wrapImage.height / 2), background.height / 2, background.height * wrapImage.width / wrapImage.height / 2, background.height / 2);
 
-		const attachmentName = `${normalize(interaction.user.username)}sLoadout.png`;
 
-		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: attachmentName });
+		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
 
 		await interaction.editReply({
 			embeds: [
 				new TimestampedEmbed()
 					.setTitle('Randomly Generated Loadout')
-					.setImage(`attachment://${attachmentName}`)
+					.setImage('attachment://loadout.png')
 					.setFields(
 						{ name: 'Outfit', value: outfit.name, inline: true },
 						{ name: 'Back Bling', value: backBling.name, inline: true },
