@@ -2,16 +2,7 @@ import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 import { EpicError } from './classes.js';
 import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
-import type { AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthAccessTokenResponse, DeviceAuthResponse, EpicAccount, Friend, RawEpicError, RefreshTokenAccessTokenResponse, RefreshTokenBody, Stats } from './types.js';
-
-const checkError = async <Res>(res: Response) => {
-	if (!res.ok) throw new Error(`Unexpected Epic response status: [${res.status}] ${res.statusText}`);
-	const json: Res | RawEpicError = await res.json();
-	if (EpicError.isRawEpicError(json)) {
-		throw new EpicError(json);
-	}
-	return json;
-};
+import type { AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthAccessTokenResponse, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenAccessTokenResponse, RefreshTokenBody, Stats } from './types.js';
 
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	method: 'post',
@@ -36,8 +27,7 @@ export async function getAccessToken(body: RefreshTokenBody | DeviceAuth = confi
 			body: new URLSearchParams({ ...body })
 		}
 	);
-	if (!res.ok) throw new Error(`Unexpected Epic response status: [${res.status}] ${res.statusText}`);
-	return res.json();
+	return EpicError.validate(res);
 }
 
 export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) => {
@@ -51,7 +41,7 @@ export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) 
 	}
 
 	const res = await fetch(url, init);
-	return checkError<Res>(res);
+	return EpicError.validate<Res>(res);
 };
 
 /**

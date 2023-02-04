@@ -283,17 +283,6 @@ export type Dimensions = { [K in Link]: [number, number, number, number] };
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
-export interface RawEpicError {
-	errorCode: string;
-	errorMessage: string;
-	messageVars: string[];
-	numericErrorCode: number;
-	originatingService: string;
-	intent: string;
-	error_description?: string;
-	error?: string;
-}
-
 export type SlashOrMessageContextMenu = ChatInputCommandInteraction | MessageContextMenuCommandInteraction;
 
 export interface Stats {

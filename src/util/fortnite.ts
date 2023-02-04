@@ -2,16 +2,16 @@ import { Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, PermissionFlagsBits, Snowflake, StringSelectMenuBuilder, codeBlock, time } from 'discord.js';
+import fortniteAPI from '../clients/fortnite.js';
+import guildModel from '../models/guilds.js';
+import memberModel from '../models/members.js';
+import userModel from '../models/users.js';
 import { DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
 import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
 import { isBackground } from './typeguards.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
-import fortniteAPI from '../clients/fortnite.js';
-import guildModel from '../models/guilds.js';
-import memberModel from '../models/members.js';
-import userModel from '../models/users.js';
 
 const cosmeticCache: CosmeticCache = {
 	cosmetics: [],
@@ -55,10 +55,7 @@ export const fetchItemShop = async () => {
 };
 
 export const fetchShopNames = async (state: TimelineClientEvent) => {
-	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => {
-		if (!r.ok) throw new Error(`Unexpected Fortnite website response status: [${r.status}] ${r.statusText}`);
-		return r.json();
-	});
+	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => EpicError.validate(r));
 	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
 
 	const shopIds = Object.keys(state.state.sectionStoreEnds);
@@ -389,8 +386,8 @@ const handleLevelsError = (e: unknown) => {
 			}
 		}
 	}
-	if (e instanceof EpicError) {
-		if (e.raw.numericErrorCode === EpicErrorCode.InvalidGrant) {
+	else if (e instanceof EpicError) {
+		if (e.code === EpicErrorCode.InvalidGrant) {
 			console.error('The main Epic account credentials must be updated.');
 			return 'This bot\'s Epic account credentials must be updated; please try again later.';
 		}

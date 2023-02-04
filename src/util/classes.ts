@@ -1,7 +1,7 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, GuildBasedChannel, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
 import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
-import type { AnyGuildTextChannel, RawEpicError } from './types';
+import type { AnyGuildTextChannel } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
 	getPermissions(channel: GuildBasedChannel): PermissionsBitField {
@@ -61,13 +61,19 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 }
 
 export class EpicError extends Error {
-	raw: RawEpicError;
-	constructor(error: RawEpicError) {
-		super(error.errorMessage);
-		this.raw = error;
+	code: number;
+	constructor(message: string, code: number, text: string) {
+		super(message);
+		this.code = code;
+		console.error(text);
 	}
-	static isRawEpicError(obj: any): obj is RawEpicError {
-		return 'errorCode' in obj;
+	static async validate<Res = unknown>(res: Response) {
+		if (!res.ok) {
+			const text = await res.text();
+			throw new EpicError(`Unexpected Epic response status: ${res.statusText}`, res.status, text);
+		}
+		const json: Res = await res.json();
+		return json;
 	}
 }
 
