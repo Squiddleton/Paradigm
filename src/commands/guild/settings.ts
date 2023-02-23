@@ -69,7 +69,7 @@ export default new SlashCommand({
 						await guildModel.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
 						await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
 					})
-					.on('end', async () => {
+					.once('end', async () => {
 						try {
 							await interaction.deleteReply();
 						}
