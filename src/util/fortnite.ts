@@ -106,16 +106,16 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 				: await guild.members.fetch({ user: userIds });
 
 			if (members.size !== 0) {
-				const msgs = ['Today\'s shop includes the following items from members\' wishlists:\n'];
+				const messages = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
 					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => c.name));
 					if (items.length > 0) {
-						msgs.push(`<@${user._id}>: ${items.join(', ')}`);
+						messages.push(`<@${user._id}>: ${items.join(', ')}`);
 					}
 				}
 
-				if (msgs.length !== 1 && guildResult.wishlistChannelId !== null) {
+				if (messages.length !== 1 && guildResult.wishlistChannelId !== null) {
 					const channel = client.channels.cache.get(guildResult.wishlistChannelId);
 					const unbindChannel = async (reason: string) => {
 						console.log(reason);
@@ -136,16 +136,16 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 						continue;
 					}
 
-					msgs.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
+					messages.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
 
-					const fullMsg = msgs.join('\n');
+					const fullMsg = messages.join('\n');
 					if (debug) {
 						console.log(fullMsg);
 					}
 					else {
 						try {
-							for (const message of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
-								await channel.send(message);
+							for (const content of fullMsg.match(/(.|[\r\n]){1,2000}/g) ?? []) {
+								await channel.send(content);
 							}
 						}
 						catch (error) {
@@ -615,12 +615,12 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	const willUseButtons = cosmeticStrings.length > inc;
 	const buttons = createPaginationButtons();
 
-	const msg = await interaction.reply({
+	const message = await interaction.reply({
 		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [],
 		embeds: [embed],
 		ephemeral: !user.same,
 		fetchReply: true
 	});
 
-	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Cosmetics', cosmeticStrings, inc);
+	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Cosmetics', cosmeticStrings, inc);
 };

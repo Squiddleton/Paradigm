@@ -217,17 +217,17 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		return;
 	}
 
-	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
+	const giveawayMessage = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
 	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
 
 	const embed = new TimestampedEmbed()
-		.setTitle(message.embeds[0].title)
+		.setTitle(giveawayMessage.embeds[0].title)
 		.setThumbnail(interaction.guild.iconURL())
 		.setColor('Blue')
 		.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(0, inc).join('\n') || 'None'}`)
 		.setFields([
-			{ name: 'Message', value: `[Link](${message.url})`, inline: true },
+			{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
 			{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
 			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${id}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
@@ -238,9 +238,9 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const willUseButtons = entrants.length > inc;
 	const buttons = createPaginationButtons();
 
-	const msg = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
+	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
 
-	if (willUseButtons) paginate(interaction, msg, embed, buttons, 'Entrants', entrants, inc);
+	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };
 
 export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);

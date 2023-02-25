@@ -48,7 +48,7 @@ export default new SlashCommand({
 			.setImage('attachment://outfit.png')
 			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);
 
-		const message = await interaction.reply({ components: [row], embeds: [embed], files: [silhouette] });
+		const response = await interaction.reply({ components: [row], embeds: [embed], files: [silhouette] });
 
 		const modal = new ModalBuilder()
 			.setTitle('Guess the Outfit')
@@ -64,7 +64,7 @@ export default new SlashCommand({
 				)
 			);
 
-		const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: Time.GuessCollector });
+		const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: Time.GuessCollector });
 		collector.on('collect', async buttonInteraction => {
 			await buttonInteraction.showModal(modal);
 		});
