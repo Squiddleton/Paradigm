@@ -84,6 +84,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
 	const [first, back, next, last, quit] = buttons;
 	let index = 0;
+	// Create the collector on the channel since message collectors do not work on ephemeral messages
 	const collector = message.channel.createMessageComponentCollector({
 		componentType: ComponentType.Button,
 		filter: (i) => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
