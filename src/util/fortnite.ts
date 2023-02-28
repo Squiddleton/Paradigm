@@ -315,7 +315,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	const message = await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
 		const collector = message.createMessageComponentCollector<ButtonOrMenu>({ filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
-		const options: { [key: string]: string } = {};
+		const options: Record<string, string> = {};
 
 		collector
 			.on('collect', async i => {
