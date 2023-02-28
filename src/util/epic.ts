@@ -1,8 +1,8 @@
-import fortniteAPI from '../clients/fortnite.js';
-import config from '../config.js';
 import { EpicError } from './classes.js';
 import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
 import type { AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthAccessTokenResponse, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenAccessTokenResponse, RefreshTokenBody, Stats } from './types.js';
+import fortniteAPI from '../clients/fortnite.js';
+import config from '../config.js';
 
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	method: 'post',

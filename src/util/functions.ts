@@ -1,12 +1,12 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
 import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
-import guildModel from '../models/guilds';
-import memberModel from '../models/members';
-import userModel from '../models/users';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import guildModel from '../models/guilds';
+import memberModel from '../models/members';
+import userModel from '../models/users';
 
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
