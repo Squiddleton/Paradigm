@@ -19,7 +19,7 @@ const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.targe
 
 const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
 	const cosmetics = await fetchCosmetics();
-	const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName));
+	const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName).filter((n): n is string => n !== null));
 	const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 	await interaction.respond(choices);
 };
@@ -57,7 +57,7 @@ export default new ClientEvent({
 						break;
 					}
 					case 'playlist': {
-						const playlists = removeDuplicates((await fortniteAPI.playlists()).map(mapByName));
+						const playlists = removeDuplicates((await fortniteAPI.playlists()).map(mapByName).filter((n): n is string => n !== null));
 						const { ratings } = findBestMatch(input, playlists);
 						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);

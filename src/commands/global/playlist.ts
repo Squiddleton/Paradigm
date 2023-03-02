@@ -23,7 +23,7 @@ export default new SlashCommand({
 		const input = interaction.options.getString('playlist', true);
 		const playlists = await fortniteAPI.playlists();
 
-		const playlist = playlists.find(p => [p.name, p.id].some(keyword => normalize(keyword) === normalize(input)));
+		const playlist = playlists.find(p => [p.name, p.id].some(keyword => keyword !== null && normalize(keyword) === normalize(input)));
 		if (playlist === undefined) {
 			await interaction.editReply('No playlist matches your query.');
 			return;
@@ -32,7 +32,7 @@ export default new SlashCommand({
 		await interaction.editReply({
 			embeds: [
 				new TimestampedEmbed()
-					.setTitle(playlist.name)
+					.setTitle(playlist.name ?? 'Unnamed Playlist')
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
 					.setImage(playlist.images.showcase)
 					.setFields([
