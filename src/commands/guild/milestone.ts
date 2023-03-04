@@ -152,8 +152,7 @@ export default new SlashCommand({
 					embed.setDescription('No milestones');
 				}
 				else {
-					let i = 0;
-					for (const milestone of milestones.sort((a, b) => {
+					milestones.sort((a, b) => {
 						if (!isRarity(a.rarity)) {
 							throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', a.rarity));
 						}
@@ -161,7 +160,9 @@ export default new SlashCommand({
 							throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', b.rarity));
 						}
 						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : RarityOrdering[a.rarity] - RarityOrdering[b.rarity];
-					})) {
+					});
+					let i = 0;
+					for (const milestone of milestones) {
 						if (i < 25) embed.addFields([{ name: milestone.name, value: milestone.description, inline: true }]);
 						i++;
 					}
