@@ -17,7 +17,9 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply({ ephemeral: true });
 		exec(interaction.options.getString('command', true), { encoding: 'utf8' }, async (error, stdout, stderr) => {
-			await interaction.editReply(codeBlock('js', error ? stderr : stdout));
+			let content = error !== null ? stderr : stdout;
+			content = content === '' ? 'There was no output returned.' : codeBlock(content);
+			await interaction.editReply(content);
 		});
 	}
 });
