@@ -15,7 +15,7 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 
 export function getAccessToken(body: RefreshTokenBody): Promise<RefreshTokenAccessTokenResponse>;
 export function getAccessToken(body?: DeviceAuth): Promise<DeviceAuthAccessTokenResponse>;
-export async function getAccessToken(body: RefreshTokenBody | DeviceAuth = config.epicDeviceAuth.device1) {
+export async function getAccessToken(body: RefreshTokenBody | DeviceAuth = config.epicDeviceAuth.device2) {
 	const res = await fetch(
 		EpicEndpoint.AccessToken,
 		{
