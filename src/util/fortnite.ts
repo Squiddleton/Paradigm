@@ -1,7 +1,7 @@
 import { Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, PermissionFlagsBits, Snowflake, StringSelectMenuBuilder, codeBlock, time } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, ColorResolvable, Colors, CommandInteraction, ComponentType, EmbedBuilder, MessageActionRowComponentBuilder, PermissionFlagsBits, Snowflake, StringSelectMenuBuilder, bold, codeBlock, time } from 'discord.js';
 import { DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
@@ -364,7 +364,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-const formatLevels = (levels: Record<string, number>, name: string) => `\`${formatPossessive(name)}\` **Battle Pass Levels**\n\n${Object
+const formatLevels = (levels: Record<string, number>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
 	.entries(levels)
 	.sort()
 	.map(([k, v]) => {

@@ -253,23 +253,22 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 	const { displayName } = member;
 	const user = await member.user.fetch();
 
-	const memberResult = await memberModel.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
+	const { milestones: memberMilestones } = await memberModel.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
 	const embed = new TimestampedEmbed()
 		.setTitle(`${formatPossessive(displayName)} Milestones`)
 		.setThumbnail(member.displayAvatarURL())
 		.setColor(user.accentColor ?? null);
 
-	if (memberResult.milestones.length === 0) {
+	if (memberMilestones.length === 0) {
 		embed.setDescription('No milestones');
 	}
 	else {
-		const { milestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+		const { milestones: guildMilestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 
-		let i = 0;
-		for (const milestone of memberResult.milestones.sort((a, b) => {
-			const fullA = milestones.find(m => m.name === a);
-			const fullB = milestones.find(m => m.name === b);
+		memberMilestones.sort((a, b) => {
+			const fullA = guildMilestones.find(m => m.name === a);
+			const fullB = guildMilestones.find(m => m.name === b);
 
 			if (fullA === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', a));
 			if (fullB === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', b));
@@ -281,10 +280,13 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 			}
 
 			return fullA.rarity === fullB.rarity ? fullA.name > fullB.name ? 1 : -1 : RarityOrdering[fullA.rarity] - RarityOrdering[fullB.rarity];
-		})) {
-			const milestoneWithDescription = milestones.find(m => m.name === milestone);
-			if (milestoneWithDescription === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', milestone));
-			if (i < 25) embed.addFields([{ name: milestone, value: milestoneWithDescription.description, inline: true }]);
+		});
+
+		let i = 0;
+		for (const milestone of memberMilestones) {
+			const guildMilestone = guildMilestones.find(m => m.name === milestone);
+			if (guildMilestone === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', milestone));
+			if (i < 25) embed.addFields([{ name: milestone, value: guildMilestone.description, inline: true }]);
 			i++;
 		}
 	}
