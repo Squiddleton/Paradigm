@@ -21,7 +21,6 @@
     "@squiddleton/discordjs-util": "^1.1.0",
     "@squiddleton/fortnite-api": "^1.1.0",
     "@squiddleton/util": "^1.0.1",
-    "discord-api-types": "^0.37.20",
     "discord.js": "^14.7.1",
     "mongoose": "^6.8.0",
     "node-cron": "^3.0.2",
