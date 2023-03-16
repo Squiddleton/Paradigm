@@ -8,7 +8,6 @@
     "outDir": "dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
     "strict": true,
     "noImplicitAny": true,
     "useUnknownInCatchVariables": true,
