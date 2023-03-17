@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, BaseInteraction, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Colors, CommandInteraction, ComponentType, EmbedBuilder, Guild, Message, MessageComponentInteraction, Role, Snowflake, UserContextMenuCommandInteraction, time } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type Role, type Snowflake, type UserContextMenuCommandInteraction, time } from 'discord.js';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';

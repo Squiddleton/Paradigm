@@ -1,5 +1,5 @@
 import { readdirSync } from 'node:fs';
-import { ClientEvent, ContextMenu, ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
+import { ClientEvent, ContextMenu, type ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
 import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';

@@ -1,6 +1,6 @@
 import { loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType, Message } from 'discord.js';
+import { ApplicationCommandOptionType, type Message } from 'discord.js';
 import { DiscordClient } from '../../util/classes';
 import { DiscordIds, ErrorMessage } from '../../util/constants';
 import type { AnyGuildTextChannel } from '../../util/types';

@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, Colors, ComponentType, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { RarityColors, Time } from '../../util/constants.js';
 import { fetchCosmetics } from '../../util/fortnite.js';

@@ -1,8 +1,8 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { ApplicationCommandOptionChoiceData, AutocompleteInteraction, DiscordAPIError, InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, Snowflake, User } from 'discord.js';
-import { Rating, findBestMatch } from 'string-similarity';
+import { type ApplicationCommandOptionChoiceData, type AutocompleteInteraction, DiscordAPIError, type InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
+import { type Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';

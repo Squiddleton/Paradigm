@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Language } from '@squiddleton/fortnite-api';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, type MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
 import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';

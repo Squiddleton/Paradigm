@@ -1,5 +1,5 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, Client as BaseClient, ChannelType, EmbedBuilder, GuildBasedChannel, PermissionFlagsBits, PermissionsBitField, Snowflake, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, type Client as BaseClient, ChannelType, EmbedBuilder, type GuildBasedChannel, PermissionFlagsBits, type PermissionsBitField, type Snowflake, StringSelectMenuBuilder } from 'discord.js';
 import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
 import type { AnyGuildTextChannel } from './types';
 
