@@ -67,7 +67,7 @@ export const fetchShopNames = async (state: TimelineClientEvent) => {
 			return returned;
 		})
 		.sort((a, b) => b.landingPriority - a.landingPriority)
-		.map(s => s.sectionDisplayName ?? 'Featured');
+		.map(s => (s.sectionDisplayName === undefined || s.sectionDisplayName === '') ? 'Featured' : s.sectionDisplayName);
 
 	return Object.entries(quantify(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
 };
