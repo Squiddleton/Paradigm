@@ -1,4 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
+import { DiscordAPIError, type Message, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds } from '../util/constants.js';
@@ -36,12 +37,20 @@ export default new ClientEvent({
 			if (guildId === exclusiveGuildId) {
 				if (!isBot) {
 					if (message.channelId === DiscordIds.ChannelId.StickerEmojiSubmissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.RoleId.Mod)) {
-						const msg = await message.reply(denySubmissionMessage).catch(() => null);
-						if (msg !== null) {
-							await message.delete().catch(() => message.reply('I am unable to delete this message without the Manage Messages permission.'));
-							setTimeout(async () => {
-								await msg.delete().catch(() => null);
-							}, 5000);
+						const botPermissions = message.channel.permissionsFor(client.user);
+						if (botPermissions !== null && botPermissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
+							const tryToDelete = async (m: Message) => {
+								try {
+									await m.delete();
+								}
+								catch (e) {
+									if (!(e instanceof DiscordAPIError) || e.code !== RESTJSONErrorCodes.UnknownMessage) console.error(e);
+								}
+							};
+
+							const msg = await message.reply(denySubmissionMessage);
+							if (botPermissions.has(PermissionFlagsBits.ManageMessages)) await tryToDelete(message);
+							setTimeout(() => tryToDelete(msg), 5000);
 						}
 					}
 				}
