@@ -277,8 +277,7 @@ export default new SlashCommand({
 				const text = interaction.options.getString('text', true);
 				const winners = interaction.options.getInteger('winners', true);
 				const messages = interaction.options.getInteger('messages') ?? 0;
-				const channel = interaction.options.getChannel('channel', true);
-				if (!channel.isTextBased()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', channel.type.toString()));
+				const channel = interaction.options.getChannel('channel', true, TextBasedChannelTypes);
 				const giveawayTime = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
 				const role1 = interaction.options.getRole('bonusrole1');

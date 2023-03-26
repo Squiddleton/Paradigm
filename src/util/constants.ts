@@ -1,5 +1,5 @@
 import { getEnumKeys } from '@squiddleton/util';
-import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, type ColorResolvable, PermissionFlagsBits } from 'discord.js';
+import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, type ColorResolvable, PermissionFlagsBits, type TextBasedChannel } from 'discord.js';
 import type { StringChoices } from './types';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
@@ -212,7 +212,7 @@ export const Seasons = Array.from({
 	length: 23 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
-export const TextBasedChannelTypes: ApplicationCommandOptionAllowedChannelTypes[] = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
+export const TextBasedChannelTypes: (ApplicationCommandOptionAllowedChannelTypes & TextBasedChannel['type'])[] = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
 
 export enum Time {
 	/** 3 minutes */
