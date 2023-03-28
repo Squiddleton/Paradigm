@@ -1,7 +1,7 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
 import { type DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { epicFetch, getLevels } from './epic.js';
@@ -608,7 +608,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 
 	const embed = new TimestampedEmbed()
 		.setColor(user.color)
-		.setDescription(`Cosmetics (${cosmeticStrings.length}):\n${cosmeticStrings.slice(0, inc).join('\n')}`)
+		.setDescription(underscore(`Cosmetics (${cosmeticStrings.length}):\n${cosmeticStrings.slice(0, inc).join('\n')}`))
 		.setThumbnail(user.avatar)
 		.setTitle(`${formatPossessive(user.username)} Wishlist`);
 

@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type Role, type Snowflake, type UserContextMenuCommandInteraction, time } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type Role, type Snowflake, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';
@@ -92,6 +92,8 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	});
 	collector
 		.on('collect', async i => {
+			const getDescription = () => underscore(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+
 			switch (i.customId) {
 				case 'quit': {
 					await i.update({ components: [] });
@@ -102,13 +104,13 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 					index = 0;
 					await i.update({
 						components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
-						embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
+						embeds: [embed.setDescription(getDescription())]
 					});
 					break;
 				}
 				case 'back': {
 					index -= inc;
-					embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+					embed.setDescription(getDescription());
 					if (index === 0) {
 						await i.update({
 							components: [row.setComponents([first.setDisabled(true), back.setDisabled(true), next.setDisabled(false), last.setDisabled(false), quit])],
@@ -125,7 +127,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 				}
 				case 'next': {
 					index += inc;
-					embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+					embed.setDescription(getDescription());
 					if (index + inc >= items.length) {
 						await i.update({
 							components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
@@ -144,7 +146,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 					index = inc * Math.floor(items.length / inc);
 					await i.update({
 						components: [row.setComponents([first.setDisabled(false), back.setDisabled(false), next.setDisabled(true), last.setDisabled(true), quit])],
-						embeds: [embed.setDescription(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`)]
+						embeds: [embed.setDescription(getDescription())]
 					});
 				}
 			}
