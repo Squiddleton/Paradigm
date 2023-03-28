@@ -92,7 +92,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	});
 	collector
 		.on('collect', async i => {
-			const getDescription = () => underscore(`${itemName} (${items.length}):\n${items.slice(index, index + inc).join('\n')}`);
+			const getDescription = () => `${underscore(`${itemName} (${items.length}):`)}\n${items.slice(index, index + inc).join('\n')}`;
 
 			switch (i.customId) {
 				case 'quit': {
