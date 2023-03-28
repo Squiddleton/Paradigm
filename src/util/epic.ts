@@ -18,21 +18,30 @@ export function getAccessToken(body?: DeviceAuth): Promise<DeviceAuthAccessToken
 export async function getAccessToken(body?: RefreshTokenBody | DeviceAuth) {
 	const bodies = body === undefined ? [config.epicDeviceAuth.device1, config.epicDeviceAuth.device2] : [body];
 
+	let lastError: unknown;
+
 	for (const b of bodies) {
-		const res = await fetch(
-			EpicEndpoint.AccessToken,
-			{
-				method: 'post',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					Authorization: `basic ${EncodedClient}`
-				},
-				body: new URLSearchParams({ ...b })
-			}
-		);
-		const validated = EpicError.validate(res);
-		return validated;
+		try {
+			const res = await fetch(
+				EpicEndpoint.AccessToken,
+				{
+					method: 'post',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						Authorization: `basic ${EncodedClient}`
+					},
+					body: new URLSearchParams({ ...b })
+				}
+			);
+			const validated = EpicError.validate(res);
+			return validated;
+		}
+		catch (e) {
+			lastError = e;
+		}
 	}
+
+	throw lastError;
 }
 
 export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) => {
