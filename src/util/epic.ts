@@ -1,6 +1,6 @@
 import { EpicError } from './classes.js';
 import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
-import type { AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthAccessTokenResponse, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenAccessTokenResponse, RefreshTokenBody, Stats } from './types.js';
+import type { AuthResponse, AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenBody, Stats } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 
@@ -13,9 +13,7 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	body
 });
 
-export function getAccessToken(body: RefreshTokenBody): Promise<RefreshTokenAccessTokenResponse>;
-export function getAccessToken(body?: DeviceAuth): Promise<DeviceAuthAccessTokenResponse>;
-export async function getAccessToken(body?: RefreshTokenBody | DeviceAuth) {
+export const getAccessToken = async <T extends RefreshTokenBody | DeviceAuth = DeviceAuth>(body?: T): Promise<AuthResponse<T>> => {
 	const bodies = body === undefined ? [config.epicDeviceAuth.device1, config.epicDeviceAuth.device2] : [body];
 
 	let lastError: unknown;
@@ -33,7 +31,7 @@ export async function getAccessToken(body?: RefreshTokenBody | DeviceAuth) {
 					body: new URLSearchParams({ ...b })
 				}
 			);
-			const validated = EpicError.validate(res);
+			const validated = EpicError.validate<AuthResponse<T>>(res);
 			return validated;
 		}
 		catch (e) {
@@ -42,7 +40,7 @@ export async function getAccessToken(body?: RefreshTokenBody | DeviceAuth) {
 	}
 
 	throw lastError;
-}
+};
 
 export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) => {
 	if (init === undefined) {

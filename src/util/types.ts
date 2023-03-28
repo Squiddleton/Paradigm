@@ -35,6 +35,16 @@ export interface RefreshTokenAccessTokenResponse extends BaseAccessTokenResponse
 	application_id: string;
 }
 
+export type AuthBody = DeviceAuth | RefreshTokenBody;
+
+export type AuthResponse<T> =
+	T extends DeviceAuth
+		? DeviceAuthAccessTokenResponse
+		: T extends RefreshTokenBody
+			? RefreshTokenAccessTokenResponse
+			: never;
+
+
 export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
 export type AnyObject = Record<string, unknown>;
