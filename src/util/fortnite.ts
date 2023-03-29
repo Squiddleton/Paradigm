@@ -602,7 +602,8 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		.map(id => {
 			const cosmetic = cosmetics.find(c => c.id === id);
 			if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
-			return `${cosmetic.name} (${cosmetic.type.displayValue})`;
+			const type = cosmetic.type.displayValue;
+			return `${cosmetic.name}${type === 'Outfit' ? '' : ` (${type})`}`;
 		})
 		.sort((a, b) => a.localeCompare(b));
 
