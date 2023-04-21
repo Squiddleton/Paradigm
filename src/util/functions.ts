@@ -1,7 +1,7 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type Role, type Snowflake, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
 import { DiscordClient, TimestampedEmbed } from './classes';
-import { ErrorMessage, RarityOrdering, Time } from './constants.js';
+import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
 import { isRarity } from './typeguards.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 import guildModel from '../models/guilds';
@@ -67,6 +67,39 @@ export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMen
 	const giveawayChannel = client.getVisibleChannel(channelId);
 	const message = await giveawayChannel.messages.fetch(messageId);
 	return message;
+};
+
+export const handleReaction = async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser, added: boolean) => {
+	const { client } = reaction;
+	DiscordClient.assertReadyClient(client);
+	if (reaction.partial) {
+		try {
+			await reaction.fetch();
+		}
+		catch (error) {
+			console.error(`An error has occurred when a fetching a${added ? 'n added' : ' removed'} reaction: `, error);
+			return;
+		}
+	}
+	const { message } = reaction;
+	if (message.guildId === DiscordIds.GuildId.FortniteBR) {
+		const toString = reaction.emoji.toString();
+		const logChannel = client.getGuildChannel(DiscordIds.ChannelId.Logs);
+
+		await logChannel.send({
+			embeds: [
+				new TimestampedEmbed()
+					.setDescription(`Reaction from ${user} (${user.id}) ${added ? 'added' : 'removed'}.`)
+					.setFields([
+						{ name: 'Reaction Name', value: reaction.emoji.name ?? toString, inline: true },
+						{ name: 'Reaction URL', value: reaction.emoji.url ?? toString, inline: true },
+						{ name: 'Message URL', value: message.url, inline: true }
+					])
+					.setColor(added ? 'Green' : 'Purple')
+					.setFooter({ text: 'Logs: Reactions' })
+			]
+		});
+	}
 };
 
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
