@@ -106,9 +106,10 @@ export interface DeviceAuthResponse {
 
 export interface EpicAccount {
 	id: string;
-	displayName: string;
+	displayName?: string;
 	passwordResetRequired?: boolean;
 	links?: AnyObject;
+	displayNameType?: string;
 	externalAuths: Record<string, AnyObject>;
 }
 
