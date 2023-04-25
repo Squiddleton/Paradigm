@@ -140,7 +140,7 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 						{ name: 'Reaction URL', value: reaction.emoji.url ?? toString, inline: true },
 						{ name: 'Message URL', value: message.url, inline: true }
 					])
-					.setColor(added ? 'Green' : 'Purple')
+					.setColor(added ? Colors.Green : Colors.Purple)
 					.setFooter({ text: 'Logs: Reactions' })
 			]
 		});
