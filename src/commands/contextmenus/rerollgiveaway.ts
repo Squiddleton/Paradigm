@@ -1,5 +1,6 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import { ApplicationCommandType, PermissionFlagsBits } from 'discord.js';
+import { ErrorMessage } from '../../util/constants';
 import { rerollGiveaway } from '../../util/functions';
 
 export default new ContextMenu({
@@ -8,6 +9,7 @@ export default new ContextMenu({
 	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
 	async execute(interaction) {
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 		await rerollGiveaway(interaction);
 	}
 });

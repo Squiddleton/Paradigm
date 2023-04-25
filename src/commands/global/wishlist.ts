@@ -55,7 +55,7 @@ export default new SlashCommand({
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
-				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true), true);
+				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true));
 				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;
@@ -84,7 +84,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'remove': {
-				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true), true);
+				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true));
 				if (cosmetic === null) {
 					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
 					return;

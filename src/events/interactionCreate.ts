@@ -41,7 +41,7 @@ export default new ClientEvent({
 			try {
 				switch (name) {
 					case 'cosmetic': {
-						const cosmetics = await fetchCosmetics(interaction.commandName === 'wishlist');
+						const cosmetics = await fetchCosmetics();
 						const { ratings } = findBestMatch(input, cosmetics.map(c => `${c.name} (${c.type.displayValue})`));
 						const choices = ratings.sort(sortByRating).map(({ target }) => {
 							const targetStrings = target.split('(');

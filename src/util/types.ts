@@ -293,7 +293,7 @@ export type Dimensions = { [K in Link]: [number, number, number, number] };
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
-export type SlashOrMessageContextMenu = ChatInputCommandInteraction | MessageContextMenuCommandInteraction;
+export type SlashOrMessageContextMenu = ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
 
 export interface Stats {
 	startTime: number;

@@ -1,13 +1,13 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
-import { type Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
 import { type DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
-import { epicFetch, getLevels } from './epic.js';
+import { getLevels, getTimeline } from './epic.js';
 import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
 import { isBackground } from './typeguards.js';
-import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, Timeline, TimelineClientEvent } from './types.js';
+import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, TimelineClientEvent } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -18,28 +18,30 @@ const cosmeticCache: CosmeticCache = {
 	lastUpdatedTimestamp: 0
 };
 
-const itemShopFilter = (cosmetic: Cosmetic) => {
-	if (cosmetic.shopHistory?.length) return true;
-
-	return cosmetic.gameplayTags !== null &&
-		!cosmetic.gameplayTags.includes('Cosmetics.QuestsMetaData.Season10.Visitor') &&
-		!['_Sync', '_Owned', '_Follower'].some(w => cosmetic.id.endsWith(w)) &&
-		((cosmetic.gameplayTags.includes('Cosmetics.Source.ItemShop')) ||
-			(!['Cosmetics.Source.Promo', 'Cosmetics.Source.Granted.SaveTheWorld', 'Cosmetics.Source.testing', 'Cosmetics.QuestsMetaData.Achievements.Umbrella', 'Cosmetics.Source.MandosBountyLTM'].some(tag => cosmetic.gameplayTags?.includes(tag)) &&
-				!cosmetic.gameplayTags.some(t => ['BattlePass', 'Cosmetics.Source.Event', 'Challenges', 'SeasonShop'].some(w => t.includes(w))) &&
-				!['Recruit', 'null', '[PH] Join Squad'].includes(cosmetic.name)));
-};
-
-export const fetchCosmetics = async (itemShopOnly = false) => {
+/**
+ * Returns all known Fortnite cosmetics via Fortnite-API.
+ *
+ * @remarks
+ *
+ * Periodically updates the cached cosmetics and returns those instead of always fetching from the API.
+ *
+ * @returns An array of cosmetic objects
+ */
+export const fetchCosmetics = async () => {
 	const now = Date.now();
-	if ((cosmeticCache.lastUpdatedTimestamp + Time.CosmeticCacheUpdate) < now) {
+	if (cosmeticCache.cosmetics.length === 0 || ((cosmeticCache.lastUpdatedTimestamp + Time.CosmeticCacheUpdate) < now)) {
 		cosmeticCache.cosmetics = await fortniteAPI.listCosmetics();
 		cosmeticCache.lastUpdatedTimestamp = now;
 	}
 	const { cosmetics } = cosmeticCache;
-	return itemShopOnly ? cosmetics.filter(itemShopFilter) : cosmetics;
+	return cosmetics;
 };
 
+/**
+ * Returns the cosmetics currently in the Fortnite item shop.
+ *
+ * @returns An array of cosmetic objects
+ */
 export const fetchItemShop = async () => {
 	const rawAPI = await fortniteAPI.shop({ combined: true });
 
@@ -47,13 +49,17 @@ export const fetchItemShop = async () => {
 	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(e => e.items).flat();
 
 	for (const item of withDupes) {
-		if (!withoutDupes.some(c => c.id === item.id)) {
-			withoutDupes.push(item);
-		}
+		if (!withoutDupes.some(c => c.id === item.id)) withoutDupes.push(item);
 	}
 	return withoutDupes;
 };
 
+/**
+ * Returns the names of the shop tabs in a client event state.
+ *
+ * @param state - The client event state from Epic Games' timeline API
+ * @returns An array of shop tab names
+ */
 export const fetchShopNames = async (state: TimelineClientEvent) => {
 	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => EpicError.validate(r));
 	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
@@ -72,9 +78,12 @@ export const fetchShopNames = async (state: TimelineClientEvent) => {
 	return Object.entries(quantify(namesWithoutQuantity)).map(([name, amount]) => `${name}${amount === 1 ? '' : ` x ${amount}`}`);
 };
 
-export const fetchStates = () => epicFetch<Timeline>(EpicEndpoint.Timeline).then(timeline => timeline.channels['client-events'].states);
+/**
+ * Returns the current client event states from Epic Games' timeline API
+ */
+export const fetchStates = () => getTimeline().then(timeline => timeline.channels['client-events'].states);
 
-export const findCosmetic = async (input: string, itemShopOnly = false) => {
+export const findCosmetic = async (input: string) => {
 	try {
 		const cosmeticById = await fortniteAPI.findCosmetic({ id: input });
 		return cosmeticById;
@@ -85,13 +94,19 @@ export const findCosmetic = async (input: string, itemShopOnly = false) => {
 			return cosmeticByName;
 		}
 		catch {
-			const list = await fetchCosmetics(itemShopOnly);
+			const list = await fetchCosmetics();
 			input = normalize(input);
 			return list.find(c => normalize(c.name) === input) ?? null;
 		}
 	}
 };
 
+/**
+ * Notifies all users with wishlisted items in the current Fortnite item shop.
+ *
+ * @param client - A Discord client instance
+ * @param debug - Whether the output should only be logged instead of sent to Discord wishlist channels
+ */
 export const checkWishlists = async (client: DiscordClient<true>, debug = false) => {
 	const entries = await fetchItemShop();
 	const userResults = await userModel.find({ wishlistCosmeticIds: { $in: entries.map(c => c.id) } });
@@ -158,6 +173,12 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 	}
 };
 
+/**
+ * Returns an embed describing a cosmetic.
+ *
+ * @param cosmetic - A cosmetic object
+ * @returns An embed filled with information about the specified cosmetic
+ */
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	const color = RarityColors[cosmetic.rarity.displayValue] ?? 'Random';
 
@@ -182,6 +203,18 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	return embed;
 };
 
+/**
+ * Creates an image of a locker loadout.
+ *
+ * @param outfit - The outfit's name, or null if none
+ * @param backbling - The back bling's name, or null if none
+ * @param harvestingtool - The harvesting tool's name, or null if none
+ * @param glider - The glider's name, or null if none
+ * @param wrap - The wrap's name, or null if none
+ * @param chosenBackground - The background color, or null if random
+ * @param links - An object with keys of each cosmetic type and values of each cosmetic's image URL
+ * @returns A Discord attachment containing the image of the loadout or a string containing an error message
+ */
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
 	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
@@ -192,6 +225,14 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	const ctx = canvas.getContext('2d');
 	ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
+	/**
+	 * Draws an image of the cosmetic on the canvas.
+	 *
+	 * @param input - The cosmetic's name
+	 * @param displayType - The cosmetic's type that will be displayed in the error message
+	 * @param displayValues - The cosmetic's possible types in-game
+	 * @returns Void if successful or a string containing an error message
+	 */
 	const handleImage = async (input: StringOption, displayType: Link, displayValues: string[]) => {
 		let image: Image | null = null;
 		const link = links[displayType];
@@ -259,6 +300,19 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	return new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
 };
 
+/**
+ * Sends a message of a loadout with buttons to edit each cosmetic's styles.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param attachment - The attachment of the loadout image
+ * @param outfit - The outfit's name, or null if none
+ * @param backbling - The back bling's name, or null if none
+ * @param harvestingtool - The harvesting tool's name, or null if none
+ * @param glider - The glider's name, or null if none
+ * @param wrap - The wrap's name, or null if none
+ * @param chosenBackground - The background color, or null if random
+ * @param embeds - An array of embeds imitating a Twitter post
+ */
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
 	const cosmetics = await fetchCosmetics();
 	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
@@ -364,43 +418,63 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
-const formatLevels = (levels: Record<string, number>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
-	.entries(levels)
-	.sort()
-	.map(([k, v]) => {
-		const overallSeason = parseInt(k.match(/\d+/)![0]);
-		const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
-		const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-		return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
-	})
-	.join('\n')}`;
+/**
+ * Returns the content for a message containing a user's final level in each Fortnite season.
+ *
+ * @param client - A ready Discord client
+ * @param options - Options specifying the Discord user and their Epic Games account
+ * @returns Options for replying to an interaction and, if found, the user's Epic Games account
+ */
+export const getLevelsString = async (client: Client<true>, options: LevelCommandOptions): Promise<InteractionReplyOptions & { account?: EpicAccount }> => {
+	/**
+	 * Returns a string including each Fortnite season and the user's respective level.
+	 *
+	 * @param levels - An object with keys of the seasons and values of the user's level in the season
+	 * @param name - The user's Epic Games account username
+	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
+	 */
+	const formatLevels = (levels: Record<string, number>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
+		.entries(levels)
+		.sort()
+		.map(([k, v]) => {
+			const overallSeason = parseInt(k.match(/\d+/)![0]);
+			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
+			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
+		})
+		.join('\n')}`;
 
-const handleLevelsError = (e: unknown) => {
-	if (e instanceof FortniteAPIError) {
-		switch (e.code) {
-			case 403: {
-				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
+	/**
+	 * Returns a string representative of an error thrown from fetching a user's levels.
+	 *
+	 * @param e - The thrown error
+	 * @returns A string explaining the error to the command user
+	 */
+	const handleLevelsError = (e: unknown) => {
+		if (e instanceof FortniteAPIError) {
+			switch (e.code) {
+				case 403: {
+					return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
+				}
+				case 404: {
+					return 'No account was found with that username on that platform.';
+				}
 			}
-			case 404: {
-				return 'No account was found with that username on that platform.';
+		}
+		else if (e instanceof EpicError) {
+			if (e.code === EpicErrorCode.InvalidGrant) {
+				console.error('The main Epic account credentials must be updated.');
+				return 'This bot\'s Epic account credentials must be updated; please try again later.';
+			}
+			else {
+				console.error(e);
+				return e.message;
 			}
 		}
-	}
-	else if (e instanceof EpicError) {
-		if (e.code === EpicErrorCode.InvalidGrant) {
-			console.error('The main Epic account credentials must be updated.');
-			return 'This bot\'s Epic account credentials must be updated; please try again later.';
-		}
-		else {
-			console.error(e);
-			return e.message;
-		}
-	}
-	console.error(e);
-	return 'There was an error while fetching the account.';
-};
+		console.error(e);
+		return 'There was an error while fetching the account.';
+	};
 
-export const getLevelsString = async (client: Client<true>, options: LevelCommandOptions) => {
 	const { accountName, accountType } = options;
 
 	if (accountName === null) {
@@ -429,9 +503,19 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	}
 };
 
-export const handleStatsError = async (interaction: CommandInteraction, error: unknown) => {
-	if (!(error instanceof FortniteAPIError)) throw error;
-	switch (error.code) {
+/**
+ * Replies to an interaction with an error message thrown from fetching a user's stats.
+ *
+ * @remarks
+ *
+ * Re-throws the error if it is not an instance of the FortniteAPIError class.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param e - The thrown error
+ */
+export const handleStatsError = async (interaction: CommandInteraction, e: unknown) => {
+	if (!(e instanceof FortniteAPIError)) throw e;
+	switch (e.code) {
 		case 403: {
 			await interaction.editReply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
 			break;
@@ -443,27 +527,30 @@ export const handleStatsError = async (interaction: CommandInteraction, error: u
 	}
 };
 
+/**
+ * Replies to an interaction with an image of a user's Fortnite stats.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param options - Options for getting the user's Epic Games account
+ * @param content - A message to send alongside the stats image
+ */
 export const getStatsImage = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
 	if (options.accountName === null) {
 		const userResult = await userModel.findById(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
-			if (content !== undefined) {
-				await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
-			}
-			else {
-				await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
-			}
-			return;
+			if (content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
+			else await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
 		}
-
-		try {
-			const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
-			await interaction.editReply({ content, files: [image] });
-		}
-		catch (error) {
-			await handleStatsError(interaction, error);
+		else {
+			try {
+				const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
+				await interaction.editReply({ content, files: [image] });
+			}
+			catch (error) {
+				await handleStatsError(interaction, error);
+			}
 		}
 	}
 	else {
@@ -471,9 +558,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			const { image, account } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
 
-			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) {
-				await linkEpicAccount(interaction, account, true);
-			}
+			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}
 		catch (error) {
 			await handleStatsError(interaction, error);
@@ -481,12 +566,28 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	}
 };
 
+/**
+ * Gives a member a milestone.
+ *
+ * @param userId - The target member's id
+ * @param guildId - The target member's guild id
+ * @param milestoneName - The name of the milestone to grant
+ * @returns The member's database document pre-update
+ */
 export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberModel.updateOne(
 	{ userId, guildId },
 	{ $addToSet: { milestones: milestoneName } },
 	{ upsert: true }
 );
 
+/**
+ * Posts leaked shop sections across all subscribed channels.
+ *
+ * @param client - A Discord client instance
+ * @param currentNamesOrUndefined - The display names of the current shop tabs
+ * @param cachedNames - The display names of the past shop tabs
+ * @returns Whether the new shop tab names and quantities are different than the old ones
+ */
 export const postShopSections = async (client: DiscordClient<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
 	const [oldState, newState] = await fetchStates();
 	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
@@ -548,48 +649,58 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 	return true;
 };
 
-const getUserProperties = async (interaction: CommandInteraction): Promise<DisplayUserProperties> => {
-	const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
-	// Users must be force-fetched to retrieve banners
-	const user = await unfetchedUser.fetch();
-	const userId = user.id;
-	const isSameUser = interaction.user.id === user.id;
-	const userData = {
-		id: userId,
-		username: user.username,
-		color: user.accentColor ?? Colors.Purple,
-		avatar: user.displayAvatarURL(),
-		same: isSameUser
-	};
+/**
+ * Replies to an interaction with a user's wishlisted items
+ *
+ * @param interaction - The command interaction that initiated this function call
+ */
+export const viewWishlist = async (interaction: CommandInteraction) => {
+	/**
+	 * Returns properties of a user or member used in a wishlist embed.
+	 *
+	 * @returns An object containing properties such as a color and avatar URL
+	 */
+	const getUserProperties = async (): Promise<DisplayUserProperties> => {
+		const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
+		// Users must be force-fetched to retrieve banners
+		const user = await unfetchedUser.fetch();
+		const userId = user.id;
+		const isSameUser = interaction.user.id === user.id;
+		const userData = {
+			id: userId,
+			username: user.username,
+			color: user.accentColor ?? Colors.Purple,
+			avatar: user.displayAvatarURL(),
+			same: isSameUser
+		};
 
-	// Return as a User if the interaction was received in DMs
-	if (!interaction.inCachedGuild()) return userData;
+		// Return as a User if the interaction was received in DMs
+		if (!interaction.inCachedGuild()) return userData;
 
-	if (isSameUser) {
+		if (isSameUser) {
+			return {
+				id: userId,
+				username: interaction.member.displayName,
+				color: interaction.member.displayColor,
+				avatar: interaction.member.displayAvatarURL(),
+				same: true
+			};
+		}
+
+		const mentionedMember = interaction.options.getMember('user');
+		if (mentionedMember === null) return userData;
+
 		return {
 			id: userId,
-			username: interaction.member.displayName,
-			color: interaction.member.displayColor,
-			avatar: interaction.member.displayAvatarURL(),
-			same: true
+			username: mentionedMember.displayName,
+			color: mentionedMember.displayColor,
+			avatar: mentionedMember.displayAvatarURL(),
+			same: false
 		};
-	}
-
-	const mentionedMember = interaction.options.getMember('user');
-	if (mentionedMember === null) return userData;
-
-	return {
-		id: userId,
-		username: mentionedMember.displayName,
-		color: mentionedMember.displayColor,
-		avatar: mentionedMember.displayAvatarURL(),
-		same: false
 	};
-};
 
-export const viewWishlist = async (interaction: CommandInteraction) => {
 	const cosmetics = await fetchCosmetics();
-	const user = await getUserProperties(interaction);
+	const user = await getUserProperties();
 
 	const userResult = await userModel.findById(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {

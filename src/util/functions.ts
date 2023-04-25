@@ -8,8 +8,23 @@ import guildModel from '../models/guilds';
 import memberModel from '../models/members';
 import userModel from '../models/users';
 
+/**
+ * Checks if a role with bonus giveaways entries has a matching amount of bonus entries provided, and if the entry amount has a matching role as well.
+ *
+ * @param role - The role that will receive bonus entries
+ * @param roleAmount - The amount of bonus entries that the role will receive
+ * @returns A boolean of whether only the role or only the role amount were provided
+ */
 export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | null) => (role !== null && roleAmount === null) || (role === null && roleAmount !== null);
 
+/**
+ * Returns an embed used for giveaways.
+ *
+ * @param giveaway - The giveaway database document that may be missing its messageId
+ * @param guild - The guild containing the giveaway
+ * @param ended - Whether the embed is created after the giveaway has concluded
+ * @returns An embed displaying the current status and features of the giveaway
+ */
 export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
 	const embed = new TimestampedEmbed()
 		.setTitle(giveaway.text)
@@ -33,6 +48,11 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
 	return embed;
 };
 
+/**
+ * Returns an array of buttons used for paginated lists.
+ *
+ * @returns An array of buttons
+ */
 export const createPaginationButtons = (): PaginationButtons => {
 	return [
 		new ButtonBuilder()
@@ -60,6 +80,14 @@ export const createPaginationButtons = (): PaginationButtons => {
 	];
 };
 
+/**
+ * Fetches the message linked to a specific giveaway.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param channelId - The id of the channel containing the giveaway message
+ * @param messageId - The id of the giveaway message
+ * @returns The giveaway message with the spcecified id in the specified channel
+ */
 export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMenu, channelId: Snowflake, messageId: Snowflake) => {
 	if (interaction.isContextMenuCommand()) return interaction.targetMessage;
 	const { client } = interaction;
@@ -69,6 +97,23 @@ export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMen
 	return message;
 };
 
+/**
+ * Handles a client disonnection.
+ *
+ * @param e - The error message caught after disconnecting
+ */
+export const handleDisconnect = (e: unknown) => {
+	console.error(e);
+	process.exit();
+};
+
+/**
+ * Handles a reaction being added or removed.
+ *
+ * @param reaction - The reaction that was added or removed
+ * @param user - The user that added or removed the reaction
+ * @param added - Whether the reaction was added
+ */
 export const handleReaction = async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser, added: boolean) => {
 	const { client } = reaction;
 	DiscordClient.assertReadyClient(client);
@@ -102,17 +147,41 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 	}
 };
 
+/**
+ * Links a Discord user's account to an Epic Games account.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param account - An Epic Games account object
+ * @param ephemeral - Whether the response should only be visible to the user
+ */
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
 	await userModel.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
+/**
+ * Filters a message component collector to only allow the initial interaction's user to interact with the components.
+ *
+ * @param interaction - The initial interaction
+ * @returns A function that checks whether the user who interacted with the components is the same as the initial interaction's user
+ */
 export const messageComponentCollectorFilter = (interaction: BaseInteraction) => (i: MessageComponentInteraction) => {
 	if (i.user.id === interaction.user.id) return true;
 	i.reply({ content: 'Only the command user can use this.', ephemeral: true });
 	return false;
 };
 
+/**
+ * Paginates items across an embed.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param message - The message containing the embed
+ * @param embed - The embed in its initial state
+ * @param buttons - The buttons used to move across pages
+ * @param itemName - The displayed name for the items being paginated
+ * @param items - An array of paginated items
+ * @param inc - The amount of items shown per page
+ */
 export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
 	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
 	const [first, back, next, last, quit] = buttons;
@@ -185,12 +254,15 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 			}
 		})
 		.once('end', async (collected, reason) => {
-			if (reason === 'time') {
-				await interaction.editReply({ components: [] });
-			}
+			if (reason === 'time') await interaction.editReply({ components: [] });
 		});
 };
 
+/**
+ * Picks new entrants to win a giveaway.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ */
 export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => {
 	await interaction.deferReply({ ephemeral: true });
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
@@ -240,6 +312,11 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	await interaction.editReply(`The giveaway has been rerolled with ${newWinnersMessage}`);
 };
 
+/**
+ * Responds with a paginated embed displaying information about a giveaway.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ */
 export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => {
 	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 	const inc = 20;
@@ -278,8 +355,19 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };
 
+/**
+ * Returns the total amount of messages sent over multiple days.
+ *
+ * @param messages - The message objects containing the amount of messages sent each day
+ * @returns The total amount of messages sent
+ */
 export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
 
+/**
+ * Responds with an embed listing a members's milestones in a guild.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ */
 export const viewMilestones = async (interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction) => {
 	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 

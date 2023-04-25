@@ -1,9 +1,16 @@
 import { EpicError } from './classes.js';
 import { EncodedClient, EpicEndpoint, Seasons } from './constants.js';
-import type { AuthResponse, AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenBody, Stats } from './types.js';
+import type { AuthResponse, AuthorizationCodeAccessTokenResponse, BlockList, DeviceAuth, DeviceAuthResponse, EpicAccount, Friend, RefreshTokenBody, Stats, Timeline } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 
+/**
+ * Returns fetch options required in making Epic Games API requests.
+ *
+ * @param accessToken - An Epic Games account access token
+ * @param body - A JSON body to pass into the request
+ * @returns The request body passed into making the API request
+ */
 const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	method: 'post',
 	headers: {
@@ -13,6 +20,12 @@ const postBody = (accessToken: string, body: BodyInit): RequestInit => ({
 	body
 });
 
+/**
+ * Fetches an Epic Games API access token using an authentication method.
+ *
+ * @param body - The body for an OAuth2 authentication method
+ * @returns An object containing the access token and other data
+ */
 export const getAccessToken = async <T extends RefreshTokenBody | DeviceAuth = DeviceAuth>(body?: T): Promise<AuthResponse<T>> => {
 	const bodies = body === undefined ? [config.epicDeviceAuth.device1, config.epicDeviceAuth.device2] : [body];
 
@@ -42,6 +55,13 @@ export const getAccessToken = async <T extends RefreshTokenBody | DeviceAuth = D
 	throw lastError;
 };
 
+/**
+ * Fetches a specific Epic Games endpoint.
+ *
+ * @param url - The endpoint to fetch
+ * @param init - Custom options to pass into the request
+ * @returns The output of the request
+ */
 export const epicFetch = async <Res = unknown>(url: string, init?: RequestInit) => {
 	if (init === undefined) {
 		const { access_token } = await getAccessToken();
@@ -98,6 +118,13 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 	};
 };
 
+/**
+ * Returns data for Epic Games accounts.
+ *
+ * @param nameOrId - An array of Epic Games usernames or an array of Epic Games account ids
+ * @param isId - Whether the nameOrId argument is of name(s) or id(s)
+ * @returns An array of Epic Games account objects
+ */
 export const getAccount = async (nameOrId: string | string[], isId = false) => {
 	const namesOrIds = [nameOrId].flat();
 
@@ -115,10 +142,29 @@ export const getAccount = async (nameOrId: string | string[], isId = false) => {
 	return epicFetch<EpicAccount[]>(`${EpicEndpoint.AccountById}?accountId=${ids.join('&accountId=')}`);
 };
 
-export const getBlockList = (accountId: string) => epicFetch<BlockList>(EpicEndpoint.BlockList.replace('{accountId}', accountId));
+/**
+ * Fetches an Epic Games account's blocked accounts.
+ *
+ * @param accountId - The user's Epic Games account id
+ * @returns An array of blocked users
+ */
+export const getBlockList = (accountId: string) => epicFetch<BlockList>(EpicEndpoint.BlockList.replace('{accountId}', accountId)).then(r => r.blockedUsers);
 
+/**
+ * Fetches an Epic Games account's friends.
+ *
+ * @param accountId - The user's Epic Games account id
+ * @returns An array of friend objects
+ */
 export const getFriends = (accountId: string) => epicFetch<Friend[]>(EpicEndpoint.Friends.replace('{accountId}', accountId));
 
+/**
+ * Fetches an Epic Games account's levels in the past Fortnite seasons.
+ *
+ * @param accountId - The user's Epic Games account id
+ * @param accessToken - An Epic Games account access token
+ * @returns An object with keys of the seasons and values of the user's level in the season
+ */
 export const getLevels = async (accountId: string, accessToken?: string) => {
 	if (accessToken === undefined) {
 		const { access_token } = await getAccessToken();
@@ -139,10 +185,29 @@ export const getLevels = async (accountId: string, accessToken?: string) => {
 	return levels.stats;
 };
 
+/**
+ * Fetches an Epic Games account's Fortnite stats.
+ *
+ * @param accountId - The user's Epic Games account id
+ * @returns An object with the user's stats
+ */
 export const getStats = (accountId: string) => epicFetch<Stats>(EpicEndpoint.Stats.replace('{accountId}', accountId)).then(r => r.stats);
 
-export const getTimeline = () => epicFetch(EpicEndpoint.Timeline);
+/**
+ * Fetches the current Fortnite timeline endpoint.
+ *
+ * @returns An object containing relevant Fortnite data.
+ */
+export const getTimeline = () => epicFetch<Timeline>(EpicEndpoint.Timeline);
 
+/**
+ * Makes a POST request to Epic Games' MCP (Master Control Program) using one of many operations.
+ *
+ * @param operation - The operation to perform
+ * @param profile - The type of profile to perform the operation on
+ * @param payload - The body to send in the request
+ * @returns The output of the request
+ */
 export const mcpRequest = async (operation: string, profile: 'common_public' | 'athena' | 'campaign', payload: Record<string, string> = {}) => {
 	const { access_token, account_id } = await getAccessToken();
 
@@ -155,6 +220,19 @@ export const mcpRequest = async (operation: string, profile: 'common_public' | '
 	);
 };
 
+/**
+ * Claims the daily Save the World login reward.
+ *
+ * @returns The output of the request
+ */
 export const claimLoginReward = () => mcpRequest('ClaimLoginReward', 'campaign');
 
+/**
+ * Changes the authenticated user's Save the World homebase name.
+ *
+ * @deprecated Homebase names are no longer visible in-game, so this method may be unsuccessful.
+ *
+ * @param homebaseName - The new homebase name
+ * @returns The output of the request
+ */
 export const setHomebaseName = (homebaseName: string) => mcpRequest('SetHomebaseName', 'common_public', { homebaseName });
