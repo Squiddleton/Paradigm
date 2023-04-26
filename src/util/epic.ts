@@ -159,11 +159,11 @@ export const getBlockList = (accountId: string) => epicFetch<BlockList>(EpicEndp
 export const getFriends = (accountId: string) => epicFetch<Friend[]>(EpicEndpoint.Friends.replace('{accountId}', accountId));
 
 /**
- * Fetches an Epic Games account's levels in the past Fortnite seasons.
+ * Fetches Epic Games accounts' levels in the past Fortnite seasons.
  *
- * @param accountId - The user's Epic Games account id
+ * @param accountIds - An array of Epic Games account ids
  * @param accessToken - An Epic Games account access token
- * @returns An object with keys of the seasons and values of the user's level in the season
+ * @returns An array of objects with keys of the seasons and values of the user's level in the season
  */
 export const getLevels = async (accountIds: string[], accessToken?: string) => {
 	if (accessToken === undefined) {
