@@ -209,7 +209,7 @@ export enum RarityOrdering {
 export const Rarities = getEnumKeys(RarityOrdering);
 
 export const Seasons = Array.from({
-	length: 23 // Increment this value every season
+	length: 24 // Increment this value every season
 }, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 export const TextBasedChannelTypes: (ApplicationCommandOptionAllowedChannelTypes & TextBasedChannel['type'])[] = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];

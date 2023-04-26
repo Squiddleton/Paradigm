@@ -165,24 +165,24 @@ export const getFriends = (accountId: string) => epicFetch<Friend[]>(EpicEndpoin
  * @param accessToken - An Epic Games account access token
  * @returns An object with keys of the seasons and values of the user's level in the season
  */
-export const getLevels = async (accountId: string, accessToken?: string) => {
+export const getLevels = async (accountIds: string[], accessToken?: string) => {
 	if (accessToken === undefined) {
 		const { access_token } = await getAccessToken();
 		accessToken = access_token;
 	}
 
-	const [levels] = await epicFetch<Stats[]>(
+	const levels = await epicFetch<Stats[]>(
 		EpicEndpoint.Levels,
 		postBody(accessToken, JSON.stringify({
 			appId: 'fortnite',
 			startDate: 0,
 			endDate: 0,
-			owners: [accountId],
+			owners: accountIds,
 			stats: Seasons
 		}))
 	);
 
-	return levels.stats;
+	return levels.map(level => level.stats);
 };
 
 /**
