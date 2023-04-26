@@ -2,8 +2,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
-import { getLevelsString } from '../../util/fortnite.js';
-import { linkEpicAccount } from '../../util/functions.js';
+import { getLevelsString, linkEpicAccount } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'levels',

@@ -5,8 +5,8 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type C
 import { type DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { getLevels, getTimeline } from './epic.js';
-import { createPaginationButtons, isKey, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, TimelineClientEvent } from './types.js';
+import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
+import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption, TimelineClientEvent } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -524,6 +524,18 @@ export const handleStatsError = async (interaction: CommandInteraction, e: unkno
 			break;
 		}
 	}
+};
+
+/**
+ * Links a Discord user's account to an Epic Games account.
+ *
+ * @param interaction - The command interaction that initiated this function call
+ * @param account - An Epic Games account object
+ * @param ephemeral - Whether the response should only be visible to the user
+ */
+export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
+	await userModel.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
+	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
 /**

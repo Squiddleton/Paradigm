@@ -2,10 +2,9 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
-import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
+import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
 import guildModel from '../models/guilds';
 import memberModel from '../models/members';
-import userModel from '../models/users';
 
 /**
  * Checks if a role with bonus giveaways entries has a matching amount of bonus entries provided, and if the entry amount has a matching role as well.
@@ -154,18 +153,6 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
  * @returns Whether the string is a key of the object
  */
 export const isKey = <T extends Record<string, unknown>>(str: string, obj: T): str is string & keyof T => str in obj;
-
-/**
- * Links a Discord user's account to an Epic Games account.
- *
- * @param interaction - The command interaction that initiated this function call
- * @param account - An Epic Games account object
- * @param ephemeral - Whether the response should only be visible to the user
- */
-export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
-	await userModel.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
-	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
-};
 
 /**
  * Filters a message component collector to only allow the initial interaction's user to interact with the components.
