@@ -2,7 +2,6 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
 import { DiscordClient, TimestampedEmbed } from './classes';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
-import { isRarity } from './typeguards.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, StatsEpicAccount } from './types.js';
 import guildModel from '../models/guilds';
 import memberModel from '../models/members';
@@ -146,6 +145,15 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 		});
 	}
 };
+
+/**
+ * Returns whether a string is a key of an object, or whether the string is a member of an enum.
+ *
+ * @param str - A potential key to an object
+ * @param obj - An object that may containing the string as a key
+ * @returns Whether the string is a key of the object
+ */
+export const isKey = <T extends Record<string, unknown>>(str: string, obj: T): str is string & keyof T => str in obj;
 
 /**
  * Links a Discord user's account to an Epic Games account.
@@ -395,10 +403,10 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 
 			if (fullA === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', a));
 			if (fullB === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', b));
-			if (!isRarity(fullA.rarity)) {
+			if (!isKey(fullA.rarity, RarityOrdering)) {
 				throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', fullA.rarity));
 			}
-			else if (!isRarity(fullB.rarity)) {
+			else if (!isKey(fullB.rarity, RarityOrdering)) {
 				throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', fullB.rarity));
 			}
 

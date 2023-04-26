@@ -3,8 +3,7 @@ import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonSt
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
-import { areMismatchedBonusRoles, createGiveawayEmbed, rerollGiveaway, reviewGiveaway } from '../../util/functions.js';
-import { isUnit } from '../../util/typeguards.js';
+import { areMismatchedBonusRoles, createGiveawayEmbed, isKey, rerollGiveaway, reviewGiveaway } from '../../util/functions.js';
 import type { IBonusRole, IGiveaway } from '../../util/types.js';
 
 export default new SlashCommand({
@@ -224,7 +223,7 @@ export default new SlashCommand({
 						if (winners !== null) {
 							giveaway.winnerNumber = winners;
 						}
-						if (giveawayTime !== null && units !== null && isUnit(units)) {
+						if (giveawayTime !== null && units !== null && isKey(units, UnitsToMS)) {
 							const endTime = giveaway.startTime + (giveawayTime * UnitsToMS[units]);
 							giveaway.endTime = endTime;
 						}
@@ -291,7 +290,7 @@ export default new SlashCommand({
 				}
 
 				const startTime = Math.round(interaction.createdTimestamp / 1000);
-				if (!isUnit(units)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', units));
+				if (!isKey(units, UnitsToMS)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', units));
 				const endTime = startTime + (giveawayTime * UnitsToMS[units]);
 
 				const permissions = client.getPermissions(channel);

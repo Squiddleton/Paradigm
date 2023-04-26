@@ -5,8 +5,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type C
 import { type DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
 import { getLevels, getTimeline } from './epic.js';
-import { createPaginationButtons, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
-import { isBackground } from './typeguards.js';
+import { createPaginationButtons, isKey, linkEpicAccount, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption, TimelineClientEvent } from './types.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
@@ -218,7 +217,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
 	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
-	if (!noBackground && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
+	if (!noBackground && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? getRandomItem(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
 	const background = await loadImage(rawBackground);
 	const canvas = createCanvas(background.width, background.height);
@@ -315,7 +314,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
  */
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
 	const cosmetics = await fetchCosmetics();
-	if (chosenBackground !== null && !isBackground(chosenBackground)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
+	if (chosenBackground !== null && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 

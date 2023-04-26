@@ -6,7 +6,7 @@ import memberModel from '../../models/members.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
 import { grantMilestone } from '../../util/fortnite.js';
-import { isRarity } from '../../util/typeguards.js';
+import { isKey } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'milestone',
@@ -153,10 +153,10 @@ export default new SlashCommand({
 				}
 				else {
 					milestones.sort((a, b) => {
-						if (!isRarity(a.rarity)) {
+						if (!isKey(a.rarity, RarityOrdering)) {
 							throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', a.rarity));
 						}
-						else if (!isRarity(b.rarity)) {
+						else if (!isKey(b.rarity, RarityOrdering)) {
 							throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', b.rarity));
 						}
 						return a.rarity === b.rarity ? a.name > b.name ? 1 : -1 : RarityOrdering[a.rarity] - RarityOrdering[b.rarity];
