@@ -47,8 +47,8 @@ export const getAccessToken = async <T extends RefreshTokenBody | DeviceAuth = D
 			const validated = EpicError.validate<AuthResponse<T>>(res);
 			return validated;
 		}
-		catch (e) {
-			lastError = e;
+		catch (error) {
+			lastError = error;
 		}
 	}
 

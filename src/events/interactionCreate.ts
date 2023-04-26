@@ -156,12 +156,13 @@ export default new ClientEvent({
 						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.tag} if this issue persists.`}`,
 					ephemeral: true
 				};
+
 				try {
 					(interaction.replied || interaction.deferred) ? await interaction.followUp(errorMessage) : await interaction.reply(errorMessage);
 				}
-				catch (e) {
-					if (!(e instanceof DiscordAPIError) || typeof e.code !== 'number' || ![RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.InvalidWebhookToken].includes(e.code)) {
-						console.error(e);
+				catch (error2) {
+					if (!(error2 instanceof DiscordAPIError) || typeof error2.code !== 'number' || ![RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.InvalidWebhookToken].includes(error2.code)) {
+						console.error(error2);
 					}
 				}
 			}

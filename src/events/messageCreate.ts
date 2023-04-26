@@ -43,8 +43,8 @@ export default new ClientEvent({
 								try {
 									await m.delete();
 								}
-								catch (e) {
-									if (!(e instanceof DiscordAPIError) || e.code !== RESTJSONErrorCodes.UnknownMessage) console.error(e);
+								catch (error) {
+									if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) console.error(error);
 								}
 							};
 

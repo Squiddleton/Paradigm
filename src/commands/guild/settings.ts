@@ -73,8 +73,8 @@ export default new SlashCommand({
 						try {
 							await interaction.deleteReply();
 						}
-						catch (e) {
-							if (!(e instanceof DiscordAPIError) || e.code !== RESTJSONErrorCodes.UnknownMessage) throw e;
+						catch (error) {
+							if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
 						}
 					});
 				break;
