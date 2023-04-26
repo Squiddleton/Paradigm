@@ -128,7 +128,7 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 	}
 	const { message } = reaction;
 	if (message.guildId === DiscordIds.GuildId.FortniteBR) {
-		const toString = reaction.emoji.toString();
+		const emojiStr = reaction.emoji.toString();
 		const logChannel = client.getGuildChannel(DiscordIds.ChannelId.Logs);
 
 		await logChannel.send({
@@ -136,8 +136,8 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 				new TimestampedEmbed()
 					.setDescription(`Reaction from ${user} (${user.id}) ${added ? 'added' : 'removed'}.`)
 					.setFields([
-						{ name: 'Reaction Name', value: reaction.emoji.name ?? toString, inline: true },
-						{ name: 'Reaction URL', value: reaction.emoji.url ?? toString, inline: true },
+						{ name: 'Reaction Name', value: reaction.emoji.name ?? emojiStr, inline: true },
+						{ name: 'Reaction URL', value: reaction.emoji.url ?? emojiStr, inline: true },
 						{ name: 'Message URL', value: message.url, inline: true }
 					])
 					.setColor(added ? Colors.Green : Colors.Purple)
