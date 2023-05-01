@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "start": "npm run build && node ."
   },
   "keywords": [
     "fortnite",
