@@ -461,7 +461,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			}
 		}
 		else if (e instanceof EpicError) {
-			if (e.code === EpicErrorCode.InvalidGrant) {
+			if (e.numericErrorCode === EpicErrorCode.InvalidGrant) {
 				console.error('The main Epic account credentials must be updated.');
 				return 'This bot\'s Epic account credentials must be updated; please try again later.';
 			}
