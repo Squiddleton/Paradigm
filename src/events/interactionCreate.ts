@@ -1,7 +1,7 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { type ApplicationCommandOptionChoiceData, type AutocompleteInteraction, DiscordAPIError, type InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
+import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
@@ -10,19 +10,6 @@ import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
 import { fetchCosmetics } from '../util/fortnite.js';
 import { sumMessages } from '../util/functions.js';
-
-const mapByName = (item: Cosmetic | Playlist) => item.name;
-
-const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
-
-const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
-
-const filterCosmetics = async (interaction: AutocompleteInteraction, input: string, type: string) => {
-	const cosmetics = await fetchCosmetics();
-	const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName).filter((n): n is string => n !== null));
-	const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
-	await interaction.respond(choices);
-};
 
 export default new ClientEvent({
 	name: 'interactionCreate',
@@ -39,6 +26,19 @@ export default new ClientEvent({
 			const input = value === '' ? 'a' : value;
 
 			try {
+				const mapByName = (item: Cosmetic | Playlist) => item.name;
+
+				const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
+
+				const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
+
+				const filterCosmetics = async (type: string) => {
+					const cosmetics = await fetchCosmetics();
+					const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName).filter((n): n is string => n !== null));
+					const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
+					await interaction.respond(choices);
+				};
+
 				switch (name) {
 					case 'cosmetic': {
 						const cosmetics = await fetchCosmetics();
@@ -64,23 +64,23 @@ export default new ClientEvent({
 						break;
 					}
 					case 'outfit': {
-						await filterCosmetics(interaction, input, 'Outfit');
+						await filterCosmetics('Outfit');
 						break;
 					}
 					case 'backbling': {
-						await filterCosmetics(interaction, input, 'Back Bling');
+						await filterCosmetics('Back Bling');
 						break;
 					}
 					case 'harvestingtool': {
-						await filterCosmetics(interaction, input, 'Harvesting Tool');
+						await filterCosmetics('Harvesting Tool');
 						break;
 					}
 					case 'glider': {
-						await filterCosmetics(interaction, input, 'Glider');
+						await filterCosmetics('Glider');
 						break;
 					}
 					case 'wrap': {
-						await filterCosmetics(interaction, input, 'Wrap');
+						await filterCosmetics('Wrap');
 						break;
 					}
 					case 'milestone': {
