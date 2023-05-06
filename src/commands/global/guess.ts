@@ -27,7 +27,6 @@ export default new SlashCommand({
 			pix[i] = 0;
 			pix[i + 1] = 0;
 			pix[i + 2] = 0;
-			pix[i + 3] = pix[i + 3];
 		}
 		ctx.putImageData(imgData, 0, 0);
 
