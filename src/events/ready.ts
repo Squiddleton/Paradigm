@@ -28,6 +28,7 @@ export default new ClientEvent({
 			postedShopSections = false;
 			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
+			await memberModel.deleteMany({ milestones: { $size: 0 }, dailyMessages: { $size: 0 } });
 		}, { timezone: 'America/New_York' });
 
 		// Intervals
