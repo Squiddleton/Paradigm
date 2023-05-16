@@ -1,6 +1,6 @@
 import { readdirSync } from 'node:fs';
 import { ClientEvent, ContextMenu, type ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
-import { ActivityType, GatewayIntentBits, Options, Partials } from 'discord.js';
+import { ActivityType, GatewayIntentBits, type GuildMember, Options, Partials, type User } from 'discord.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
 
@@ -12,6 +12,8 @@ for (const folder of readdirSync('./dist/commands')) {
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
 	}
 }
+
+const sweeperFilter = () => (structure: User | GuildMember) => structure.id !== structure.client.user.id;
 
 const client = new DiscordClient({
 	allowedMentions: {
@@ -37,11 +39,9 @@ const client = new DiscordClient({
 		GatewayIntentBits.Guilds
 	],
 	makeCache: Options.cacheWithLimits({
-		ApplicationCommandManager: 10,
 		GuildBanManager: 10,
 		GuildInviteManager: 10,
 		GuildScheduledEventManager: 10,
-		MessageManager: 10,
 		PresenceManager: 10,
 		ReactionUserManager: 10
 	}),
@@ -55,6 +55,21 @@ const client = new DiscordClient({
 			name: 'Rip & Tear',
 			type: ActivityType.Listening
 		}]
+	},
+	sweepers: {
+		...Options.DefaultSweeperSettings,
+		guildMembers: {
+			interval: 3600,
+			filter: sweeperFilter
+		},
+		messages: {
+			interval: 1800,
+			lifetime: 1200
+		},
+		users: {
+			interval: 3600,
+			filter: sweeperFilter
+		}
 	}
 });
 
