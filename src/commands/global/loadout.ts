@@ -10,24 +10,24 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const outfit = interaction.options.getString('outfit');
 		const backbling = interaction.options.getString('backbling');
-		const harvestingtool = interaction.options.getString('harvestingtool');
+		const pickaxe = interaction.options.getString('pickaxe');
 		const glider = interaction.options.getString('glider');
 		const wrap = interaction.options.getString('wrap');
 		const chosenBackground = interaction.options.getString('background');
 
-		if (!outfit && !backbling && !harvestingtool && !glider && !wrap) {
+		if (!outfit && !backbling && !pickaxe && !glider && !wrap) {
 			await interaction.reply({ content: 'You must include at least one cosmetic.', ephemeral: true });
 			return;
 		}
 		await interaction.deferReply();
-		const attachment = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground);
+		const attachment = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, chosenBackground);
 
 		if (typeof attachment === 'string') {
 			await interaction.editReply(attachment);
 			return;
 		}
 
-		return createStyleListeners(interaction, attachment, outfit, backbling, harvestingtool, glider, wrap, chosenBackground);
+		return createStyleListeners(interaction, attachment, outfit, backbling, pickaxe, glider, wrap, chosenBackground);
 	}
 });
 

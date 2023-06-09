@@ -207,14 +207,14 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
  *
  * @param outfit - The outfit's name, or null if none
  * @param backbling - The back bling's name, or null if none
- * @param harvestingtool - The harvesting tool's name, or null if none
+ * @param pickaxe - The pickaxe's name, or null if none
  * @param glider - The glider's name, or null if none
  * @param wrap - The wrap's name, or null if none
  * @param chosenBackground - The background color, or null if random
  * @param links - An object with keys of each cosmetic type and values of each cosmetic's image URL
  * @returns A Discord attachment containing the image of the loadout or a string containing an error message
  */
-export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
+export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
 	const cosmetics = await fetchCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
@@ -229,10 +229,10 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	 *
 	 * @param input - The cosmetic's name
 	 * @param displayType - The cosmetic's type that will be displayed in the error message
-	 * @param displayValues - The cosmetic's possible types in-game
+	 * @param types - The cosmetic's possible types in-game
 	 * @returns Void if successful or a string containing an error message
 	 */
-	const handleImage = async (input: StringOption, displayType: Link, displayValues: string[]) => {
+	const handleImage = async (input: StringOption, types: string[], displayType: Link) => {
 		let image: Image | null = null;
 		const link = links[displayType];
 
@@ -240,7 +240,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 			image = await loadImage(link);
 		}
 		else if (input !== null) {
-			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
+			const cosmetic = cosmetics.find(c => types.includes(c.type.value) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic === undefined) {
 				return `No ${displayType} matches your query.`;
 			}
@@ -261,7 +261,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 					background.height * image.width / image.height / 2,
 					background.height / 2
 				],
-				'Harvesting Tool': [
+				Pickaxe: [
 					0,
 					background.height / 2,
 					background.height * image.width / image.height / 2,
@@ -284,12 +284,12 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		}
 	};
 
-	const args: [StringOption, Link, string[]][] = [
-		[outfit, 'Outfit', ['Outfit']],
-		[backbling, 'Back Bling', ['Back Bling', 'Pet']],
-		[harvestingtool, 'Harvesting Tool', ['Harvesting Tool']],
-		[glider, 'Glider', ['Glider']],
-		[wrap, 'Wrap', ['Wrap']]
+	const args: [StringOption, string[], Link][] = [
+		[outfit, ['outfit'], 'Outfit'],
+		[backbling, ['backpack', 'petcarrier'], 'Back Bling'],
+		[pickaxe, ['pickaxe'], 'Pickaxe'],
+		[glider, ['glider'], 'Glider'],
+		[wrap, ['wrap'], 'Wrap']
 	];
 	for (const arg of args) {
 		const returned = await handleImage(...arg);
@@ -306,21 +306,21 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
  * @param attachment - The attachment of the loadout image
  * @param outfit - The outfit's name, or null if none
  * @param backbling - The back bling's name, or null if none
- * @param harvestingtool - The harvesting tool's name, or null if none
+ * @param pickaxe - The pickaxe's name, or null if none
  * @param glider - The glider's name, or null if none
  * @param wrap - The wrap's name, or null if none
  * @param chosenBackground - The background color, or null if random
  * @param embeds - An array of embeds imitating a Twitter post
  */
-export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, harvestingtool: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
+export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
 	const cosmetics = await fetchCosmetics();
 	if (chosenBackground !== null && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
-	const handleVariants = (input: StringOption, displayValues: string[], displayType: string) => {
+	const handleVariants = (input: StringOption, types: string[], displayType: string) => {
 		if (input !== null) {
-			const cosmetic = cosmetics.find(c => displayValues.includes(c.type.displayValue) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
+			const cosmetic = cosmetics.find(c => types.includes(c.type.value) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
 			if (cosmetic !== undefined) {
 				const variants = cosmetic.variants?.[0];
 				if (variants) {
@@ -342,13 +342,13 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 		}
 	};
 
-	const args: [StringOption, string[], string][] = [
-		[outfit, ['Outfit'], 'Outfit'],
-		[backbling, ['Back Bling', 'Pet'], 'Back Bling'],
-		[harvestingtool, ['Harvesting Tool'], 'Pickaxe'],
-		[glider, ['Glider'], 'Glider']
+	const variantArgs: [StringOption, string[], string][] = [
+		[outfit, ['outfit'], 'Outfit'],
+		[backbling, ['backpack', 'petcarrier'], 'Back Bling'],
+		[pickaxe, ['pickaxe'], 'Pickaxe'],
+		[glider, ['glider'], 'Glider']
 	];
-	args.forEach(arg => handleVariants(...arg));
+	variantArgs.forEach(arg => handleVariants(...arg));
 
 	if (components.length > 0) {
 		components.push(
@@ -392,7 +392,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 						options[cosmetic.type.displayValue] = imageURL;
 
-						const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, harvestingtool, glider, wrap, chosenBackground, options);
+						const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, chosenBackground, options);
 						components = components.map(c => {
 							const [menu] = c.components;
 							const menuJSON = menu.toJSON();

@@ -24,7 +24,7 @@ export default new SlashCommand({
 				{ name: 'Glider', value: 'glider' },
 				{ name: 'Emoticon', value: 'emoji' },
 				{ name: 'Loading Screen', value: 'loadingscreen' },
-				{ name: 'Harvesting Tool', value: 'pickaxe' },
+				{ name: 'Pickaxe', value: 'pickaxe' },
 				{ name: 'Contrail', value: 'contrail' },
 				{ name: 'Spray', value: 'spray' },
 				{ name: 'Toy', value: 'toy' },
@@ -47,7 +47,7 @@ export default new SlashCommand({
 
 		const backBling = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Back Bling'));
 		const glider = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Glider'));
-		const harvestingTool = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Harvesting Tool'));
+		const pickaxe = getRandomItem(cosmetics.filter(c => c.type.value === 'pickaxe'));
 		const wrap = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Wrap'));
 		const outfit = getRandomItem(cosmetics.filter(c => c.type.displayValue === 'Outfit'));
 
@@ -62,8 +62,8 @@ export default new SlashCommand({
 		const backBlingImage = await loadImage(getImage(backBling));
 		ctx.drawImage(backBlingImage, 0, 0, background.height * backBlingImage.width / backBlingImage.height / 2, background.height / 2);
 
-		const harvestingToolImage = await loadImage(getImage(harvestingTool));
-		ctx.drawImage(harvestingToolImage, 0, background.height / 2, background.height * harvestingToolImage.width / harvestingToolImage.height / 2, background.height / 2);
+		const pickaxeImage = await loadImage(getImage(pickaxe));
+		ctx.drawImage(pickaxeImage, 0, background.height / 2, background.height * pickaxeImage.width / pickaxeImage.height / 2, background.height / 2);
 
 		const gliderImage = await loadImage(getImage(glider));
 		ctx.drawImage(gliderImage, background.width - (background.height * gliderImage.width / gliderImage.height / 2), 0, background.height * gliderImage.width / gliderImage.height / 2, background.height / 2);
@@ -82,7 +82,7 @@ export default new SlashCommand({
 					.setFields(
 						{ name: 'Outfit', value: outfit.name, inline: true },
 						{ name: 'Back Bling', value: backBling.name, inline: true },
-						{ name: 'Harvesting Tool', value: harvestingTool.name, inline: true },
+						{ name: 'Pickaxe', value: pickaxe.name, inline: true },
 						{ name: 'Glider', value: glider.name, inline: true },
 						{ name: 'Wrap', value: wrap.name, inline: true }
 					)

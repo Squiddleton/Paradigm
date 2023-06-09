@@ -146,8 +146,8 @@ export const LoadoutImageOptions: ApplicationCommandOptionData[] = [
 		autocomplete: true
 	},
 	{
-		name: 'harvestingtool',
-		description: 'Any harvesting tool in the game\'s files',
+		name: 'pickaxe',
+		description: 'Any pickaxe in the game\'s files',
 		type: ApplicationCommandOptionType.String,
 		autocomplete: true
 	},

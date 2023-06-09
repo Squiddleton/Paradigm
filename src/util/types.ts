@@ -283,7 +283,7 @@ export interface LevelCommandOptions {
 export interface Links {
 	Outfit?: string;
 	'Back Bling'?: string;
-	'Harvesting Tool'?: string;
+	Pickaxe?: string;
 	Glider?: string;
 	Wrap?: string;
 }

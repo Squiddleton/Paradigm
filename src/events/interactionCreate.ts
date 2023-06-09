@@ -34,7 +34,7 @@ export default new ClientEvent({
 
 				const filterCosmetics = async (type: string) => {
 					const cosmetics = await fetchCosmetics();
-					const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.displayValue === type).map(mapByName).filter((n): n is string => n !== null));
+					const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.value === type).map(mapByName).filter((n): n is string => n !== null));
 					const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 					await interaction.respond(choices);
 				};
@@ -64,23 +64,23 @@ export default new ClientEvent({
 						break;
 					}
 					case 'outfit': {
-						await filterCosmetics('Outfit');
+						await filterCosmetics('outfit');
 						break;
 					}
 					case 'backbling': {
-						await filterCosmetics('Back Bling');
+						await filterCosmetics('backpack');
 						break;
 					}
-					case 'harvestingtool': {
-						await filterCosmetics('Harvesting Tool');
+					case 'pickaxe': {
+						await filterCosmetics('pickaxe');
 						break;
 					}
 					case 'glider': {
-						await filterCosmetics('Glider');
+						await filterCosmetics('glider');
 						break;
 					}
 					case 'wrap': {
-						await filterCosmetics('Wrap');
+						await filterCosmetics('wrap');
 						break;
 					}
 					case 'milestone': {
