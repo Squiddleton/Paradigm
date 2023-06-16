@@ -145,7 +145,7 @@ export default new ClientEvent({
 						date: new Date().toLocaleString('en-us', { timeZone: 'America/New_York' }),
 						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
 						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message'} (${interaction.channelId})`,
-						user: `${interaction.user.tag} (${userId})`,
+						user: `${interaction.user.username} (${userId})`,
 						options: interaction.options.data
 					},
 					error
@@ -153,7 +153,7 @@ export default new ClientEvent({
 				const errorMessage: InteractionReplyOptions = {
 					content: (error instanceof DiscordAPIError && typeof error.code === 'number' && [RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.InvalidWebhookToken].includes(error.code))
 						? 'That command took too long to execute; please try again.'
-						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.tag} if this issue persists.`}`,
+						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.username} if this issue persists.`}`,
 					ephemeral: true
 				};
 

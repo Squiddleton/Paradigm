@@ -42,7 +42,7 @@ export default new SlashCommand({
 
 		const sortedResults = memberResults.sort((a, b) => combineMessages(b.dailyMessages) - combineMessages(a.dailyMessages));
 		const users = await Promise.all(sortedResults.slice(0, max).map(r => client.users.fetch(r.userId)));
-		const mapped = users.map(u => `${u.tag} (${u.id})`);
+		const mapped = users.map(u => `${u.username} (${u.id})`);
 
 		await interaction.editReply(`${max === 1 ? 'Most active user' : `Top ${max} most active users`} over the past${time === 1 ? '' : ` ${time}`} ${formatPlural('day', time)}:\n${mapped.join('\n')}`);
 	}
