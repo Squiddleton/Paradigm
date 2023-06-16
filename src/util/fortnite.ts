@@ -7,6 +7,7 @@ import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoi
 import { getLevels, getTimeline } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption, TimelineClientEvent } from './types.js';
+import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -548,6 +549,19 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 export const getStatsImage = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
+	const getRankedContent = async (epicAccountId: string) => {
+		const progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
+
+		const transformTrack = (rankingType: string, displayName: string) => {
+			const track = progress.find(t => t.rankingType === rankingType);
+			if (track === undefined) throw new Error(`No track was found for ${displayName}`);
+			const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Diamond I', 'Diamond II', 'Diamond III', 'Platinum I', 'Platinum II', 'Platinum III', 'Elite', 'Champion', 'Unreal'];
+			return `${displayName}: ${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`}`;
+		};
+
+		return `${bold('Ranked Stats')}\n\n${transformTrack('ranked-br', 'Battle Royale')}\n${transformTrack('ranked-zb', 'Zero Build')}`;
+	};
+
 	if (options.accountName === null) {
 		const userResult = await userModel.findById(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
@@ -556,7 +570,12 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 		}
 		else {
 			try {
+				const rankedContent = await getRankedContent(userResult.epicAccountId);
+				if (typeof content === 'string') content += `\n\n${rankedContent}`;
+				else content = rankedContent;
+
 				const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
+
 				await interaction.editReply({ content, files: [image] });
 			}
 			catch (error) {
@@ -567,7 +586,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	else {
 		try {
 			const { image, account } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
-			await interaction.editReply({ files: [image] });
+			await interaction.editReply({ content: await getRankedContent(account.id), files: [image] });
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}
