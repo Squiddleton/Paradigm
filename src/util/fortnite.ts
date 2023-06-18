@@ -729,15 +729,16 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		};
 	};
 
-	const cosmetics = await fetchCosmetics();
 	const user = await getUserProperties();
+	if (interaction.isUserContextMenuCommand()) await interaction.deferReply({ ephemeral: !user.same });
 
 	const userResult = await userModel.findById(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {
-		await interaction.reply({ content: user.same ? 'You have not added any cosmetics into your wishlist.' : `${user.username} has an empty wishlist.`, ephemeral: true });
+		await interaction.editReply({ content: `${user.same ? 'Your' : formatPossessive(user.username)} wishlist is currently empty.` });
 		return;
 	}
 
+	const cosmetics = await fetchCosmetics();
 	const inc = 25;
 	const cosmeticStrings = userResult.wishlistCosmeticIds
 		.map(id => {
@@ -757,11 +758,9 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	const willUseButtons = cosmeticStrings.length > inc;
 	const buttons = createPaginationButtons();
 
-	const message = await interaction.reply({
+	const message = await interaction.editReply({
 		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [],
-		embeds: [embed],
-		ephemeral: !user.same,
-		fetchReply: true
+		embeds: [embed]
 	});
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Cosmetics', cosmeticStrings, inc);

@@ -51,13 +51,14 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
+		await interaction.deferReply();
 		const userId = interaction.user.id;
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
 				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true));
 				if (cosmetic === null) {
-					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
+					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
 				}
 
@@ -67,15 +68,15 @@ export default new SlashCommand({
 					{ upsert: true }
 				);
 				userResult?.wishlistCosmeticIds.includes(cosmetic.id)
-					? await interaction.reply({ content: `${cosmetic.name} is already on your wishlist.`, ephemeral: true })
-					: await interaction.reply(`${cosmetic.name} has been added to your wishlist.`);
+					? await interaction.editReply({ content: `${cosmetic.name} is already on your wishlist.` })
+					: await interaction.editReply(`${cosmetic.name} has been added to your wishlist.`);
 
 				if (interaction.inCachedGuild()) {
 					const guildResult = await guildModel.findById(interaction.guildId);
 					if (guildResult === null || guildResult.wishlistChannelId === null) {
 						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set one.', ephemeral: true });
 					}
-					else if (interaction.guild.channels.cache.get(guildResult.wishlistChannelId) === undefined) {
+					else if (!interaction.guild.channels.cache.has(guildResult.wishlistChannelId)) {
 						guildResult.wishlistChannelId = null;
 						await guildResult.save();
 						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set a new one.', ephemeral: true });
@@ -86,17 +87,17 @@ export default new SlashCommand({
 			case 'remove': {
 				const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true));
 				if (cosmetic === null) {
-					await interaction.reply({ content: 'No cosmetic matches the option provided.', ephemeral: true });
+					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
 				}
 
 				const userResult = await userModel.findById(userId);
 				if (userResult === null) {
-					await interaction.reply({ content: 'You have not added any cosmetics into your wishlist.', ephemeral: true });
+					await interaction.editReply({ content: 'You have not added any cosmetics into your wishlist.' });
 					return;
 				}
 				if (!userResult.wishlistCosmeticIds.includes(cosmetic.id)) {
-					await interaction.reply({ content: 'No cosmetic in your wishlist matches the option provided.', ephemeral: true });
+					await interaction.editReply({ content: 'I could not find a cosmetic with that name in your wishlist.' });
 					return;
 				}
 
@@ -104,7 +105,7 @@ export default new SlashCommand({
 					userId,
 					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
 				);
-				await interaction.reply(`${cosmetic.name} has been removed from your wishlist.`);
+				await interaction.editReply(`${cosmetic.name} has been removed from your wishlist.`);
 				break;
 			}
 			case 'view': {
