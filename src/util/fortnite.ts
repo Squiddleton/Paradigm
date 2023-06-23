@@ -529,7 +529,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			const track = progress.find(t => t.rankingType === rankingType);
 			if (track === undefined) throw new Error(`No track was found for ${displayName}`);
 			const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Diamond I', 'Diamond II', 'Diamond III', 'Platinum I', 'Platinum II', 'Platinum III', 'Elite', 'Champion', 'Unreal'];
-			return `${displayName}: ${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated: ${time(new Date(track.lastUpdated), 'R')})`;
+			return `${displayName}: ${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated ${time(new Date(track.lastUpdated), 'R')})`;
 		};
 
 		return `${bold('Ranked Stats')}\n\n${transformTrack('ranked-br', 'Battle Royale')}\n${transformTrack('ranked-zb', 'Zero Build')}`;
