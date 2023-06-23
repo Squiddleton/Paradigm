@@ -4,14 +4,14 @@ import { getRandomItem, normalize } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { RarityColors, Time } from '../../util/constants.js';
-import { fetchCosmetics } from '../../util/fortnite.js';
+import { getCosmetics } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'guess',
 	description: 'Guess a Fortnite Outfit\'s name from its silhouette',
 	scope: 'Global',
 	async execute(interaction) {
-		const cosmetics = await fetchCosmetics();
+		const cosmetics = getCosmetics();
 		const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
 		const cosmetic = getRandomItem(items);
 		const image = cosmetic.images.featured ?? cosmetic.images.icon;

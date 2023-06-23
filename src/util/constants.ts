@@ -98,10 +98,6 @@ export enum EpicEndpoint {
 	Website = 'https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game?lang=en-US'
 }
 
-export enum EpicErrorCode {
-	InvalidGrant = 18031
-}
-
 export enum ErrorMessage {
 	FalseTypeguard = 'The value "{value}" did not satisfy the typeguard',
 	InvisibleChannel = 'The Client is missing the View Channel permission in the channel "{channelId}"',

@@ -8,7 +8,7 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
-import { fetchCosmetics } from '../util/fortnite.js';
+import { getCosmetics } from '../util/fortnite.js';
 import { sumMessages } from '../util/functions.js';
 
 export default new ClientEvent({
@@ -26,6 +26,8 @@ export default new ClientEvent({
 			const input = value === '' ? 'a' : value;
 
 			try {
+				const cosmetics = getCosmetics();
+
 				const mapByName = (item: Cosmetic | Playlist) => item.name;
 
 				const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
@@ -33,7 +35,6 @@ export default new ClientEvent({
 				const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
 
 				const filterCosmetics = async (type: string) => {
-					const cosmetics = await fetchCosmetics();
 					const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.value === type).map(mapByName).filter((n): n is string => n !== null));
 					const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 					await interaction.respond(choices);
@@ -41,7 +42,6 @@ export default new ClientEvent({
 
 				switch (name) {
 					case 'cosmetic': {
-						const cosmetics = await fetchCosmetics();
 						const { ratings } = findBestMatch(input, cosmetics.map(c => `${c.name} (${c.type.displayValue})`));
 						const choices = ratings.sort(sortByRating).map(({ target }) => {
 							const targetStrings = target.split('(');

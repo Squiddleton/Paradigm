@@ -1,7 +1,7 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, type Client as BaseClient, ChannelType, EmbedBuilder, type GuildBasedChannel, PermissionFlagsBits, type PermissionsBitField, type Snowflake, StringSelectMenuBuilder } from 'discord.js';
 import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
-import type { AnyGuildTextChannel, RawEpicError } from './types';
+import type { AnyGuildTextChannel } from './types';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
 	getPermissions(channel: GuildBasedChannel): PermissionsBitField {
@@ -57,33 +57,6 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 	}
 	static assertReadyClient(client: BaseClient): asserts client is DiscordClient<true> {
 		if (!client.isReady()) throw new Error(ErrorMessage.UnreadyClient);
-	}
-}
-
-export class EpicError extends Error {
-	status: number;
-	numericErrorCode: number | null;
-	constructor(message: string, status: number, text: string, numericErrorCode: number | null) {
-		super(message);
-		this.status = status;
-		this.numericErrorCode = numericErrorCode;
-		console.error(text);
-	}
-	static async validate<Res = unknown>(res: Response) {
-		if (!res.ok) {
-			const text = await res.text();
-			let code: number | null;
-			try {
-				const json: RawEpicError = await res.json();
-				code = json.numericErrorCode;
-			}
-			catch {
-				code = null;
-			}
-			throw new EpicError(`Unexpected Epic response status: ${res.statusText}`, res.status, text, code);
-		}
-		const json: Res = await res.json();
-		return json;
 	}
 }
 

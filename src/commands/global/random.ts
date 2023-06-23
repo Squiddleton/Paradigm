@@ -5,7 +5,7 @@ import { getRandomItem } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { BackgroundURL } from '../../util/constants.js';
-import { createCosmeticEmbed, fetchCosmetics } from '../../util/fortnite.js';
+import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
 
 const getImage = (cosmetic: Cosmetic) => cosmetic.images.featured ? cosmetic.images.featured : cosmetic.images.icon;
 
@@ -38,7 +38,7 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		await interaction.deferReply();
-		const cosmetics = await fetchCosmetics();
+		const cosmetics = getCosmetics();
 		const type = interaction.options.getString('type');
 		if (type) {
 			await interaction.editReply({ embeds: [createCosmeticEmbed(getRandomItem(cosmetics.filter(c => c.type.value === type)))] });

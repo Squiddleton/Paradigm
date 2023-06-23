@@ -5,7 +5,7 @@ import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
-import { checkWishlists, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
+import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 
 export default new ClientEvent({
@@ -13,6 +13,7 @@ export default new ClientEvent({
 	once: true,
 	async execute(client) {
 		await client.application.fetch();
+		await fetchCosmetics();
 		DiscordClient.assertReadyClient(client);
 		const readyMessage = `${client.user.username} is ready!`;
 		await client.devChannel.send(readyMessage);
@@ -29,9 +30,11 @@ export default new ClientEvent({
 			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 			await memberModel.deleteMany({ milestones: { $size: 0 }, dailyMessages: { $size: 0 } });
+			await fetchCosmetics();
 		}, { timezone: 'America/New_York' });
 
 		// Intervals
+
 		let cachedStates = await fetchStates();
 		schedule('*/3 * * * *', async () => {
 			const currentStates = await fetchStates();

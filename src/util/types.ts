@@ -1,49 +1,6 @@
-import type { Cosmetic, DateString } from '@squiddleton/fortnite-api';
+import type { DeviceAuthGrant } from '@squiddleton/epic';
+import type { DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
-
-export interface BaseAccessTokenResponse {
-	access_token: string;
-	expires_in: number;
-	expires_at: DateString;
-	token_type: string;
-	refresh_token: string;
-	refresh_expires: number;
-	refresh_expires_at: DateString;
-	account_id: string;
-	client_id: string;
-	internal_client: boolean;
-	client_service: string;
-	displayName: string;
-	app: string;
-	in_app_id: string;
-}
-
-export interface DeviceAuthAccessTokenResponse extends BaseAccessTokenResponse {
-	device_id: string;
-}
-
-export interface AuthorizationCodeAccessTokenResponse extends DeviceAuthAccessTokenResponse {
-	scope: unknown[];
-	ext_auth_id: string;
-	ext_auth_type: string;
-	ext_auth_method: string;
-	ext_auth_display_name: string;
-}
-
-export interface RefreshTokenAccessTokenResponse extends BaseAccessTokenResponse {
-	product_id: string;
-	application_id: string;
-}
-
-export type AuthBody = DeviceAuth | RefreshTokenBody;
-
-export type AuthResponse<T> =
-	T extends DeviceAuth
-		? DeviceAuthAccessTokenResponse
-		: T extends RefreshTokenBody
-			? RefreshTokenAccessTokenResponse
-			: never;
-
 
 export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
@@ -60,9 +17,9 @@ export interface Config {
 	token: string;
 	/** Device authentications for multiple devices/accounts */
 	epicDeviceAuth: {
-		device1: DeviceAuth;
-		device2: DeviceAuth;
-		alt?: DeviceAuth;
+		device1: DeviceAuthGrant;
+		device2: DeviceAuthGrant;
+		alt?: DeviceAuthGrant;
 	};
 	/** A key for Fortnite-API.com */
 	fortniteAPIKey: string;
@@ -70,11 +27,6 @@ export interface Config {
 	imgurClientId: string;
 	/** The MongoDB path to connect to */
 	mongoPath: string;
-}
-
-export interface CosmeticCache {
-	cosmetics: Cosmetic[];
-	lastUpdatedTimestamp: number;
 }
 
 export interface DisplayUserProperties {
@@ -85,25 +37,6 @@ export interface DisplayUserProperties {
 	same: boolean;
 }
 
-export interface DeviceAuth {
-	grant_type: 'device_auth';
-	account_id: string;
-	device_id: string;
-	secret: string;
-}
-
-export interface DeviceAuthResponse {
-	deviceId: string;
-	accountId: string;
-	secret: string;
-	userAgent: string;
-	created: {
-		location: string;
-		ipAddress: string;
-		dateTime: DateString;
-	};
-}
-
 export interface EpicAccount {
 	id: string;
 	displayName?: string;
@@ -111,15 +44,6 @@ export interface EpicAccount {
 	links?: AnyObject;
 	displayNameType?: string;
 	externalAuths: Record<string, AnyObject>;
-}
-
-export interface Friend {
-	accountId: string;
-	status: string;
-	direction: string;
-	alias?: string;
-	created: DateString;
-	favorite: boolean;
 }
 
 export type Template<T> = T & {
@@ -161,12 +85,6 @@ export interface MOTD {
 	};
 	platform: string;
 }
-
-export interface RefreshTokenBody {
-	grant_type: 'refresh_token';
-	refresh_token: string;
-}
-
 export interface ShopSection {
 	bSortOffersByOwnership: boolean;
 	bShowIneligibleOffersIfGiftable: boolean;
@@ -294,18 +212,7 @@ export type Dimensions = { [K in Link]: [number, number, number, number] };
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
-export interface RawEpicError {
-	numericErrorCode: number;
-}
-
 export type SlashOrMessageContextMenu = ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
-
-export interface Stats {
-	startTime: number;
-	endTime: number;
-	stats: Record<string, number>;
-	accountId: string;
-}
 
 export interface StatsCommandOptions extends LevelCommandOptions {
 	input: 'all' | 'keyboardMouse' | 'gamepad' | 'touch';
@@ -320,50 +227,3 @@ export interface StatsEpicAccount {
 export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
-
-export interface ChannelData<State> {
-	states: State[];
-	cacheExpire: DateString;
-}
-
-export interface ActiveEvent {
-	eventType: string;
-	activeUntil: DateString;
-	activeSince: DateString;
-}
-
-export interface TimelineClientEvent {
-	validFrom: DateString;
-	activeEvents: ActiveEvent[];
-	state: {
-		activeStorefronts: unknown[];
-		eventNamedWeights: unknown;
-		activeEvents: unknown[];
-		seasonNumber: number;
-		seasonTemplateId: string;
-		matchXpBonusPoints: number;
-		eventPunchCardTemplateId: string;
-		seasonBegin: DateString;
-		seasonEnd: DateString;
-		seasonDisplayedEnd: DateString;
-		weeklyStoreEnd: DateString;
-		stwEventStoreEnd: DateString;
-		stwWeeklyStoreEnd: DateString;
-		sectionStoreEnds: Record<string, DateString>;
-		rmtPromotion: string;
-		dailyStoreEnd: DateString;
-	};
-}
-
-export interface Timeline {
-	channels: {
-		'standalone-store': ChannelData<unknown>;
-		'client-matchmaking': ChannelData<unknown>;
-		tk: ChannelData<unknown>;
-		'featured-islands': ChannelData<unknown>;
-		'community-votes': ChannelData<unknown>;
-		'client-events': ChannelData<TimelineClientEvent>;
-	};
-	cacheIntervalMins: number;
-	currentTime: DateString;
-}

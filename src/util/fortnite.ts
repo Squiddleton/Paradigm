@@ -1,40 +1,23 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
+import { type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
-import { type DiscordClient, EpicError, TimestampedEmbed } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, EpicErrorCode, ErrorMessage, RarityColors, Time } from './constants.js';
-import { getLevels, getTimeline } from './epic.js';
+import { type DiscordClient, TimestampedEmbed } from './classes.js';
+import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticCache, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption, TimelineClientEvent } from './types.js';
+import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption } from './types.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 
-const cosmeticCache: CosmeticCache = {
-	cosmetics: [],
-	lastUpdatedTimestamp: 0
-};
+let cachedCosmetics: Cosmetic[] = [];
 
-/**
- * Returns all known Fortnite cosmetics via Fortnite-API.
- *
- * @remarks
- *
- * Periodically updates the cached cosmetics and returns those instead of always fetching from the API.
- *
- * @returns An array of cosmetic objects
- */
+export const getCosmetics = () => cachedCosmetics;
 export const fetchCosmetics = async () => {
-	const now = Date.now();
-	if (cosmeticCache.cosmetics.length === 0 || ((cosmeticCache.lastUpdatedTimestamp + Time.CosmeticCacheUpdate) < now)) {
-		cosmeticCache.cosmetics = await fortniteAPI.listCosmetics();
-		cosmeticCache.lastUpdatedTimestamp = now;
-	}
-	const { cosmetics } = cosmeticCache;
-	return cosmetics;
+	cachedCosmetics = await fortniteAPI.listCosmetics();
 };
 
 /**
@@ -60,8 +43,8 @@ export const fetchItemShop = async () => {
  * @param state - The client event state from Epic Games' timeline API
  * @returns An array of shop tab names
  */
-export const fetchShopNames = async (state: TimelineClientEvent) => {
-	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(r => EpicError.validate(r));
+export const fetchShopNames = async (state: TimelineChannelData<TimelineClientEventsState>) => {
+	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(res => res.json());
 	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
 
 	const shopIds = Object.keys(state.state.sectionStoreEnds);
@@ -81,7 +64,7 @@ export const fetchShopNames = async (state: TimelineClientEvent) => {
 /**
  * Returns the current client event states from Epic Games' timeline API
  */
-export const fetchStates = () => getTimeline().then(timeline => timeline.channels['client-events'].states);
+export const fetchStates = () => epicClient.fortnite.getTimeline().then(timeline => timeline.channels['client-events'].states);
 
 export const findCosmetic = async (input: string) => {
 	try {
@@ -94,7 +77,7 @@ export const findCosmetic = async (input: string) => {
 			return cosmeticByName;
 		}
 		catch {
-			const list = await fetchCosmetics();
+			const list = getCosmetics();
 			input = normalize(input);
 			return list.find(c => normalize(c.name) === input) ?? null;
 		}
@@ -216,7 +199,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
  * @returns A Discord attachment containing the image of the loadout or a string containing an error message
  */
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
-	const cosmetics = await fetchCosmetics();
+	const cosmetics = getCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? getRandomItem(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
@@ -314,7 +297,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
  * @param embeds - An array of embeds imitating a Twitter post
  */
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
-	const cosmetics = await fetchCosmetics();
+	const cosmetics = getCosmetics();
 	if (chosenBackground !== null && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
@@ -433,14 +416,14 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	 * @param name - The user's Epic Games account username
 	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
 	 */
-	const formatLevels = (levels: Record<string, number>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
+	const formatLevels = (levels: Partial<Record<string, number>>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
 			const overallSeason = parseInt(k.match(/\d+/)![0]);
 			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
 			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
-			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor(v / 100)}`;
+			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;
 
@@ -461,16 +444,6 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 				}
 			}
 		}
-		else if (e instanceof EpicError) {
-			if (e.numericErrorCode === EpicErrorCode.InvalidGrant) {
-				console.error('The main Epic account credentials must be updated.');
-				return 'This bot\'s Epic account credentials must be updated; please try again later.';
-			}
-			else {
-				console.error(e);
-				return e.message;
-			}
-		}
 		console.error(e);
 		return 'There was an error while fetching the account.';
 	};
@@ -484,8 +457,8 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		}
 
 		try {
-			const [levels] = await getLevels([userResult.epicAccountId]);
-			return { content: formatLevels(levels, options.targetUser.username) };
+			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [userResult.epicAccountId] });
+			return { content: formatLevels(stats, options.targetUser.username) };
 		}
 		catch (error) {
 			return { content: handleLevelsError(error), ephemeral: true };
@@ -494,8 +467,8 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	else {
 		try {
 			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
-			const [levels] = await getLevels([account.id]);
-			return { content: formatLevels(levels, account.name), account };
+			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [account.id] });
+			return { content: formatLevels(stats, account.name), account };
 		}
 		catch (error) {
 			return { content: handleLevelsError(error), ephemeral: true };
@@ -730,15 +703,13 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	};
 
 	const user = await getUserProperties();
-	if (interaction.isUserContextMenuCommand()) await interaction.deferReply({ ephemeral: !user.same });
-
 	const userResult = await userModel.findById(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {
 		await interaction.editReply({ content: `${user.same ? 'Your' : formatPossessive(user.username)} wishlist is currently empty.` });
 		return;
 	}
 
-	const cosmetics = await fetchCosmetics();
+	const cosmetics = getCosmetics();
 	const inc = 25;
 	const cosmeticStrings = userResult.wishlistCosmeticIds
 		.map(id => {

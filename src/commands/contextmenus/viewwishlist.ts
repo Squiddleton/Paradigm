@@ -7,6 +7,7 @@ export default new ContextMenu({
 	type: ApplicationCommandType.User,
 	scope: 'Global',
 	async execute(interaction) {
+		await interaction.deferReply({ ephemeral: true });
 		await viewWishlist(interaction);
 	}
 });
