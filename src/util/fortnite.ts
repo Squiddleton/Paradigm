@@ -108,9 +108,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
 					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => c.name));
-					if (items.length > 0) {
-						messages.push(`<@${user._id}>: ${items.join(', ')}`);
-					}
+					if (items.length > 0) messages.push(`<@${user._id}>: ${items.slice(0, 10).join(', ')}${items.length > 10 ? ', and more!' : ''}`);
 				}
 
 				if (messages.length !== 1 && guildResult.wishlistChannelId !== null) {
