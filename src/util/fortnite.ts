@@ -414,7 +414,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	 * @param name - The user's Epic Games account username
 	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
 	 */
-	const formatLevels = (levels: Partial<Record<string, number>>, name: string) => `${bold(`Battle Pass Levels for ${name}`)}\n\n${Object
+	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold('Battle Pass Levels')}\n\n${Object
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
@@ -456,7 +456,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 
 		try {
 			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [userResult.epicAccountId] });
-			return { content: formatLevels(stats, options.targetUser.username) };
+			return { content: formatLevels(stats) };
 		}
 		catch (error) {
 			return { content: handleLevelsError(error), ephemeral: true };
@@ -466,7 +466,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		try {
 			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
 			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [account.id] });
-			return { content: formatLevels(stats, account.name), account };
+			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
 			return { content: handleLevelsError(error), ephemeral: true };
