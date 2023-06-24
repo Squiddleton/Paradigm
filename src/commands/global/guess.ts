@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 import { RarityColors, Time } from '../../util/constants.js';
 import { getCosmetics } from '../../util/fortnite.js';
@@ -80,7 +80,7 @@ export default new SlashCommand({
 
 			if (modalInteraction.isFromMessage()) {
 				embed
-					.setTitle(`${modalInteraction.user.username} correctly guessed **${cosmetic.name}**`)
+					.setTitle(`${modalInteraction.user.username} correctly guessed ${bold(cosmetic.name)}`)
 					.setImage(image)
 					.setColor(Colors.Green);
 				await modalInteraction.update({ attachments: [], components: [], embeds: [embed] });
@@ -89,7 +89,7 @@ export default new SlashCommand({
 		}
 		catch {
 			embed
-				.setTitle(`Nobody guessed **${cosmetic.name}**`)
+				.setTitle(`Nobody guessed ${bold(cosmetic.name)}`)
 				.setImage(image)
 				.setColor(Colors.Red);
 			await interaction.editReply({ attachments: [], components: [], embeds: [embed] });

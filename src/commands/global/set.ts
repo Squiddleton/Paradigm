@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, bold } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { TimestampedEmbed } from '../../util/classes.js';
 
@@ -33,7 +33,7 @@ export default new SlashCommand({
 		await interaction.editReply({
 			embeds: [
 				new TimestampedEmbed()
-					.setTitle(`Set: **${cosmetics[0].set!.value}**`)
+					.setTitle(`Set: ${bold(cosmetics[0].set!.value)}`)
 					.setDescription(cosmetics
 						.sort((a, b) => cosmeticToAddedTime(a) - cosmeticToAddedTime(b))
 						.map(c => `${c.name} (${c.type.displayValue})`)
