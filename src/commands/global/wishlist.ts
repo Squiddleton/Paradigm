@@ -1,8 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import userModel from '../../models/users.js';
+import { Time } from '../../util/constants.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
+import { messageComponentCollectorFilter } from '../../util/functions.js';
 
 export default new SlashCommand({
 	name: 'wishlist',
@@ -21,6 +23,11 @@ export default new SlashCommand({
 					autocomplete: true
 				}
 			]
+		},
+		{
+			name: 'clear',
+			description: 'Removes all cosmetics from your wishlist',
+			type: ApplicationCommandOptionType.Subcommand
 		},
 		{
 			name: 'remove',
@@ -80,6 +87,49 @@ export default new SlashCommand({
 						guildResult.wishlistChannelId = null;
 						await guildResult.save();
 						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set a new one.', ephemeral: true });
+					}
+				}
+				break;
+			}
+			case 'clear': {
+				const userResult = await userModel.findById(userId);
+				if (userResult === null || userResult.wishlistCosmeticIds.length === 0) {
+					await interaction.editReply({ content: 'You have not added any cosmetics into your wishlist.' });
+					return;
+				}
+				const cosmeticCount = userResult.wishlistCosmeticIds.length;
+
+				const row = new ActionRowBuilder<ButtonBuilder>()
+					.setComponents(
+						new ButtonBuilder()
+							.setLabel('Confirm')
+							.setCustomId('confirm')
+							.setStyle(ButtonStyle.Primary),
+						new ButtonBuilder()
+							.setLabel('Cancel')
+							.setCustomId('cancel')
+							.setStyle(ButtonStyle.Secondary)
+					);
+				const message = await interaction.editReply({ components: [row], content: `Are you sure you want to remove ${cosmeticCount === 1 ? 'the only cosmetic' : cosmeticCount === 2 ? 'both cosmetics' : `all ${cosmeticCount} cosmetics`} from your wishlist? This action is irreversible.` });
+				let buttonInteraction: ButtonInteraction;
+				try {
+					buttonInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
+				}
+				catch (error) {
+					await interaction.editReply({ components: [], content: 'Ran out of time; the command has been cancelled.' });
+					return;
+				}
+
+				switch (buttonInteraction.customId) {
+					case 'cancel': {
+						await buttonInteraction.update({ components: [], content: 'The command has been cancelled.' });
+						return;
+					}
+					case 'confirm': {
+						await buttonInteraction.deferUpdate();
+						userResult.wishlistCosmeticIds = [];
+						await userResult.save();
+						await buttonInteraction.editReply({ components: [], content: 'Your wishlist has been cleared.' });
 					}
 				}
 				break;
