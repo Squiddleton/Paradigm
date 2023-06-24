@@ -139,6 +139,10 @@ export default new ClientEvent({
 				}
 			}
 			catch (error) {
+				const isUnknownInteraction = (e: unknown) => e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownInteraction;
+
+				const firstIsUnknownInteraction = isUnknownInteraction(error);
+
 				console.error(
 					`An error has occurred while executing the ${command.name} command: `,
 					{
@@ -148,11 +152,11 @@ export default new ClientEvent({
 						user: `${interaction.user.username} (${userId})`,
 						options: interaction.options.data
 					},
-					error
+					firstIsUnknownInteraction ? 'Unknown Interaction' : error
 				);
 				const errorMessage: InteractionReplyOptions = {
-					content: (error instanceof DiscordAPIError && typeof error.code === 'number' && [RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.InvalidWebhookToken].includes(error.code))
-						? 'That command took too long to execute; please try again.'
+					content: firstIsUnknownInteraction
+						? 'That command timed out internally; please try again.'
 						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.username} if this issue persists.`}`,
 					ephemeral: true
 				};
@@ -161,9 +165,7 @@ export default new ClientEvent({
 					(interaction.replied || interaction.deferred) ? await interaction.followUp(errorMessage) : await interaction.reply(errorMessage);
 				}
 				catch (error2) {
-					if (!(error2 instanceof DiscordAPIError) || typeof error2.code !== 'number' || ![RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.InvalidWebhookToken].includes(error2.code)) {
-						console.error(error2);
-					}
+					if (!isUnknownInteraction(error2)) console.error(error2);
 				}
 			}
 		}
