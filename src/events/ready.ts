@@ -59,7 +59,7 @@ export default new ClientEvent({
 					}
 					catch {
 						console.error('The channel for the following giveaway no longer exists:', giveaway);
-						return;
+						continue;
 					}
 					let message: Message;
 					try {
@@ -67,7 +67,7 @@ export default new ClientEvent({
 					}
 					catch {
 						console.error('The message for the following giveaway no longer exists:', giveaway);
-						return;
+						continue;
 					}
 
 					const winnerIds: Snowflake[] = [];
@@ -92,9 +92,9 @@ export default new ClientEvent({
 						{ $set: { 'giveaways.$': giveaway } }
 					);
 
-					if (winnerIds.length === 0) return message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
-					return message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
-
+					if (winnerIds.length === 0) await message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
+					else await message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
+					continue;
 				}
 				catch (error) {
 					console.error('An error has occurred with the following giveaway', giveaway, error);
