@@ -48,55 +48,63 @@ export default new ClientEvent({
 		});
 
 		schedule('*/1 * * * *', async () => {
-			const guildResults = await guildModel.find();
-			const giveaways = guildResults.map(r => r.giveaways).flat().filter(g => !g.completed && g.endTime <= (Date.now() / 1000));
+			const guildResults = await guildModel.find({ giveaways: { $ne: [] } });
 
-			for (const giveaway of giveaways) {
-				try {
-					let giveawayChannel: GuildTextBasedChannel;
+			for (const guildResult of guildResults) {
+				const guildId = guildResult._id;
+
+				for (const giveaway of guildResult.giveaways.filter(g => !g.completed && g.endTime <= (Date.now() / 1000))) {
+					const deleteGiveaway = () => guildModel.findByIdAndUpdate(guildId, { $pull: { giveaways: giveaway } });
+
 					try {
-						giveawayChannel = client.getVisibleChannel(giveaway.channelId);
+						let giveawayChannel: GuildTextBasedChannel;
+						try {
+							giveawayChannel = client.getVisibleChannel(giveaway.channelId);
+						}
+						catch {
+							console.log('The channel for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
+							await deleteGiveaway();
+							continue;
+						}
+
+						let message: Message;
+						try {
+							message = await giveawayChannel.messages.fetch(giveaway.messageId);
+						}
+						catch {
+							console.error('The message for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
+							await deleteGiveaway();
+							continue;
+						}
+
+						const winnerIds: Snowflake[] = [];
+						const entrantsInGuild = await giveawayChannel.guild.members.fetch({ user: giveaway.entrants });
+						const entrantIds = entrantsInGuild.map(m => m.id);
+
+						for (let i = 0; i < giveaway.winnerNumber && i < entrantIds.length; i++) {
+							const winnerId = getRandomItem(entrantIds);
+							if (!winnerIds.includes(winnerId)) winnerIds.push(winnerId);
+						}
+
+						giveaway.completed = true;
+						giveaway.winners = winnerIds;
+
+						await message.edit({ components: [], embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)] });
+
+						await guildModel.updateOne(
+							{
+								_id: guildId,
+								'giveaways.messageId': giveaway.messageId
+							},
+							{ $set: { 'giveaways.$': giveaway } }
+						);
+
+						if (winnerIds.length === 0) await message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
+						else await message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
 					}
-					catch {
-						console.error('The channel for the following giveaway no longer exists:', giveaway);
-						continue;
+					catch (error) {
+						console.error('An error has occurred with the following giveaway', giveaway, error);
 					}
-					let message: Message;
-					try {
-						message = await giveawayChannel.messages.fetch(giveaway.messageId);
-					}
-					catch {
-						console.error('The message for the following giveaway no longer exists:', giveaway);
-						continue;
-					}
-
-					const winnerIds: Snowflake[] = [];
-					const entrantsInGuild = await giveawayChannel.guild.members.fetch({ user: giveaway.entrants });
-					const entrantIds = entrantsInGuild.map(m => m.id);
-
-					for (let i = 0; i < giveaway.winnerNumber && i < entrantIds.length; i++) {
-						const winnerId = getRandomItem(entrantIds);
-						if (!winnerIds.includes(winnerId)) winnerIds.push(winnerId);
-					}
-
-					giveaway.completed = true;
-					giveaway.winners = winnerIds;
-
-					await message.edit({ components: [], embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)] });
-
-					await guildModel.updateOne(
-						{
-							_id: message.guildId,
-							'giveaways.messageId': giveaway.messageId
-						},
-						{ $set: { 'giveaways.$': giveaway } }
-					);
-
-					if (winnerIds.length === 0) await message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
-					else await message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
-				}
-				catch (error) {
-					console.error('An error has occurred with the following giveaway', giveaway, error);
 				}
 			}
 		});
