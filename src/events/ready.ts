@@ -1,6 +1,6 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import { getRandomItem } from '@squiddleton/util';
-import type { Message, Snowflake } from 'discord.js';
+import type { GuildTextBasedChannel, Message, Snowflake } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -53,7 +53,14 @@ export default new ClientEvent({
 
 			for (const giveaway of giveaways) {
 				try {
-					const giveawayChannel = client.getVisibleChannel(giveaway.channelId);
+					let giveawayChannel: GuildTextBasedChannel;
+					try {
+						giveawayChannel = client.getVisibleChannel(giveaway.channelId);
+					}
+					catch {
+						console.error('The channel for the following giveaway no longer exists:', giveaway);
+						return;
+					}
 					let message: Message;
 					try {
 						message = await giveawayChannel.messages.fetch(giveaway.messageId);
