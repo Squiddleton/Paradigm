@@ -41,12 +41,10 @@ export default new SlashCommand({
 				.setCustomId('guess')
 		);
 
-		const color = RarityColors[cosmetic.rarity.displayValue];
-
 		const embed = new EmbedBuilder()
 			.setTitle('What is this Outfit?')
 			.setImage('attachment://outfit.png')
-			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);
+			.setColor(cosmetic.series?.colors[0].slice(0, 6) as (ColorResolvable | undefined) ?? RarityColors[cosmetic.rarity.displayValue] ?? null);
 
 		const message = await interaction.editReply({ components: [row], embeds: [embed], files: [silhouette] });
 

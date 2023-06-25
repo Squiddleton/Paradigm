@@ -173,7 +173,7 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'PlayStation', value: 'psn' }
 ];
 
-export const RarityColors: Record<string, ColorResolvable> = {
+export const RarityColors: Partial<Record<string, ColorResolvable>> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,
 	Rare: 0x4e5afe,

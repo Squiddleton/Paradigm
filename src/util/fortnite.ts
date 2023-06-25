@@ -161,12 +161,10 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @returns An embed filled with information about the specified cosmetic
  */
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
-	const color = RarityColors[cosmetic.rarity.displayValue] ?? 'Random';
-
 	const embed = new EmbedBuilder()
 		.setTitle(cosmetic.name)
 		.setDescription(cosmetic.description)
-		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
+		.setColor(cosmetic.series === null ? (RarityColors[cosmetic.rarity.displayValue] ?? 'Random') : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
 		.setThumbnail(cosmetic.images.smallIcon)
 		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
 		.setFields([
