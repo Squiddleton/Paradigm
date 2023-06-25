@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
-import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'map',
@@ -11,7 +11,7 @@ export default new SlashCommand({
 
 		await interaction.reply({
 			embeds: [
-				new TimestampedEmbed()
+				new EmbedBuilder()
 					.setTitle('Artemis')
 					.setImage(map.images.pois)
 					.setFields([

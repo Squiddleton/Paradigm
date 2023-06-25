@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
 import guildModel from '../../models/guilds.js';
-import { DiscordClient, TimestampedEmbed } from '../../util/classes.js';
+import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 
@@ -83,7 +83,7 @@ export default new SlashCommand({
 				const { giveaways, milestones, shopSectionsChannelId, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				await interaction.reply({
 					embeds: [
-						new TimestampedEmbed()
+						new EmbedBuilder()
 							.setTitle(`${interaction.guild.name} Server Settings`)
 							.setThumbnail(interaction.guild.iconURL())
 							.setFields(

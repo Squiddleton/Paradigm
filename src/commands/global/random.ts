@@ -2,8 +2,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem } from '@squiddleton/util';
-import { ApplicationCommandOptionType, AttachmentBuilder } from 'discord.js';
-import { TimestampedEmbed } from '../../util/classes.js';
+import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { BackgroundURL } from '../../util/constants.js';
 import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
 
@@ -76,7 +75,7 @@ export default new SlashCommand({
 
 		await interaction.editReply({
 			embeds: [
-				new TimestampedEmbed()
+				new EmbedBuilder()
 					.setTitle('Randomly Generated Loadout')
 					.setImage('attachment://loadout.png')
 					.setFields(

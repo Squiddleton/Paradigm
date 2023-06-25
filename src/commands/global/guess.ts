@@ -1,8 +1,7 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
-import { TimestampedEmbed } from '../../util/classes.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { RarityColors, Time } from '../../util/constants.js';
 import { getCosmetics } from '../../util/fortnite.js';
 
@@ -42,7 +41,7 @@ export default new SlashCommand({
 
 		const color = RarityColors[cosmetic.rarity.displayValue];
 
-		const embed = new TimestampedEmbed()
+		const embed = new EmbedBuilder()
 			.setTitle('What is this Outfit?')
 			.setImage('attachment://outfit.png')
 			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);

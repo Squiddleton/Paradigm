@@ -3,7 +3,7 @@ import { type TimelineChannelData, type TimelineClientEventsState } from '@squid
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
-import { type DiscordClient, TimestampedEmbed } from './classes.js';
+import { type DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption } from './types.js';
@@ -163,7 +163,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	const color = RarityColors[cosmetic.rarity.displayValue] ?? 'Random';
 
-	const embed = new TimestampedEmbed()
+	const embed = new EmbedBuilder()
 		.setTitle(cosmetic.name)
 		.setDescription(cosmetic.description)
 		.setColor(cosmetic.series === null ? color : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
@@ -294,7 +294,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
  * @param chosenBackground - The background color, or null if random
  * @param embeds - An array of embeds imitating a Twitter post
  */
-export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: TimestampedEmbed[] = []) => {
+export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[] = []) => {
 	const cosmetics = getCosmetics();
 	if (chosenBackground !== null && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
@@ -721,7 +721,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		})
 		.sort((a, b) => a.localeCompare(b));
 
-	const embed = new TimestampedEmbed()
+	const embed = new EmbedBuilder()
 		.setColor(user.color)
 		.setDescription(`${underscore(`Cosmetics (${cosmeticStrings.length}):`)}\n${cosmeticStrings.slice(0, inc).join('\n')}`)
 		.setThumbnail(user.avatar)

@@ -1,6 +1,6 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, type EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
-import { DiscordClient, TimestampedEmbed } from './classes';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
+import { DiscordClient } from './classes';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
 import guildModel from '../models/guilds';
@@ -24,7 +24,7 @@ export const areMismatchedBonusRoles = (role: Role | null, roleAmount: number | 
  * @returns An embed displaying the current status and features of the giveaway
  */
 export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guild: Guild, ended = false) => {
-	const embed = new TimestampedEmbed()
+	const embed = new EmbedBuilder()
 		.setTitle(giveaway.text)
 		.setThumbnail(guild.iconURL())
 		.setColor(ended ? Colors.Red : Colors.Green)
@@ -131,7 +131,7 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 
 		await logChannel.send({
 			embeds: [
-				new TimestampedEmbed()
+				new EmbedBuilder()
 					.setDescription(`Reaction from ${user} (${user.id}) ${added ? 'added' : 'removed'}.`)
 					.setFields([
 						{ name: 'Reaction Name', value: reaction.emoji.name ?? emojiStr, inline: true },
@@ -328,7 +328,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
 
-	const embed = new TimestampedEmbed()
+	const embed = new EmbedBuilder()
 		.setTitle(giveawayMessage.embeds[0].title)
 		.setThumbnail(interaction.guild.iconURL())
 		.setColor('Blue')
@@ -373,7 +373,7 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 
 	const { milestones: memberMilestones } = await memberModel.findOneAndUpdate({ userId: member.id, guildId }, {}, { new: true, upsert: true });
 
-	const embed = new TimestampedEmbed()
+	const embed = new EmbedBuilder()
 		.setTitle(`${formatPossessive(displayName)} Milestones`)
 		.setThumbnail(member.displayAvatarURL())
 		.setColor(user.accentColor ?? null);

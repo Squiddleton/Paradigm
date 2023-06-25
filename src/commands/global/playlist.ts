@@ -1,8 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { normalize, removeDuplicates } from '@squiddleton/util';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
-import { TimestampedEmbed } from '../../util/classes.js';
 
 export default new SlashCommand({
 	name: 'playlist',
@@ -31,7 +30,7 @@ export default new SlashCommand({
 
 		await interaction.editReply({
 			embeds: [
-				new TimestampedEmbed()
+				new EmbedBuilder()
 					.setTitle(playlist.name ?? 'Unnamed Playlist')
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
 					.setImage(playlist.images.showcase)

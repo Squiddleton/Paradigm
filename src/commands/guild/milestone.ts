@@ -1,9 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPossessive } from '@squiddleton/util';
-import { ApplicationCommandOptionType, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import memberModel from '../../models/members.js';
-import { TimestampedEmbed } from '../../util/classes.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
 import { grantMilestone } from '../../util/fortnite.js';
 import { isKey } from '../../util/functions.js';
@@ -142,7 +141,7 @@ export default new SlashCommand({
 				return;
 			}
 			case 'list': {
-				const embed = new TimestampedEmbed()
+				const embed = new EmbedBuilder()
 					.setTitle(`${formatPossessive(interaction.guild.name)} Milestones`)
 					.setThumbnail(interaction.guild.iconURL());
 
