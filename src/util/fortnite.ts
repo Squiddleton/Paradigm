@@ -523,14 +523,17 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	const getRankedContent = async (epicAccountId: string) => {
 		const progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
 
-		const transformTrack = (rankingType: string, displayName: string) => {
-			const track = progress.find(t => t.rankingType === rankingType);
-			if (track === undefined) throw new Error(`No track was found for ${displayName}`);
-			const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Diamond I', 'Diamond II', 'Diamond III', 'Platinum I', 'Platinum II', 'Platinum III', 'Elite', 'Champion', 'Unreal'];
-			return `${displayName}: ${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated ${time(new Date(track.lastUpdated), 'R')})`;
+		const transformTrack = (trackguid: string, trackDisplayName: string) => {
+			const track = progress.find(t => t.trackguid === trackguid);
+			if (track === undefined) throw new Error(`No track was found for ${trackDisplayName}`);
+			const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
+			const progressString = track.currentDivision === 0 && track.promotionProgress === 0
+				? 'Unknown'
+				: `${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated ${time(new Date(track.lastUpdated), 'R')})`;
+			return `${trackDisplayName}: ${progressString}`;
 		};
 
-		return `${bold('Ranked Stats')}\n\n${transformTrack('ranked-br', 'Battle Royale')}\n${transformTrack('ranked-zb', 'Zero Build')}`;
+		return `${bold('Ranked Stats')}\n\n${transformTrack('ggOwuK', 'Battle Royale')}\n${transformTrack('AjRdrb', 'Zero Build')}`;
 	};
 
 	if (options.accountName === null) {
