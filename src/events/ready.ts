@@ -72,7 +72,7 @@ export default new ClientEvent({
 							message = await giveawayChannel.messages.fetch(giveaway.messageId);
 						}
 						catch {
-							console.error('The message for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
+							console.log('The message for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
 							await deleteGiveaway();
 							continue;
 						}
