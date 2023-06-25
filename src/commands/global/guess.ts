@@ -10,6 +10,8 @@ export default new SlashCommand({
 	description: 'Guess a Fortnite Outfit\'s name from its silhouette',
 	scope: 'Global',
 	async execute(interaction) {
+		await interaction.deferReply();
+
 		const cosmetics = getCosmetics();
 		const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
 		const cosmetic = getRandomItem(items);
@@ -46,7 +48,7 @@ export default new SlashCommand({
 			.setImage('attachment://outfit.png')
 			.setColor(cosmetic.series?.colors[0].slice(0, 6) as ColorResolvable ?? color ?? null);
 
-		const response = await interaction.reply({ components: [row], embeds: [embed], files: [silhouette] });
+		const message = await interaction.editReply({ components: [row], embeds: [embed], files: [silhouette] });
 
 		const modal = new ModalBuilder()
 			.setTitle('Guess the Outfit')
@@ -62,7 +64,7 @@ export default new SlashCommand({
 				)
 			);
 
-		const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: Time.GuessCollector });
+		const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: Time.GuessCollector });
 		collector.on('collect', async buttonInteraction => {
 			await buttonInteraction.showModal(modal);
 		});
