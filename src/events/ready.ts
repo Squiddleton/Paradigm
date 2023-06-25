@@ -94,7 +94,6 @@ export default new ClientEvent({
 
 					if (winnerIds.length === 0) await message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
 					else await message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. <@${w}> (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
-					continue;
 				}
 				catch (error) {
 					console.error('An error has occurred with the following giveaway', giveaway, error);
