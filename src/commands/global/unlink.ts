@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import userModel from '../../models/users';
+import userModel from '../../models/users.js';
 
 export default new SlashCommand({
 	name: 'unlink',

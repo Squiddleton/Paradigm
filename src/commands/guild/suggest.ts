@@ -1,9 +1,9 @@
 import { loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ApplicationCommandOptionType, type Message } from 'discord.js';
-import { DiscordClient } from '../../util/classes';
-import { DiscordIds, ErrorMessage } from '../../util/constants';
-import type { AnyGuildTextChannel } from '../../util/types';
+import { DiscordClient } from '../../util/classes.js';
+import { DiscordIds, ErrorMessage } from '../../util/constants.js';
+import type { AnyGuildTextChannel } from '../../util/types.js';
 
 export default new SlashCommand({
 	name: 'suggest',

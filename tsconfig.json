@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "CommonJS",
+    "module": "ES2022",
     "rootDir": "src",
     "moduleResolution": "node",
     "resolveJsonModule": true,

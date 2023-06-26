@@ -1,7 +1,7 @@
 import { Client as UtilClient, validateChannel, validateGuild } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, type Client as BaseClient, ChannelType, type GuildBasedChannel, PermissionFlagsBits, type PermissionsBitField, type Snowflake, StringSelectMenuBuilder } from 'discord.js';
-import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants';
-import type { AnyGuildTextChannel } from './types';
+import { AccessibleChannelPermissions, DiscordIds, ErrorMessage } from './constants.js';
+import type { AnyGuildTextChannel } from './types.js';
 
 export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<Ready> {
 	getPermissions(channel: GuildBasedChannel): PermissionsBitField {

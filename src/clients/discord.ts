@@ -8,7 +8,7 @@ const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of readdirSync('./dist/commands')) {
 	const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
-		const { default: command } = require(`../commands/${folder}/${file}`);
+		const { default: command } = await import(`../commands/${folder}/${file}`);
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
 	}
 }
@@ -21,15 +21,13 @@ const client = new DiscordClient({
 	},
 	commands,
 	devGuildId: DiscordIds.GuildId.Dev,
-	events: readdirSync('./dist/events').filter(file => file.endsWith('.js')).map(file => {
-		const { default: event } = require(`../events/${file}`);
-		if (event instanceof ClientEvent) {
+	events: await Promise.all(
+		readdirSync('./dist/events').filter(file => file.endsWith('.js')).map(async file => {
+			const { default: event } = await import(`../events/${file}`);
+			if (!(event instanceof ClientEvent)) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 			return event;
-		}
-		else {
-			throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
-		}
-	}),
+		})
+	),
 	exclusiveGuildId: DiscordIds.GuildId.FortniteBR,
 	failIfNotExists: false,
 	intents: [

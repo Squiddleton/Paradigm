@@ -1,9 +1,9 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
-import fortniteAPI from '../../clients/fortnite';
-import { handleStatsError, linkEpicAccount } from '../../util/fortnite';
-import type { StatsEpicAccount } from '../../util/types';
+import fortniteAPI from '../../clients/fortnite.js';
+import { handleStatsError, linkEpicAccount } from '../../util/fortnite.js';
+import type { StatsEpicAccount } from '../../util/types.js';
 
 export default new SlashCommand({
 	name: 'link',

@@ -1,7 +1,7 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import { ApplicationCommandType, PermissionFlagsBits } from 'discord.js';
-import { ErrorMessage } from '../../util/constants';
-import { rerollGiveaway } from '../../util/functions';
+import { ErrorMessage } from '../../util/constants.js';
+import { rerollGiveaway } from '../../util/functions.js';
 
 export default new ContextMenu({
 	name: 'Reroll Giveaway',

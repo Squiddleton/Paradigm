@@ -1,6 +1,6 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import { ApplicationCommandType } from 'discord.js';
-import { viewMilestones } from '../../util/functions';
+import { viewMilestones } from '../../util/functions.js';
 
 export default new ContextMenu({
 	name: 'View Milestones',

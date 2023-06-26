@@ -1,7 +1,7 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import { ApplicationCommandType } from 'discord.js';
-import { getLevelsString, getStatsImage } from '../../util/fortnite';
-import type { LevelCommandOptions } from '../../util/types';
+import { getLevelsString, getStatsImage } from '../../util/fortnite.js';
+import type { LevelCommandOptions } from '../../util/types.js';
 
 export default new ContextMenu({
 	name: 'View Stats',

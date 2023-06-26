@@ -6,8 +6,6 @@ import { DiscordIds } from '../util/constants.js';
 import { checkWishlists } from '../util/fortnite.js';
 import type { IMessage } from '../util/types.js';
 
-const denySubmissionMessage = 'Discussion is not allowed in this channel. Please use </suggest:1000168121098842274> for submissions.';
-
 export default new ClientEvent({
 	name: 'messageCreate',
 	async execute(message) {
@@ -48,7 +46,7 @@ export default new ClientEvent({
 								}
 							};
 
-							const msg = await message.reply(denySubmissionMessage);
+							const msg = await message.reply('Discussion is not allowed in this channel. Please use </suggest:1000168121098842274> for submissions.');
 							if (botPermissions.has(PermissionFlagsBits.ManageMessages)) await tryToDelete(message);
 							setTimeout(() => tryToDelete(msg), 5000);
 						}

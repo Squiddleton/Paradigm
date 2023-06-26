@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A Fortnite-themed Discord bot with a variety of commands",
   "main": "./dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "lint": "eslint . --fix",

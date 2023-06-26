@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import { handleReaction } from '../util/functions';
+import { handleReaction } from '../util/functions.js';
 
 export default new ClientEvent({
 	name: 'messageReactionRemove',

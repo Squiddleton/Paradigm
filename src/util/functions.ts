@@ -1,10 +1,10 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
-import { DiscordClient } from './classes';
+import { DiscordClient } from './classes.js';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
-import guildModel from '../models/guilds';
-import memberModel from '../models/members';
+import guildModel from '../models/guilds.js';
+import memberModel from '../models/members.js';
 
 /**
  * Checks if a role with bonus giveaways entries has a matching amount of bonus entries provided, and if the entry amount has a matching role as well.
