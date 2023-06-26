@@ -1,9 +1,12 @@
 import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
+import { EpicAPIError } from '@squiddleton/epic';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
 import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, PermissionFlagsBits, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
+import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
+import config from '../config.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
@@ -139,6 +142,19 @@ export default new ClientEvent({
 				}
 			}
 			catch (error) {
+				const date = new Date().toLocaleString('en-us', { timeZone: 'America/New_York' });
+
+				if (error instanceof EpicAPIError && error.status === 401) {
+					await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+					console.log(`The Epic client's access token was unauthorized, but it successfully reauthenticated at ${date}.`);
+					const errorMessage: InteractionReplyOptions = {
+						content: 'An internal error occurred, but it has been resolved. Try the command again!',
+						ephemeral: true
+					};
+					if (interaction.replied || interaction.deferred) await interaction.followUp(errorMessage);
+					else await interaction.reply(errorMessage);
+				}
+
 				const isUnknownInteraction = (e: unknown) => e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownInteraction;
 
 				const firstIsUnknownInteraction = isUnknownInteraction(error);
@@ -146,7 +162,7 @@ export default new ClientEvent({
 				console.error(
 					`An error has occurred while executing the ${command.name} command: `,
 					{
-						date: new Date().toLocaleString('en-us', { timeZone: 'America/New_York' }),
+						date,
 						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
 						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message'} (${interaction.channelId})`,
 						user: `${interaction.user.username} (${userId})`,
@@ -162,7 +178,8 @@ export default new ClientEvent({
 				};
 
 				try {
-					(interaction.replied || interaction.deferred) ? await interaction.followUp(errorMessage) : await interaction.reply(errorMessage);
+					if (interaction.replied || interaction.deferred) await interaction.followUp(errorMessage);
+					else await interaction.reply(errorMessage);
 				}
 				catch (error2) {
 					if (!isUnknownInteraction(error2)) console.error(error2);
