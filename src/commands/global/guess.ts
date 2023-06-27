@@ -1,5 +1,6 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { type Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { RarityColors, Time } from '../../util/constants.js';
@@ -13,9 +14,19 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const cosmetics = getCosmetics();
-		const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
-		const cosmetic = getRandomItem(items);
-		const image = cosmetic.images.featured ?? cosmetic.images.icon;
+
+		const getCosmeticWithImage = (): [Cosmetic, string | null] => {
+			const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
+			const cosmetic = getRandomItem(items);
+			const image = cosmetic.images.featured ?? cosmetic.images.icon;
+			return [cosmetic, image];
+		};
+
+		let cosmetic: Cosmetic | null = null;
+		let image: string | null = null;
+		while (cosmetic === null || image === null) {
+			[cosmetic, image] = getCosmeticWithImage();
+		}
 
 		const background = await loadImage(image);
 		const canvas = createCanvas(background.width, background.height);
@@ -67,15 +78,15 @@ export default new SlashCommand({
 			await buttonInteraction.showModal(modal);
 		});
 
-		const filter = (i: ModalSubmitInteraction) => {
+		const filter = (c: Cosmetic) => (i: ModalSubmitInteraction) => {
 			if (i.customId !== interaction.id) return false;
-			if (normalize(i.fields.getTextInputValue('outfit')) === normalize(cosmetic.name)) return true;
+			if (normalize(i.fields.getTextInputValue('outfit')) === normalize(c.name)) return true;
 			i.reply({ content: 'Your guess is incorrect.', ephemeral: true });
 			return false;
 		};
 
 		try {
-			const modalInteraction = await interaction.awaitModalSubmit({ filter, time: Time.GuessCollector });
+			const modalInteraction = await interaction.awaitModalSubmit({ filter: filter(cosmetic), time: Time.GuessCollector });
 
 			if (modalInteraction.isFromMessage()) {
 				embed

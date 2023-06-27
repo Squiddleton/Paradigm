@@ -6,7 +6,7 @@ import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'd
 import { BackgroundURL } from '../../util/constants.js';
 import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
 
-const getImage = (cosmetic: Cosmetic) => cosmetic.images.featured ? cosmetic.images.featured : cosmetic.images.icon;
+const getImage = (cosmetic: Cosmetic) => cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
 
 export default new SlashCommand({
 	name: 'random',
@@ -55,19 +55,44 @@ export default new SlashCommand({
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-		const outfitImage = await loadImage(getImage(outfit));
+		const outfitIcon = getImage(outfit);
+		if (outfitIcon === null) {
+			await interaction.editReply('Your Outfit has no image; please try a different one!');
+			return;
+		}
+		const outfitImage = await loadImage(outfitIcon);
 		ctx.drawImage(outfitImage, (background.width - (background.height * outfitImage.width / outfitImage.height)) / 2, 0, background.height * outfitImage.width / outfitImage.height, background.height);
 
-		const backBlingImage = await loadImage(getImage(backBling));
+		const backBlingIcon = getImage(backBling);
+		if (backBlingIcon === null) {
+			await interaction.editReply('Your Back Bling has no image; please try a different one!');
+			return;
+		}
+		const backBlingImage = await loadImage(backBlingIcon);
 		ctx.drawImage(backBlingImage, 0, 0, background.height * backBlingImage.width / backBlingImage.height / 2, background.height / 2);
 
-		const pickaxeImage = await loadImage(getImage(pickaxe));
+		const pickaxeIcon = getImage(pickaxe);
+		if (pickaxeIcon === null) {
+			await interaction.editReply('Your Pickaxe has no image; please try a different one!');
+			return;
+		}
+		const pickaxeImage = await loadImage(pickaxeIcon);
 		ctx.drawImage(pickaxeImage, 0, background.height / 2, background.height * pickaxeImage.width / pickaxeImage.height / 2, background.height / 2);
 
-		const gliderImage = await loadImage(getImage(glider));
+		const gliderIcon = getImage(glider);
+		if (gliderIcon === null) {
+			await interaction.editReply('Your Glider has no image; please try a different one!');
+			return;
+		}
+		const gliderImage = await loadImage(gliderIcon);
 		ctx.drawImage(gliderImage, background.width - (background.height * gliderImage.width / gliderImage.height / 2), 0, background.height * gliderImage.width / gliderImage.height / 2, background.height / 2);
 
-		const wrapImage = await loadImage(getImage(wrap));
+		const wrapIcon = getImage(wrap);
+		if (wrapIcon === null) {
+			await interaction.editReply('Your Wrap has no image; please try a different one!');
+			return;
+		}
+		const wrapImage = await loadImage(wrapIcon);
 		ctx.drawImage(wrapImage, background.width - (background.height * wrapImage.width / wrapImage.height / 2), background.height / 2, background.height * wrapImage.width / wrapImage.height / 2, background.height / 2);
 
 

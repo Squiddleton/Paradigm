@@ -221,10 +221,11 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		}
 		else if (input !== null) {
 			const cosmetic = cosmetics.find(c => types.includes(c.type.value) && normalize(c.name.toLowerCase().replace(/ /g, '')) === normalize(input));
-			if (cosmetic === undefined) {
-				return `No ${displayType} matches your query.`;
-			}
-			image = await loadImage(cosmetic.images.featured ?? cosmetic.images.icon);
+			if (cosmetic === undefined) return `No ${displayType} matches your query.`;
+
+			const icon = cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
+			if (icon === null) return `Your ${displayType} has no image; please try a different one!`;
+			image = await loadImage(icon);
 		}
 
 		if (image !== null) {
@@ -365,10 +366,10 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					const variants = cosmetic.variants?.[0].options;
 					if (variants) {
 						const imageURL = value.startsWith('truedefault')
-							? cosmetic.images.featured ?? cosmetic.images.icon
+							? cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon
 							: variants.find(v => v.tag === value)?.image;
 
-						if (imageURL === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
+						if (typeof imageURL !== 'string') throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
 
 						options[cosmetic.type.displayValue] = imageURL;
 
@@ -483,17 +484,20 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
  * @param e - The thrown error
  */
 export const handleStatsError = async (interaction: CommandInteraction, e: unknown) => {
-	if (!(e instanceof FortniteAPIError)) throw e;
-	switch (e.code) {
-		case 403: {
-			await interaction.editReply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
-			break;
-		}
-		case 404: {
-			await interaction.editReply('No account was found with that username on that platform.');
-			break;
+	if (e instanceof FortniteAPIError) {
+		switch (e.code) {
+			case 403: {
+				await interaction.reply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
+				return;
+			}
+			case 404: {
+				await interaction.reply('No account was found with that username on that platform.');
+				return;
+			}
 		}
 	}
+	console.error(e);
+	await interaction.reply('There was an error while fetching the account.');
 };
 
 /**
