@@ -398,6 +398,28 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 	}
 };
 
+
+/**
+ * Returns a string representative of an error thrown from fetching a user's levels.
+ *
+ * @param e - The thrown error
+ * @returns A string explaining the error to the command user
+ */
+const getStatsErrorMessage = (e: unknown) => {
+	if (e instanceof FortniteAPIError) {
+		switch (e.code) {
+			case 403: {
+				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
+			}
+			case 404: {
+				return 'No account was found with that username on that platform.';
+			}
+		}
+	}
+	console.error(e);
+	return 'There was an error while fetching the account.';
+};
+
 /**
  * Returns the content for a message containing a user's final level in each Fortnite season.
  *
@@ -424,27 +446,6 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		})
 		.join('\n')}`;
 
-	/**
-	 * Returns a string representative of an error thrown from fetching a user's levels.
-	 *
-	 * @param e - The thrown error
-	 * @returns A string explaining the error to the command user
-	 */
-	const handleLevelsError = (e: unknown) => {
-		if (e instanceof FortniteAPIError) {
-			switch (e.code) {
-				case 403: {
-					return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
-				}
-				case 404: {
-					return 'No account was found with that username on that platform.';
-				}
-			}
-		}
-		console.error(e);
-		return 'There was an error while fetching the account.';
-	};
-
 	const { accountName, accountType } = options;
 
 	if (accountName === null) {
@@ -458,7 +459,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
-			return { content: handleLevelsError(error), ephemeral: true };
+			return { content: getStatsErrorMessage(error), ephemeral: true };
 		}
 	}
 	else {
@@ -468,7 +469,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
-			return { content: handleLevelsError(error), ephemeral: true };
+			return { content: getStatsErrorMessage(error), ephemeral: true };
 		}
 	}
 };
@@ -476,29 +477,11 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 /**
  * Replies to an interaction with an error message thrown from fetching a user's stats.
  *
- * @remarks
- *
- * Re-throws the error if it is not an instance of the FortniteAPIError class.
  *
  * @param interaction - The command interaction that initiated this function call
  * @param e - The thrown error
  */
-export const handleStatsError = async (interaction: CommandInteraction, e: unknown) => {
-	if (e instanceof FortniteAPIError) {
-		switch (e.code) {
-			case 403: {
-				await interaction.reply('This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.');
-				return;
-			}
-			case 404: {
-				await interaction.reply('No account was found with that username on that platform.');
-				return;
-			}
-		}
-	}
-	console.error(e);
-	await interaction.reply('There was an error while fetching the account.');
-};
+export const handleStatsError = (interaction: CommandInteraction, e: unknown) => interaction.reply(getStatsErrorMessage(e));
 
 /**
  * Links a Discord user's account to an Epic Games account.
