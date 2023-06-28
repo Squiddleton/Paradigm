@@ -1,5 +1,5 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
-import { type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
+import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
@@ -9,6 +9,7 @@ import { createPaginationButtons, isKey, messageComponentCollectorFilter, pagina
 import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption } from './types.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
+import config from '../config.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
@@ -506,7 +507,16 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
 	const getRankedContent = async (epicAccountId: string) => {
-		const progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
+		let progress: HabaneroTrackProgress[];
+		try {
+			progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
+		}
+		catch (error) {
+			if (!(error instanceof EpicAPIError) || error.status !== 401) throw error;
+
+			await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+			progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
+		}
 
 		const transformTrack = (trackguid: string, trackDisplayName: string) => {
 			const track = progress.find(t => t.trackguid === trackguid);
