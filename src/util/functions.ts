@@ -73,8 +73,8 @@ export const createPaginationButtons = (): PaginationButtons => {
 			.setStyle(ButtonStyle.Primary),
 		new ButtonBuilder()
 			.setCustomId('quit')
-			.setLabel('Quit')
-			.setStyle(ButtonStyle.Danger)
+			.setLabel('Cancel')
+			.setStyle(ButtonStyle.Secondary)
 	];
 };
 

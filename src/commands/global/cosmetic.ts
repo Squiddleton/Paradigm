@@ -55,7 +55,7 @@ export default new SlashCommand({
 					new ButtonBuilder()
 						.setCustomId('lock')
 						.setLabel('Lock Image In')
-						.setStyle(ButtonStyle.Danger)
+						.setStyle(ButtonStyle.Primary)
 				),
 			...variants.slice(0, 4).map(v => new ActionRowBuilder<StringSelectMenuBuilder>()
 				.setComponents(new StringSelectMenuBuilder()

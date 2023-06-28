@@ -104,7 +104,7 @@ export default new SlashCommand({
 						new ButtonBuilder()
 							.setLabel('Confirm')
 							.setCustomId('confirm')
-							.setStyle(ButtonStyle.Primary),
+							.setStyle(ButtonStyle.Danger),
 						new ButtonBuilder()
 							.setLabel('Cancel')
 							.setCustomId('cancel')

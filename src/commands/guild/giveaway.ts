@@ -321,7 +321,7 @@ export default new SlashCommand({
 						new ButtonBuilder()
 							.setLabel('Enter')
 							.setCustomId('giveaway')
-							.setStyle(ButtonStyle.Success)
+							.setStyle(ButtonStyle.Primary)
 					]
 				});
 				const message = await channel.send({ components: [row], embeds: [createGiveawayEmbed(withoutMessage, interaction.guild)] });

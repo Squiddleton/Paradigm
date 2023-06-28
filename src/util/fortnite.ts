@@ -339,7 +339,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 					new ButtonBuilder()
 						.setCustomId('lock')
 						.setLabel('Lock Image In')
-						.setStyle(ButtonStyle.Danger)
+						.setStyle(ButtonStyle.Primary)
 				]
 			})
 		);
