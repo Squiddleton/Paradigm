@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ES2022",
-    "rootDir": "src",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "outDir": "dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
-    "strict": true,
-    "noImplicitAny": true,
-    "useUnknownInCatchVariables": true,
-    "skipLibCheck": true
-  }
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ES2022",
+		"rootDir": "src",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"outDir": "dist",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"useUnknownInCatchVariables": true,
+		"skipLibCheck": true
+	}
 }
