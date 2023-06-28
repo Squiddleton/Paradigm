@@ -44,16 +44,21 @@ export default new ClientEvent({
 				switch (name) {
 					case 'cosmetic': {
 						const { ratings } = findBestMatch(input, cosmetics.map(c => `${c.name} (${c.type.displayValue})`));
-						const choices = ratings.sort(sortByRating).map(({ target }) => {
-							const targetStrings = target.split('(');
-							const typeWithParen = targetStrings.pop();
-							if (typeWithParen === undefined) throw new TypeError(`The target ${target} was unexpected`);
-							const cosmeticName = targetStrings.join('(').trim();
-							const cosmeticType = typeWithParen.replace(')', '');
-							const cosmetic = cosmetics.find(c => c.name === cosmeticName && c.type.displayValue === cosmeticType);
-							if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', target));
-							return { name: target, value: cosmetic.id };
-						}).slice(0, 25);
+						const choices = ratings
+							.sort(sortByRating)
+							.slice(0, 25)
+							.map(({ target }) => {
+								const parenthesesRegExp = new RegExp(/(.*) \(([^)]+)\)/);
+
+								const match = target.match(parenthesesRegExp);
+								if (match === null) throw new TypeError(`The target ${target} did not match the RegExp`);
+
+								const [, cosmeticName, cosmeticType] = match;
+								const cosmetic = cosmetics.find(c => c.name === cosmeticName && c.type.displayValue === cosmeticType);
+								if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', target));
+
+								return { name: target, value: cosmetic.id };
+							});
 						await interaction.respond(choices);
 						break;
 					}
