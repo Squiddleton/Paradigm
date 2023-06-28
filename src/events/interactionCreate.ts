@@ -1,4 +1,4 @@
-import { ClientEvent, ContextMenu, SlashCommand } from '@squiddleton/discordjs-util';
+import { ClientEvent } from '@squiddleton/discordjs-util';
 import { EpicAPIError } from '@squiddleton/epic';
 import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
@@ -21,8 +21,6 @@ export default new ClientEvent({
 		const inCachedGuild = interaction.inCachedGuild();
 		const { client } = interaction;
 		DiscordClient.assertReadyClient(client);
-		const { owner } = client.application;
-		if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 
 		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
@@ -129,10 +127,10 @@ export default new ClientEvent({
 
 			try {
 				// TODO: Simplify this block
-				if (interaction.isChatInputCommand() && command instanceof SlashCommand) {
+				if (interaction.isChatInputCommand() && !('type' in command)) {
 					await command.execute(interaction, client);
 				}
-				else if (command instanceof ContextMenu) {
+				else if ('type' in command) {
 					if (interaction.isMessageContextMenuCommand() && command.isMessage()) {
 						await command.execute(interaction, client);
 					}
@@ -170,6 +168,8 @@ export default new ClientEvent({
 					},
 					firstIsUnknownInteraction ? 'Unknown Interaction' : error
 				);
+				const { owner } = client.application;
+				if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 				const errorMessage: InteractionReplyOptions = {
 					content: firstIsUnknownInteraction
 						? 'That command timed out internally; please try again.'
