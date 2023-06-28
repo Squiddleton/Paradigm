@@ -22,7 +22,7 @@ export namespace DiscordIds {
 	export enum ChannelId {
 		BRLeaks = '509930374021775394',
 		BRSpeculation = '785210975733284915',
-		Dev = '713250274214543360',
+		Dev = '863882874519814154',
 		General = '488040333310164992',
 		LeakPosts = '819870118720438273',
 		LeaksDiscussion = '509936143169748992',
