@@ -36,8 +36,17 @@ export default new ClientEvent({
 				const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
 
 				const filterCosmetics = async (type: string) => {
-					const { ratings } = findBestMatch(input, cosmetics.filter(c => c.type.value === type).map(mapByName).filter((n): n is string => n !== null));
-					const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
+					const filteredCosmetics = cosmetics
+						.filter(c => c.type.value === type)
+						.map(mapByName)
+						.filter((n): n is string => n !== null);
+
+					const { ratings } = findBestMatch(input, filteredCosmetics);
+
+					const choices = ratings
+						.sort(sortByRating)
+						.slice(0, 25)
+						.map(mapByTarget);
 					await interaction.respond(choices);
 				};
 
