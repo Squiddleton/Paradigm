@@ -481,7 +481,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
  * @param interaction - The command interaction that initiated this function call
  * @param e - The thrown error
  */
-export const handleStatsError = (interaction: CommandInteraction, e: unknown) => interaction.reply(getStatsErrorMessage(e));
+export const handleStatsError = (interaction: CommandInteraction, e: unknown) => interaction[interaction.deferred || interaction.replied ? 'followUp' : 'reply'](getStatsErrorMessage(e));
 
 /**
  * Links a Discord user's account to an Epic Games account.
