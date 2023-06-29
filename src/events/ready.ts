@@ -7,6 +7,7 @@ import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
+import { populateUsers } from '../util/users.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -14,6 +15,7 @@ export default new ClientEvent({
 	async execute(client) {
 		await client.application.fetch();
 		await fetchCosmetics();
+		await populateUsers();
 		DiscordClient.assertReadyClient(client);
 		const readyMessage = `${client.user.username} is ready!`;
 		await client.devChannel.send(readyMessage);

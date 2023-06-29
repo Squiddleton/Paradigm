@@ -7,6 +7,7 @@ import { type DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption } from './types.js';
+import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
@@ -450,7 +451,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	const { accountName, accountType } = options;
 
 	if (accountName === null) {
-		const userResult = await userModel.findById(options.targetUser.id);
+		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
 			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
 		}
@@ -492,7 +493,7 @@ export const handleStatsError = (interaction: CommandInteraction, e: unknown) =>
  * @param ephemeral - Whether the response should only be visible to the user
  */
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
-	await userModel.findByIdAndUpdate(interaction.user.id, { epicAccountId: account.id }, { upsert: true });
+	await setEpicAccount(interaction.user.id, account.id);
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
@@ -532,7 +533,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	};
 
 	if (options.accountName === null) {
-		const userResult = await userModel.findById(options.targetUser.id);
+		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
 			if (content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
 			else await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
@@ -699,7 +700,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	};
 
 	const user = await getUserProperties();
-	const userResult = await userModel.findById(user.id);
+	const userResult = getUser(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {
 		await interaction.editReply({ content: `${user.same ? 'Your' : formatPossessive(user.username)} wishlist is currently empty.` });
 		return;

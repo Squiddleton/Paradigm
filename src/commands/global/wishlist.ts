@@ -1,10 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType } from 'discord.js';
 import guildModel from '../../models/guilds.js';
-import userModel from '../../models/users.js';
 import { Time } from '../../util/constants.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
+import { addToWishlist, getUser, removeFromWishlist, saveUser } from '../../util/users.js';
 
 export default new SlashCommand({
 	name: 'wishlist',
@@ -69,11 +69,8 @@ export default new SlashCommand({
 					return;
 				}
 
-				const userResult = await userModel.findByIdAndUpdate(
-					userId,
-					{ $addToSet: { wishlistCosmeticIds: cosmetic.id } },
-					{ upsert: true }
-				);
+				const userResult = getUser(userId);
+				await addToWishlist(userId, cosmetic.id);
 				userResult?.wishlistCosmeticIds.includes(cosmetic.id)
 					? await interaction.editReply({ content: `${cosmetic.name} is already on your wishlist.` })
 					: await interaction.editReply(`${cosmetic.name} has been added to your wishlist.`);
@@ -92,7 +89,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'clear': {
-				const userResult = await userModel.findById(userId);
+				const userResult = getUser(userId);
 				if (userResult === null || userResult.wishlistCosmeticIds.length === 0) {
 					await interaction.editReply({ content: 'You have not added any cosmetics into your wishlist.' });
 					return;
@@ -128,7 +125,7 @@ export default new SlashCommand({
 					case 'confirm': {
 						await buttonInteraction.deferUpdate();
 						userResult.wishlistCosmeticIds = [];
-						await userResult.save();
+						await saveUser(userResult);
 						await buttonInteraction.editReply({ components: [], content: 'Your wishlist has been cleared.' });
 					}
 				}
@@ -141,7 +138,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				const userResult = await userModel.findById(userId);
+				const userResult = getUser(userId);
 				if (userResult === null) {
 					await interaction.editReply({ content: 'You have not added any cosmetics into your wishlist.' });
 					return;
@@ -151,10 +148,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				await userModel.findByIdAndUpdate(
-					userId,
-					{ $pull: { wishlistCosmeticIds: cosmetic.id } }
-				);
+				await removeFromWishlist(userResult, cosmetic.id);
 				await interaction.editReply(`${cosmetic.name} has been removed from your wishlist.`);
 				break;
 			}
