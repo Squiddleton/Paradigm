@@ -13,6 +13,7 @@ import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
 import { getCosmetics } from '../util/fortnite.js';
 import { sumMessages } from '../util/functions.js';
+import { getUser } from '../util/users.js';
 
 export default new ClientEvent({
 	name: 'interactionCreate',
@@ -52,7 +53,17 @@ export default new ClientEvent({
 
 				switch (name) {
 					case 'cosmetic': {
-						const { ratings } = findBestMatch(input, cosmetics.map(c => `${c.name} (${c.type.displayValue})`));
+						let filteredCosmetics = cosmetics;
+						if (interaction.commandName === 'wishlist' && interaction.options.getSubcommand() === 'remove') {
+							const userResult = getUser(userId);
+							if (userResult === null || userResult.wishlistCosmeticIds.length === 0) {
+								await interaction.respond([]);
+								return;
+							}
+							filteredCosmetics = cosmetics.filter(cosmetic => userResult.wishlistCosmeticIds.includes(cosmetic.id));
+						}
+
+						const { ratings } = findBestMatch(input, filteredCosmetics.map(c => `${c.name} (${c.type.displayValue})`));
 						const choices = ratings
 							.sort(sortByRating)
 							.slice(0, 25)
