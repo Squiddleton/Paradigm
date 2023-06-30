@@ -68,9 +68,7 @@ export default new ClientEvent({
 							.sort(sortByRating)
 							.slice(0, 25)
 							.map(({ target }) => {
-								const parenthesesRegExp = new RegExp(/(.*) \(([^)]+)\)/);
-
-								const match = target.match(parenthesesRegExp);
+								const match = target.match(/(.*) \(([^)]+)\)/);
 								if (match === null) throw new TypeError(`The target ${target} did not match the RegExp`);
 
 								const [, cosmeticName, cosmeticType] = match;
