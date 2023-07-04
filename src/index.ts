@@ -3,10 +3,10 @@ import client from './clients/discord.js';
 import config from './config.js';
 import { handleDisconnect } from './util/functions.js';
 
-client
-	.login(config.token)
+await set('strictQuery', 'throw')
+	.connect(config.mongoPath)
 	.catch(handleDisconnect);
 
-set('strictQuery', 'throw')
-	.connect(config.mongoPath)
+await client
+	.login(config.token)
 	.catch(handleDisconnect);
