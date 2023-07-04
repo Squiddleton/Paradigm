@@ -437,7 +437,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	 * @param name - The user's Epic Games account username
 	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
 	 */
-	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold('Battle Pass Levels')}\n\n${Object
+	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold('Battle Pass Levels')}\n${Object
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
@@ -529,7 +529,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			return `${trackDisplayName}: ${progressString}`;
 		};
 
-		return `${bold('Ranked Stats')}\n\n${transformTrack('ggOwuK', 'Battle Royale')}\n${transformTrack('AjRdrb', 'Zero Build')}`;
+		return `${bold('Ranked Stats')}\n${transformTrack('ggOwuK', 'Battle Royale')}\n${transformTrack('AjRdrb', 'Zero Build')}`;
 	};
 
 	if (options.accountName === null) {
