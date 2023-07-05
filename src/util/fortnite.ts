@@ -586,7 +586,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 
 				ctx.font = `${fontSize * 0.75}px fortnite`;
 				ctx.fillStyle = 'yellow';
-				ctx.fillText(`${Math.round(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.75, width / 2);
+				ctx.fillText(`${Math.floor(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.75, width / 2);
 
 				ctx.font = `${fontSize * 0.5}px fortnite`;
 				ctx.fillText(isUnknown ? 'Unknown' : divisionNames[track.currentDivision], xOffset + (width / 4), height * 0.9, width / 2);
