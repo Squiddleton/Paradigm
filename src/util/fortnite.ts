@@ -6,7 +6,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type C
 import { type DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StatsEpicAccount, StringOption } from './types.js';
+import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -491,7 +491,7 @@ export const handleStatsError = (interaction: CommandInteraction, e: unknown) =>
  * @param account - An Epic Games account object
  * @param ephemeral - Whether the response should only be visible to the user
  */
-export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: StatsEpicAccount, ephemeral = false) => {
+export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: EpicAccount, ephemeral = false) => {
 	await setEpicAccount(interaction.user.id, account.id);
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };

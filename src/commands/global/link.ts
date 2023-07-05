@@ -1,9 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { AccountType } from '@squiddleton/fortnite-api';
+import type { AccountType, EpicAccount } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { handleStatsError, linkEpicAccount } from '../../util/fortnite.js';
-import type { StatsEpicAccount } from '../../util/types.js';
 
 export default new SlashCommand({
 	name: 'link',
@@ -30,7 +29,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		let account: StatsEpicAccount;
+		let account: EpicAccount;
 		try {
 			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') ?? 'epic') as AccountType });
 			account = stats.account;
