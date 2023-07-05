@@ -2,7 +2,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType, Input, TimeWindow } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
-import { getStatsImage } from '../../util/fortnite.js';
+import { sendStatsImages } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'stats',
@@ -51,7 +51,7 @@ export default new SlashCommand({
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 		const input = (interaction.options.getString('input') ?? 'all') as Input;
 		const timeWindow = (interaction.options.getString('timewindow') ?? 'lifetime') as TimeWindow;
-		await getStatsImage(interaction, {
+		await sendStatsImages(interaction, {
 			targetUser: interaction.user,
 			accountName,
 			accountType,

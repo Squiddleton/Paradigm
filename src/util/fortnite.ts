@@ -631,7 +631,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
  * @param options - Options for getting the user's Epic Games account
  * @param content - A message to send alongside the stats image
  */
-export const getStatsImage = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
+export const sendStatsImages = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
 	const isContextMenu = interaction.isContextMenuCommand();
 	await interaction.deferReply({ ephemeral: isContextMenu });
 

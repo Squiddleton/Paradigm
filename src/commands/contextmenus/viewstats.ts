@@ -1,6 +1,6 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import { ApplicationCommandType } from 'discord.js';
-import { getLevelsString, getStatsImage } from '../../util/fortnite.js';
+import { getLevelsString, sendStatsImages } from '../../util/fortnite.js';
 import type { LevelCommandOptions } from '../../util/types.js';
 
 export default new ContextMenu({
@@ -16,7 +16,7 @@ export default new ContextMenu({
 
 		const { content } = await getLevelsString(interaction.client, levelsOptions);
 
-		await getStatsImage(interaction, {
+		await sendStatsImages(interaction, {
 			...levelsOptions,
 			input: 'all',
 			timeWindow: 'lifetime'
