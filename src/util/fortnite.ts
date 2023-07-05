@@ -1,4 +1,4 @@
-import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
+import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
@@ -507,29 +507,89 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 export const getStatsImage = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
 	await interaction.deferReply({ ephemeral: interaction.isContextMenuCommand() });
 
-	const getRankedContent = async (epicAccountId: string) => {
-		let progress: HabaneroTrackProgress[];
-		try {
-			progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
-		}
-		catch (error) {
-			if (!(error instanceof EpicAPIError) || error.status !== 401) throw error;
-
-			await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
-			progress = await epicClient.fortnite.getTrackProgress({ accountId: epicAccountId });
-		}
+	/*
+	const getTracks = async (epicAccountId: string) => {
 
 		const transformTrack = (trackguid: string, trackDisplayName: string) => {
-			const track = progress.find(t => t.trackguid === trackguid);
-			if (track === undefined) throw new Error(`No track was found for ${trackDisplayName}`);
-			const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
 			const progressString = track.currentDivision === 0 && track.promotionProgress === 0
 				? 'Unknown'
 				: `${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated ${time(new Date(track.lastUpdated), 'R')})`;
 			return `${trackDisplayName}: ${progressString}`;
 		};
 
-		return `${bold('Ranked Stats')}\n${transformTrack('ggOwuK', 'Battle Royale')}\n${transformTrack('AjRdrb', 'Zero Build')}`;
+		return {
+			br: transformTrack('ggOwuK', 'Battle Royale'),
+			nb: transformTrack('AjRdrb', 'Zero Build')
+		};
+	};
+	*/
+
+	const sendRankedImage = async (account: EpicAccount) => {
+		let trackProgress: HabaneroTrackProgress[];
+		try {
+			trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
+		}
+		catch (error) {
+			if (!(error instanceof EpicAPIError) || error.status !== 401) throw error;
+
+			await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+			trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
+		}
+
+		const getTrack = (trackguid: string) => {
+			const track = trackProgress.find(t => t.trackguid === trackguid);
+			if (track === undefined) throw new Error(`No track was found for guid ${trackguid}`);
+			return track;
+		};
+		const brTrack = getTrack('ggOwuK');
+		const zbTrack = getTrack('AjRdrb');
+
+		if ((brTrack.currentDivision !== 0 && brTrack.promotionProgress !== 0) || (zbTrack.currentDivision !== 0 && zbTrack.promotionProgress !== 0)) {
+			const background = await loadImage('./assets/ranked/background.jpg');
+			const { height, width } = background;
+			const canvas = createCanvas(width, height);
+			const ctx = canvas.getContext('2d');
+
+			ctx.drawImage(background, 0, 0);
+
+			GlobalFonts.registerFromPath('./fonts/fortnite.otf', 'fortnite');
+			const fontSize = height / 8;
+
+			ctx.font = `${fontSize}px fortnite`;
+			ctx.textAlign = 'center';
+			ctx.fillStyle = '#ffffff';
+
+			ctx.fillText(`Ranked Season Zero: ${account.name}`, width / 2, fontSize, width);
+			ctx.fillText('Battle Royale', width / 4, height - (fontSize / 2), width / 2);
+			ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 2), width / 2);
+
+			const drawRankedImage = async (xOffset: number, track: HabaneroTrackProgress) => {
+				const start = 1.5 * Math.PI;
+				const end = (2 * Math.PI * track.promotionProgress) - (0.5 * Math.PI);
+
+				ctx.beginPath();
+				ctx.arc(xOffset + (width / 4), height / 2, height * 0.3, start, end);
+				ctx.strokeStyle = 'yellow';
+				ctx.lineWidth = 50;
+				ctx.stroke();
+
+				const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
+				const divisionIconName = (track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0)
+					? 'unknown'
+					: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
+
+				const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
+				ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, width / 5, width / 5);
+
+				ctx.font = `${fontSize * 0.75}px fortnite`;
+				ctx.fillStyle = 'yellow';
+				ctx.fillText(`${Math.round(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.75, width / 2);
+			};
+			await drawRankedImage(0, brTrack);
+			await drawRankedImage(width / 2, zbTrack);
+
+			await interaction.followUp({ files: [await canvas.encode('jpeg')] });
+		}
 	};
 
 	if (options.accountName === null) {
@@ -540,13 +600,9 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 		}
 		else {
 			try {
-				const rankedContent = await getRankedContent(userResult.epicAccountId);
-				if (typeof content === 'string') content += `\n\n${rankedContent}`;
-				else content = rankedContent;
-
-				const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
-
+				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 				await interaction.editReply({ content, files: [image] });
+				await sendRankedImage(account);
 			}
 			catch (error) {
 				await handleStatsError(interaction, error);
@@ -555,8 +611,9 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 	}
 	else {
 		try {
-			const { image, account } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
-			await interaction.editReply({ content: await getRankedContent(account.id), files: [image] });
+			const { account, image } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
+			await interaction.editReply({ files: [image] });
+			await sendRankedImage(account);
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}
