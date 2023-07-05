@@ -560,8 +560,10 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			ctx.fillStyle = '#ffffff';
 
 			ctx.fillText(`Ranked Season Zero: ${account.name}`, width / 2, fontSize, width);
-			ctx.fillText('Battle Royale', width / 4, height - (fontSize / 2), width / 2);
-			ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 2), width / 2);
+
+			ctx.font = `${fontSize / 2}px fortnite`;
+			ctx.fillText('Battle Royale', width / 4, height - (fontSize / 4), width / 2);
+			ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
 
 			const drawRankedImage = async (xOffset: number, track: HabaneroTrackProgress) => {
 				const start = 1.5 * Math.PI;
@@ -574,7 +576,8 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 				ctx.stroke();
 
 				const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
-				const divisionIconName = (track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0)
+				const isUnknown = track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0;
+				const divisionIconName = isUnknown
 					? 'unknown'
 					: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
 
@@ -584,6 +587,9 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 				ctx.font = `${fontSize * 0.75}px fortnite`;
 				ctx.fillStyle = 'yellow';
 				ctx.fillText(`${Math.round(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.75, width / 2);
+
+				ctx.font = `${fontSize * 0.5}px fortnite`;
+				ctx.fillText(isUnknown ? 'Unknown' : divisionNames[track.currentDivision], xOffset + (width / 4), height * 0.9, width / 2);
 			};
 			await drawRankedImage(0, brTrack);
 			await drawRankedImage(width / 2, zbTrack);
