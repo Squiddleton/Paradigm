@@ -569,10 +569,22 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 				const start = 1.5 * Math.PI;
 				const end = (2 * Math.PI * track.promotionProgress) - (0.5 * Math.PI);
 
+				const vertexX = xOffset + (width / 4);
+				const vertexY = height / 2;
+				const radius = height * 0.3;
+
+				const iconWidth = width / 5;
+
+				ctx.lineWidth = 30;
+
 				ctx.beginPath();
-				ctx.arc(xOffset + (width / 4), height / 2, height * 0.3, start, end);
-				ctx.strokeStyle = 'yellow';
-				ctx.lineWidth = 50;
+				ctx.arc(vertexX, vertexY, iconWidth / 1.5, 0, 2 * Math.PI);
+				ctx.fillStyle = 'midnightblue';
+				ctx.fill();
+
+				ctx.beginPath();
+				ctx.arc(vertexX, vertexY, radius, 0, 2 * Math.PI);
+				ctx.strokeStyle = 'midnightblue';
 				ctx.stroke();
 
 				const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
@@ -581,15 +593,54 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 					? 'unknown'
 					: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
 
-				const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
-				ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, width / 5, width / 5);
+				let progressColor: string;
+				switch (true) {
+					case divisionIconName.startsWith('bronze'): {
+						progressColor = 'peru';
+						break;
+					}
+					case divisionIconName.startsWith('silver'): {
+						progressColor = 'silver';
+						break;
+					}
+					case divisionIconName.startsWith('gold'): {
+						progressColor = 'gold';
+						break;
+					}
+					case divisionIconName.startsWith('platinum'): {
+						progressColor = 'lightsteelblue';
+						break;
+					}
+					case divisionIconName.startsWith('diamond'): {
+						progressColor = 'cornflowerblue';
+						break;
+					}
+					case divisionIconName.startsWith('elite'): {
+						progressColor = 'lightslategray';
+						break;
+					}
+					case divisionIconName.startsWith('champion'): {
+						progressColor = 'firebrick';
+						break;
+					}
+					default: {
+						progressColor = 'midnightblue';
+						break;
+					}
+				}
 
-				ctx.font = `${fontSize * 0.75}px fortnite`;
-				ctx.fillStyle = 'yellow';
-				ctx.fillText(`${Math.floor(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.75, width / 2);
+				ctx.beginPath();
+				ctx.arc(vertexX, vertexY, radius, start, end);
+				ctx.strokeStyle = progressColor;
+				ctx.stroke();
+
+				const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
+				ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, iconWidth, iconWidth);
 
 				ctx.font = `${fontSize * 0.5}px fortnite`;
-				ctx.fillText(isUnknown ? 'Unknown' : divisionNames[track.currentDivision], xOffset + (width / 4), height * 0.9, width / 2);
+				ctx.fillStyle = 'yellow';
+				const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
+				ctx.fillText(`${divisionName} ${Math.floor(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.9, width / 2);
 			};
 			await drawRankedImage(0, brTrack);
 			await drawRankedImage(width / 2, zbTrack);
