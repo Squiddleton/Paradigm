@@ -2,7 +2,7 @@ import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canva
 import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, type Snowflake, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
 import { type DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
@@ -12,7 +12,6 @@ import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import config from '../config.js';
 import guildModel from '../models/guilds.js';
-import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 
 let cachedCosmetics: Cosmetic[] = [];
@@ -685,20 +684,6 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 		}
 	}
 };
-
-/**
- * Gives a member a milestone.
- *
- * @param userId - The target member's id
- * @param guildId - The target member's guild id
- * @param milestoneName - The name of the milestone to grant
- * @returns The member's database document pre-update
- */
-export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberModel.updateOne(
-	{ userId, guildId },
-	{ $addToSet: { milestones: milestoneName } },
-	{ upsert: true }
-);
 
 /**
  * Posts leaked shop sections across all subscribed channels.

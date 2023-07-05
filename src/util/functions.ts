@@ -96,6 +96,20 @@ export const fetchGiveawayMessage = async (interaction: SlashOrMessageContextMen
 };
 
 /**
+ * Gives a member a milestone.
+ *
+ * @param userId - The target member's id
+ * @param guildId - The target member's guild id
+ * @param milestoneName - The name of the milestone to grant
+ * @returns The member's database document pre-update
+ */
+export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneName: string) => memberModel.updateOne(
+	{ userId, guildId },
+	{ $addToSet: { milestones: milestoneName } },
+	{ upsert: true }
+);
+
+/**
  * Handles a client disonnection.
  *
  * @param e - The error message caught after disconnecting
