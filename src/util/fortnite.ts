@@ -635,23 +635,6 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 	const isContextMenu = interaction.isContextMenuCommand();
 	await interaction.deferReply({ ephemeral: isContextMenu });
 
-	/*
-	const getTracks = async (epicAccountId: string) => {
-
-		const transformTrack = (trackguid: string, trackDisplayName: string) => {
-			const progressString = track.currentDivision === 0 && track.promotionProgress === 0
-				? 'Unknown'
-				: `${divisionNames[track.currentDivision]} (${Math.round(track.promotionProgress * 100)}%)${track.currentPlayerRanking === null ? '' : `; Player Ranking: ${track.currentPlayerRanking}`} (Last Updated ${time(new Date(track.lastUpdated), 'R')})`;
-			return `${trackDisplayName}: ${progressString}`;
-		};
-
-		return {
-			br: transformTrack('ggOwuK', 'Battle Royale'),
-			nb: transformTrack('AjRdrb', 'Zero Build')
-		};
-	};
-	*/
-
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
