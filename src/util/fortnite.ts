@@ -663,7 +663,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 				await interaction.editReply({ content, files: [image] });
 				const buffer = await createRankedImage(account, isContextMenu);
-				if (buffer !== null) await interaction.followUp({ files: [buffer] });
+				if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
 			}
 			catch (error) {
 				await handleStatsError(interaction, error);
@@ -675,7 +675,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			const { account, image } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
 			const buffer = await createRankedImage(account, isContextMenu);
-			if (buffer !== null) await interaction.followUp({ files: [buffer] });
+			if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}
