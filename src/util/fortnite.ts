@@ -588,7 +588,7 @@ export const getStatsImage = async (interaction: CommandInteraction, options: St
 			await drawRankedImage(0, brTrack);
 			await drawRankedImage(width / 2, zbTrack);
 
-			await interaction.followUp({ files: [await canvas.encode('jpeg')] });
+			await interaction.followUp({ files: [await canvas.encode('jpeg')], ephemeral: interaction.isContextMenuCommand() });
 		}
 	};
 
