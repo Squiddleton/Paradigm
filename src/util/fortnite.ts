@@ -615,7 +615,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		ctx.font = `${fontSize * 0.5}px fortnite`;
 		ctx.fillStyle = 'yellow';
 		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
-		ctx.fillText(`${divisionName} ${Math.floor(track.promotionProgress * 100)}%`, xOffset + (width / 4), height * 0.9, width / 2);
+		ctx.fillText(`${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`, xOffset + (width / 4), height * 0.9, width / 2);
 	};
 	await drawRankedImage(0, brTrack);
 	await drawRankedImage(width / 2, zbTrack);
