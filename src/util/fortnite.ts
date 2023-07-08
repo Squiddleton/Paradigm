@@ -552,65 +552,65 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		ctx.lineWidth = 30;
 
-		ctx.beginPath();
-		ctx.arc(vertexX, vertexY, iconWidth / 1.5, 0, 2 * Math.PI);
-		ctx.fillStyle = 'midnightblue';
-		ctx.fill();
-
-		ctx.beginPath();
-		ctx.arc(vertexX, vertexY, radius, 0, 2 * Math.PI);
-		ctx.strokeStyle = 'midnightblue';
-		ctx.stroke();
-
 		const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
 		const isUnknown = track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0;
 		const divisionIconName = isUnknown
 			? 'unknown'
 			: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
 
-		let progressColor: string;
-		switch (true) {
-			case divisionIconName.startsWith('bronze'): {
-				progressColor = 'peru';
-				break;
+
+		if (track.currentPlayerRanking === null) {
+			ctx.beginPath();
+			ctx.arc(vertexX, vertexY, iconWidth / 1.5, 0, 2 * Math.PI);
+			ctx.fillStyle = 'midnightblue';
+			ctx.fill();
+
+			ctx.beginPath();
+			ctx.arc(vertexX, vertexY, radius, 0, 2 * Math.PI);
+			ctx.strokeStyle = 'midnightblue';
+			ctx.stroke();
+
+			let progressColor = 'midnightblue';
+			switch (true) {
+				case divisionIconName.startsWith('bronze'): {
+					progressColor = 'peru';
+					break;
+				}
+				case divisionIconName.startsWith('silver'): {
+					progressColor = 'silver';
+					break;
+				}
+				case divisionIconName.startsWith('gold'): {
+					progressColor = 'gold';
+					break;
+				}
+				case divisionIconName.startsWith('platinum'): {
+					progressColor = 'lightsteelblue';
+					break;
+				}
+				case divisionIconName.startsWith('diamond'): {
+					progressColor = 'cornflowerblue';
+					break;
+				}
+				case divisionIconName.startsWith('elite'): {
+					progressColor = 'lightslategray';
+					break;
+				}
+				case divisionIconName.startsWith('champion'): {
+					progressColor = 'firebrick';
+					break;
+				}
 			}
-			case divisionIconName.startsWith('silver'): {
-				progressColor = 'silver';
-				break;
-			}
-			case divisionIconName.startsWith('gold'): {
-				progressColor = 'gold';
-				break;
-			}
-			case divisionIconName.startsWith('platinum'): {
-				progressColor = 'lightsteelblue';
-				break;
-			}
-			case divisionIconName.startsWith('diamond'): {
-				progressColor = 'cornflowerblue';
-				break;
-			}
-			case divisionIconName.startsWith('elite'): {
-				progressColor = 'lightslategray';
-				break;
-			}
-			case divisionIconName.startsWith('champion'): {
-				progressColor = 'firebrick';
-				break;
-			}
-			default: {
-				progressColor = 'midnightblue';
-				break;
-			}
+
+			ctx.beginPath();
+			ctx.arc(vertexX, vertexY, radius, start, end);
+			ctx.strokeStyle = progressColor;
+			ctx.stroke();
 		}
 
-		ctx.beginPath();
-		ctx.arc(vertexX, vertexY, radius, start, end);
-		ctx.strokeStyle = progressColor;
-		ctx.stroke();
-
 		const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
-		ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, iconWidth, iconWidth);
+		if (divisionIconName === 'unreal')ctx.drawImage(divisionIcon, (width * 0.15 + xOffset) / 1.5, height / 4.5, iconWidth * 1.5, iconWidth * 1.5);
+		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite`;
 		ctx.fillStyle = 'yellow';
