@@ -134,7 +134,7 @@ export const handleReaction = async (reaction: MessageReaction | PartialMessageR
 			await reaction.fetch();
 		}
 		catch (error) {
-			console.error(`An error has occurred when a fetching a${added ? 'n added' : ' removed'} reaction: `, error);
+			console.error(`An error has occurred when fetching a${added ? 'n added' : ' removed'} reaction: `, error);
 			return;
 		}
 	}
