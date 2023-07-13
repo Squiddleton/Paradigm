@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType, italic } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { Time } from '../../util/constants.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
@@ -71,9 +71,14 @@ export default new SlashCommand({
 
 				const userResult = getUser(userId);
 				await addToWishlist(userId, cosmetic.id);
-				userResult?.wishlistCosmeticIds.includes(cosmetic.id)
-					? await interaction.editReply({ content: `${cosmetic.name} is already on your wishlist.` })
-					: await interaction.editReply(`${cosmetic.name} has been added to your wishlist.`);
+
+				if (userResult?.wishlistCosmeticIds.includes(cosmetic.id)) {
+					await interaction.editReply({ content: `${cosmetic.name} is already on your wishlist.` });
+				}
+				else {
+					const limitedTag = cosmetic.gameplayTags?.find(tag => ['SeasonShop', 'BattlePass', 'LimitedTimeReward'].some(phrase => tag.includes(phrase)));
+					await interaction.editReply(`${cosmetic.name} has been added to your wishlist.${(limitedTag === undefined || (cosmetic.shopHistory !== null && cosmetic.shopHistory.length > 0)) ? '' : italic(`\nWarning: This cosmetic has the gameplay tag "${limitedTag}" which implies that it may never appear in the item shop.`)}`);
+				}
 
 				if (interaction.inCachedGuild()) {
 					const guildResult = await guildModel.findById(interaction.guildId);
