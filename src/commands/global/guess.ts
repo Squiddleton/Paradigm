@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { type Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { RarityColors, Time } from '../../util/constants.js';
 import { getCosmetics } from '../../util/fortnite.js';
 
@@ -102,7 +102,12 @@ export default new SlashCommand({
 				.setTitle(`Nobody guessed ${bold(cosmetic.name)}`)
 				.setImage(image)
 				.setColor(Colors.Red);
-			await interaction.editReply({ attachments: [], components: [], embeds: [embed] });
+			try {
+				await interaction.editReply({ attachments: [], components: [], embeds: [embed] });
+			}
+			catch (error) {
+				if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+			}
 		}
 		collector.stop();
 	}
