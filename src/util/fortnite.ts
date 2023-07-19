@@ -631,20 +631,20 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
  * @param options - Options for getting the user's Epic Games account
  * @param content - A message to send alongside the stats image
  */
-export const sendStatsImages = async (interaction: CommandInteraction, options: StatsCommandOptions, content?: string) => {
+export const sendStatsImages = async (interaction: CommandInteraction, options: StatsCommandOptions) => {
 	const isContextMenu = interaction.isContextMenuCommand();
 	await interaction.deferReply({ ephemeral: isContextMenu });
 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
-			if (content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
+			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
 			else await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
 		}
 		else {
 			try {
 				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
-				await interaction.editReply({ content, files: [image] });
+				await interaction.editReply({ content: options.content, files: [image] });
 				const buffer = await createRankedImage(account, isContextMenu);
 				if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
 			}

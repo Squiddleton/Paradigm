@@ -215,6 +215,7 @@ export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, Bu
 export type SlashOrMessageContextMenu = ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
 
 export interface StatsCommandOptions extends LevelCommandOptions {
+	content?: string;
 	input: 'all' | 'keyboardMouse' | 'gamepad' | 'touch';
 	timeWindow: 'lifetime' | 'season';
 }

@@ -18,8 +18,9 @@ export default new ContextMenu({
 
 		await sendStatsImages(interaction, {
 			...levelsOptions,
+			content,
 			input: 'all',
 			timeWindow: 'lifetime'
-		}, content);
+		});
 	}
 });
