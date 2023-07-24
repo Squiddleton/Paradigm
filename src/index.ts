@@ -2,7 +2,12 @@ import { set } from 'mongoose';
 import client from './clients/discord.js';
 import epicClient from './clients/epic.js';
 import config from './config.js';
+import { fetchCosmetics } from './util/fortnite.js';
 import { handleDisconnect } from './util/functions.js';
+import { populateUsers } from './util/users.js';
+
+await fetchCosmetics();
+await populateUsers();
 
 await set('strictQuery', 'throw')
 	.connect(config.mongoPath)
