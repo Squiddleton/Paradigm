@@ -10,14 +10,13 @@ export default new ContextMenu({
 	type: ApplicationCommandType.User,
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply();
-
 		const userResult = getUser(interaction.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
-			await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
+			await interaction.reply({ content: 'The target user has not yet linked their account with </link:1032454252024565821>.', ephemeral: true });
 			return;
 		}
 
+		await interaction.deferReply();
 		let stats: Stats<false>;
 		try {
 			stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
