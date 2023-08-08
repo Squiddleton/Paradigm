@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, RESTJSONErrorCodes, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -263,7 +263,14 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 			}
 		})
 		.once('end', async (collected, reason) => {
-			if (reason === 'time') await interaction.editReply({ components: [] });
+			if (reason === 'time') {
+				try {
+					await interaction.editReply({ components: [] });
+				}
+				catch (error) {
+					if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+				}
+			}
 		});
 };
 
