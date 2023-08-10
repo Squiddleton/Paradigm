@@ -1,4 +1,4 @@
-import { type Snowflake } from 'discord.js';
+import type { Snowflake } from 'discord.js';
 import type { HydratedDocument } from 'mongoose';
 import type { IUser } from './types.js';
 import userModel from '../models/users.js';
