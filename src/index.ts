@@ -9,18 +9,18 @@ import { populateUsers } from './util/users.js';
 await set('strictQuery', 'throw')
 	.connect(config.mongoPath)
 	.catch(handleDisconnect);
-console.log('Connected to MongoDB');
+console.log('Connected to MongoDB.');
 
 await fetchCosmetics();
 await populateUsers();
-console.log('Populated caches');
+console.log('Populated caches.');
 
 const authenticate = async () => {
 	await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
 	setTimeout(authenticate, 7200000);
 };
 await authenticate();
-console.log('Authenticated with Epic Games');
+console.log('Authenticated with Epic Games.');
 
 await client
 	.login(config.token)
