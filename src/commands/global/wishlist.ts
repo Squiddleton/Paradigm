@@ -153,7 +153,7 @@ export default new SlashCommand({
 					return;
 				}
 
-				await removeFromWishlist(userResult, cosmetic.id);
+				await removeFromWishlist(userId, cosmetic.id);
 				await interaction.editReply(`${cosmetic.name} has been removed from your wishlist.`);
 				break;
 			}

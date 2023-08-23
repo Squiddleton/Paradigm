@@ -23,10 +23,11 @@ export const populateUsers = async () => {
 	users.forEach(user => updateUserCache(user));
 };
 
-export const removeFromWishlist = async (user: HydratedDocument<IUser>, cosmeticId: string) => {
-	await userModel.findByIdAndUpdate(
-		user._id,
-		{ $pull: { wishlistCosmeticIds: cosmeticId } }
+export const removeFromWishlist = async (userId: Snowflake, cosmeticId: string) => {
+	const user = await userModel.findByIdAndUpdate(
+		userId,
+		{ $pull: { wishlistCosmeticIds: cosmeticId } },
+		{ new: true, upsert: true }
 	);
 	updateUserCache(user);
 };
