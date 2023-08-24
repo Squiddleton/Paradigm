@@ -1,4 +1,4 @@
-import { type AnyGrant, type DeviceAuthGrant, type EpicAuthResponse } from '@squiddleton/epic';
+import type { AnyGrant, DeviceAuthGrant, EpicAuthResponse } from '@squiddleton/epic';
 import { EncodedClient, EpicEndpoint } from './constants.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';

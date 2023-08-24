@@ -1,6 +1,6 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { type Cosmetic } from '@squiddleton/fortnite-api';
+import type { Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { RarityColors, Time } from '../../util/constants.js';
