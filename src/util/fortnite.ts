@@ -515,8 +515,8 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		if (track === undefined) throw new Error(`No track was found for guid ${trackguid}`);
 		return track;
 	};
-	const brTrack = getTrack('ggOwuK');
-	const zbTrack = getTrack('AjRdrb');
+	const brTrack = getTrack('gXffl');
+	const zbTrack = getTrack('yHNFu');
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
 
@@ -534,7 +534,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.textAlign = 'center';
 	ctx.fillStyle = '#ffffff';
 
-	ctx.fillText(`Ranked Season Zero: ${account.name}`, width / 2, fontSize, width);
+	ctx.fillText(`Chapter 4 Season 4 Ranked: ${account.name}`, width / 2, fontSize, width);
 
 	ctx.font = `${fontSize / 2}px fortnite`;
 	ctx.fillText('Battle Royale', width / 4, height - (fontSize / 4), width / 2);
