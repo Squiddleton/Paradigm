@@ -90,7 +90,7 @@ export default new SlashCommand({
 
 			if (modalInteraction.isFromMessage()) {
 				embed
-					.setTitle(`${modalInteraction.user.username} correctly guessed ${bold(cosmetic.name)}`)
+					.setTitle(`${modalInteraction.inCachedGuild() ? modalInteraction.member.displayName : modalInteraction.user.username} correctly guessed ${bold(cosmetic.name)}`)
 					.setImage(image)
 					.setColor(Colors.Green);
 				await modalInteraction.update({ attachments: [], components: [], embeds: [embed] });
