@@ -2,9 +2,9 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Cosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ColorResolvable, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
-import { RarityColors, Time } from '../../util/constants.js';
-import { getCosmetics } from '../../util/fortnite.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
+import { Time } from '../../util/constants.js';
+import { getCosmeticColor, getCosmetics } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'guess',
@@ -55,7 +55,7 @@ export default new SlashCommand({
 		const embed = new EmbedBuilder()
 			.setTitle('What is this Outfit?')
 			.setImage('attachment://outfit.png')
-			.setColor(cosmetic.series?.colors[0].slice(0, 6) as (ColorResolvable | undefined) ?? RarityColors[cosmetic.rarity.displayValue] ?? null);
+			.setColor(getCosmeticColor(cosmetic));
 
 		const message = await interaction.editReply({ components: [row], embeds: [embed], files: [silhouette] });
 

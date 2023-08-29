@@ -155,6 +155,11 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 	}
 };
 
+export const getCosmeticColor = (cosmetic: Cosmetic): ColorResolvable | null => {
+	const seriesColor = cosmetic.series?.colors[0].slice(0, 6);
+	return seriesColor === undefined ? RarityColors[cosmetic.rarity.displayValue] ?? null : `#${seriesColor}`;
+};
+
 /**
  * Returns an embed describing a cosmetic.
  *
@@ -165,7 +170,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 	const embed = new EmbedBuilder()
 		.setTitle(cosmetic.name)
 		.setDescription(cosmetic.description)
-		.setColor(cosmetic.series === null ? (RarityColors[cosmetic.rarity.displayValue] ?? 'Random') : (cosmetic.series.colors[0].slice(0, 6) as ColorResolvable))
+		.setColor(getCosmeticColor(cosmetic))
 		.setThumbnail(cosmetic.images.smallIcon)
 		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
 		.setFields([
@@ -398,7 +403,6 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 			});
 	}
 };
-
 
 /**
  * Returns a string representative of an error thrown from fetching a user's levels.
