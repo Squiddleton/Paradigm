@@ -1,5 +1,5 @@
 import { getEnumKeys } from '@squiddleton/util';
-import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, type ColorResolvable, PermissionFlagsBits, type TextBasedChannel } from 'discord.js';
+import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits, type TextBasedChannel } from 'discord.js';
 import type { StringChoices } from './types.js';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
@@ -173,7 +173,7 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'PlayStation', value: 'psn' }
 ];
 
-export const RarityColors: Partial<Record<string, ColorResolvable>> = {
+export const RarityColors: Partial<Record<string, number>> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,
 	Rare: 0x4e5afe,
