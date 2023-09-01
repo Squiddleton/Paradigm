@@ -155,6 +155,12 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 	}
 };
 
+/**
+ * Returns a cosmetic's color.
+ *
+ * @param cosmetic - A cosmetic object
+ * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
+ */
 export const getCosmeticColor = (cosmetic: Cosmetic): ColorResolvable | null => {
 	const seriesColor = cosmetic.series?.colors[0].slice(0, 6);
 	return seriesColor === undefined ? RarityColors[cosmetic.rarity.displayValue] ?? null : `#${seriesColor}`;
