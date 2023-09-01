@@ -182,7 +182,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		.setFields([
 			{ name: 'Type', value: cosmetic.type.displayValue, inline: true },
 			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
-			{ name: 'Set', value: cosmetic.set === null ? 'None' : cosmetic.set.value, inline: true },
+			{ name: 'Set', value: cosmetic.set?.value ?? 'None', inline: true },
 			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
 		]);
 	// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
