@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType, italic } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType, chatInputApplicationCommandMention, italic } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { Time } from '../../util/constants.js';
 import { findCosmetic, viewWishlist } from '../../util/fortnite.js';
@@ -83,12 +83,12 @@ export default new SlashCommand({
 				if (interaction.inCachedGuild()) {
 					const guildResult = await guildModel.findById(interaction.guildId);
 					if (guildResult === null || guildResult.wishlistChannelId === null) {
-						await interaction.followUp({ content: 'Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set one.', ephemeral: true });
+						await interaction.followUp({ content: `Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use ${chatInputApplicationCommandMention('settings', 'edit', '1001289651862118471')} to set one.`, ephemeral: true });
 					}
 					else if (!interaction.guild.channels.cache.has(guildResult.wishlistChannelId)) {
 						guildResult.wishlistChannelId = null;
 						await guildResult.save();
-						await interaction.followUp({ content: 'The server\'s configured wishlist channel no longer exists. By default, members with the Manage Server permission can use </settings edit:1001289651862118471> to set a new one.', ephemeral: true });
+						await interaction.followUp({ content: `The server's configured wishlist channel no longer exists. By default, members with the Manage Server permission can use ${chatInputApplicationCommandMention('settings', 'edit', '1001289651862118471')} to set a new one.`, ephemeral: true });
 					}
 				}
 				break;

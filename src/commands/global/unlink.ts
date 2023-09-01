@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { chatInputApplicationCommandMention } from 'discord.js';
 import { getUser, saveUser } from '../../util/users.js';
 
 export default new SlashCommand({
@@ -8,7 +9,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const user = getUser(interaction.user.id);
 		if (user === null || user.epicAccountId === null) {
-			await interaction.reply({ content: 'You have not linked your account with </link:1032454252024565821>.', ephemeral: true });
+			await interaction.reply({ content: `You have not linked your account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`, ephemeral: true });
 		}
 		else {
 			user.epicAccountId = null;

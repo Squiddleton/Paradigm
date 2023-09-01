@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
@@ -89,8 +89,8 @@ export default new SlashCommand({
 							.setFields(
 								{ name: 'Total Giveaways', value: giveaways.length.toString(), inline: true },
 								{ name: 'Total Milestones', value: milestones.length.toString(), inline: true },
-								{ name: 'Leaked Shop Sections', value: shopSectionsChannelId === null ? 'No Channel Set' : `<#${shopSectionsChannelId}>`, inline: true },
-								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : `<#${wishlistChannelId}>`, inline: true }
+								{ name: 'Leaked Shop Sections', value: shopSectionsChannelId === null ? 'No Channel Set' : channelMention(shopSectionsChannelId), inline: true },
+								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : channelMention(wishlistChannelId), inline: true }
 							)
 					],
 					ephemeral: true

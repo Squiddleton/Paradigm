@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, RESTJSONErrorCodes, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, time, underscore } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, RESTJSONErrorCodes, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -32,7 +32,7 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
 			ended
 				?
 				[
-					{ name: 'Winners', value: giveaway.winners.length === 0 ? 'None' : giveaway.winners.map((id, i) => `${i + 1}. <@${id}> (${id})`).join('\n'), inline: true },
+					{ name: 'Winners', value: giveaway.winners.length === 0 ? 'None' : giveaway.winners.map((id, i) => `${i + 1}. ${userMention(id)} (${id})`).join('\n'), inline: true },
 					{ name: 'Time', value: `Started ${time(giveaway.startTime, 'R')}\nEnded ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
 				:
@@ -309,7 +309,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		newWinners.push(newWinner);
 	}
 
-	const winnersDisplay = newWinners.map((id, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}<@${id}> (${id})`).join('\n');
+	const winnersDisplay = newWinners.map((id, i) => `${newWinners.length === 1 ? '' : `${i + 1}. `}${userMention(id)} (${id})`).join('\n');
 
 	const message = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
@@ -347,7 +347,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	const giveawayMessage = await fetchGiveawayMessage(interaction, giveaway.channelId, messageId);
 
-	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. <@${name}>${amount > 1 ? ` x${amount}` : ''}`);
+	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. ${userMention(name)}${amount > 1 ? ` x${amount}` : ''}`);
 
 	const embed = new EmbedBuilder()
 		.setTitle(giveawayMessage.embeds[0].title)
@@ -355,9 +355,9 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 		.setColor('Blue')
 		.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(0, inc).join('\n') || 'None'}`)
 		.setFields([
-			{ name: 'Message', value: `[Link](${giveawayMessage.url})`, inline: true },
-			{ name: 'Channel', value: `<#${giveaway.channelId}>`, inline: true },
-			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. <@${id}>${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
+			{ name: 'Message', value: hyperlink('Link', giveawayMessage.url), inline: true },
+			{ name: 'Channel', value: channelMention(giveaway.channelId), inline: true },
+			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. ${userMention(id)}${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
 			{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
 			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(r => `${interaction.guild.roles.cache.get(r.id)?.name ?? 'Deleted Role'}: ${r.amount} Entries`).join('\n'), inline: true }

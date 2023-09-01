@@ -2,7 +2,7 @@ import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canva
 import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, codeBlock, time, underscore } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
@@ -109,7 +109,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
 					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => c.name));
-					if (items.length > 0) messages.push(`<@${user._id}>: ${items.slice(0, 10).join(', ')}${items.length > 10 ? ', and more!' : ''}`);
+					if (items.length > 0) messages.push(`${userMention(user._id)}: ${items.slice(0, 10).join(', ')}${items.length > 10 ? ', and more!' : ''}`);
 				}
 
 				if (messages.length !== 1 && guildResult.wishlistChannelId !== null) {
@@ -133,7 +133,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 						continue;
 					}
 
-					messages.push('\nIf you have purchased your item, use </wishlist remove:1000092959875793080>.\nDo you want to create your own wishlist?  Check out </wishlist add:1000092959875793080>!');
+					messages.push(`\nIf you have purchased your item, use ${chatInputApplicationCommandMention('wishlist', 'remove', '1000092959875793080')}.\nDo you want to create your own wishlist?  Check out ${chatInputApplicationCommandMention('wishlist', 'add', '1000092959875793080')}!`);
 
 					const fullMsg = messages.join('\n');
 					if (debug) {
@@ -356,7 +356,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 		);
 	}
 
-	const content = embeds.length > 0 ? '<https://twitter.com/FortniteGame/status/1068655953699053568>' : null;
+	const content = embeds.length > 0 ? hideLinkEmbed('https://twitter.com/FortniteGame/status/1068655953699053568') : null;
 
 	const message = await interaction.editReply({ components, content, files: [attachment], embeds });
 	if (components.length > 0) {
@@ -648,8 +648,8 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
-			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with </link:1032454252024565821>.`);
-			else await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
+			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`);
+			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`);
 		}
 		else {
 			try {

@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType, Stats } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, chatInputApplicationCommandMention } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { PlatformChoices } from '../../util/constants.js';
 import { createRankedImage, handleStatsError, linkEpicAccount } from '../../util/fortnite.js';
@@ -47,7 +47,7 @@ export default new SlashCommand({
 		else {
 			const userResult = getUser(interaction.user.id);
 			if (userResult === null || userResult.epicAccountId === null) {
-				await interaction.editReply('No player username was provided, and you have not linked your account with </link:1032454252024565821>.');
+				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`);
 				return;
 			}
 			stats = await fortniteAPI.stats({ id: userResult.epicAccountId });

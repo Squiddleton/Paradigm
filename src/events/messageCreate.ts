@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import { DiscordAPIError, type Message, PermissionFlagsBits, RESTJSONErrorCodes } from 'discord.js';
+import { DiscordAPIError, type Message, PermissionFlagsBits, RESTJSONErrorCodes, chatInputApplicationCommandMention } from 'discord.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds } from '../util/constants.js';
@@ -46,7 +46,7 @@ export default new ClientEvent({
 								}
 							};
 
-							const msg = await message.reply('Discussion is not allowed in this channel. Please use </suggest:1000168121098842274> for submissions.');
+							const msg = await message.reply(`Discussion is not allowed in this channel. Please use ${chatInputApplicationCommandMention('suggest', '1000168121098842274')} for submissions.`);
 							if (botPermissions.has(PermissionFlagsBits.ManageMessages)) await tryToDelete(message);
 							setTimeout(() => tryToDelete(msg), 5000);
 						}
