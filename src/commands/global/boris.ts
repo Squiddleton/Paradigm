@@ -14,7 +14,7 @@ export default new SlashCommand({
 				.flat()
 				.map(i => i.link);
 
-			await interaction.reply({ files: [getRandomItem(data)] });
+			await interaction.reply(getRandomItem(data));
 		}
 		catch (error) {
 			if (typeof error === 'object' && error !== null && 'status' in error && error.status === 429) await interaction.reply({ content: 'Imgur is temporarily over capacity for fetching images; please try again later.', ephemeral: true });
