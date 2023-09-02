@@ -17,8 +17,8 @@ export default new SlashCommand({
 			await interaction.reply(getRandomItem(data));
 		}
 		catch (error) {
-			if (typeof error === 'object' && error !== null && 'status' in error && error.status === 429) await interaction.reply({ content: 'Imgur is temporarily over capacity for fetching images; please try again later.', ephemeral: true });
-			else throw error;
+			if (typeof error !== 'object' || error === null || !('status' in error) || error.status !== 429) throw error;
+			await interaction.reply({ content: 'Imgur is temporarily over capacity for fetching images; please try again later.', ephemeral: true });
 		}
 	}
 });
