@@ -6,7 +6,7 @@ import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type C
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Link, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -224,7 +224,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 	 * @param types - The cosmetic's possible types in-game
 	 * @returns Void if successful or a string containing an error message
 	 */
-	const handleImage = async (input: StringOption, types: string[], displayType: Link) => {
+	const handleImage = async (input: StringOption, types: string[], displayType: CosmeticDisplayType) => {
 		let image: Image | null = null;
 		const link = links[displayType];
 
@@ -277,7 +277,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		}
 	};
 
-	const args: [StringOption, string[], Link][] = [
+	const args: [StringOption, string[], CosmeticDisplayType][] = [
 		[outfit, ['outfit'], 'Outfit'],
 		[backbling, ['backpack', 'petcarrier'], 'Back Bling'],
 		[pickaxe, ['pickaxe'], 'Pickaxe'],
