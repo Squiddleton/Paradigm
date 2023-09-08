@@ -42,7 +42,7 @@ export default new SlashCommand({
 		}
 		ctx.putImageData(imgData, 0, 0);
 
-		const silhouette = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'outfit.png' });
+		const silhouette = new AttachmentBuilder(await canvas.encode('png'), { name: 'outfit.png' });
 
 		const row = new ActionRowBuilder<ButtonBuilder>().setComponents(
 			new ButtonBuilder()

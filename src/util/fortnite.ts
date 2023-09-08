@@ -289,7 +289,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 		if (returned !== undefined) return returned;
 	}
 
-	return new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
+	return new AttachmentBuilder(await canvas.encode('png'), { name: 'loadout.png' });
 };
 
 /**
