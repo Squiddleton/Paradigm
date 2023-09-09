@@ -96,7 +96,7 @@ export default new SlashCommand({
 		ctx.drawImage(wrapImage, background.width - (background.height * wrapImage.width / wrapImage.height / 2), background.height / 2, background.height * wrapImage.width / wrapImage.height / 2, background.height / 2);
 
 
-		const attachment = new AttachmentBuilder(canvas.toBuffer('image/png'), { name: 'loadout.png' });
+		const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'loadout.png' });
 
 		await interaction.editReply({
 			embeds: [

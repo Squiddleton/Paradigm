@@ -198,17 +198,11 @@ export interface LevelCommandOptions {
 	accountType: 'epic' | 'xbl' | 'psn';
 }
 
-export interface Links {
-	Outfit?: string;
-	'Back Bling'?: string;
-	Pickaxe?: string;
-	Glider?: string;
-	Wrap?: string;
-}
+export type CosmeticDisplayType = 'Outfit' | 'Back Bling' | 'Pickaxe' | 'Glider' | 'Wrap';
 
-export type Link = keyof Links;
+export type Links = Partial<Record<CosmeticDisplayType, string>>;
 
-export type Dimensions = { [K in Link]: [number, number, number, number] };
+export type Dimensions = Record<CosmeticDisplayType, [number, number, number, number]>;
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
