@@ -4,6 +4,7 @@ import { type GuildTextBasedChannel, type Message, type Snowflake, userMention }
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
+import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
@@ -26,6 +27,7 @@ export default new ClientEvent({
 		let postedShopSections = false;
 		schedule('0 0 * * *', async () => {
 			postedShopSections = false;
+			await userModel.deleteMany({ epicAccountId: null, wishlistCosmeticIds: { $size: 0 } });
 			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 			await memberModel.deleteMany({ milestones: { $size: 0 }, dailyMessages: { $size: 0 } });
