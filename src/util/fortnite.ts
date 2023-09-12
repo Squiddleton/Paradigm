@@ -454,7 +454,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		.map(([k, v]) => {
 			const overallSeason = parseInt(k.match(/\d+/)![0]);
 			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
-			const chapterIndex = (index === -1 ? ChapterLengths.length : index);
+			const chapterIndex = index === -1 ? ChapterLengths.length : index;
 			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;
