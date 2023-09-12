@@ -439,6 +439,8 @@ const getStatsErrorMessage = (e: unknown) => {
  * @returns Options for replying to an interaction and, if found, the user's Epic Games account
  */
 export const getLevelsString = async (client: Client<true>, options: LevelCommandOptions): Promise<InteractionReplyOptions & { account?: EpicAccount }> => {
+	const { accountName, accountType } = options;
+
 	/**
 	 * Returns a string including each Fortnite season and the user's respective level.
 	 *
@@ -446,7 +448,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	 * @param name - The user's Epic Games account username
 	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
 	 */
-	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold('Battle Pass Levels')}\n${Object
+	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold(`${formatPossessive(options.targetUser.username)} Battle Pass Levels`)}\n${Object
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
@@ -456,8 +458,6 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;
-
-	const { accountName, accountType } = options;
 
 	if (accountName === null) {
 		const userResult = getUser(options.targetUser.id);
