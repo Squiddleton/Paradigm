@@ -1,11 +1,10 @@
 import type { Snowflake } from 'discord.js';
-import type { HydratedDocument } from 'mongoose';
-import type { IUser } from './types.js';
+import type { UserDocument } from './types.js';
 import userModel from '../models/users.js';
 
-const cachedUsers = new Map<Snowflake, HydratedDocument<IUser>>();
+const cachedUsers = new Map<Snowflake, UserDocument>();
 
-const updateUserCache = (user: HydratedDocument<IUser>) => cachedUsers.set(user._id, user);
+const updateUserCache = (user: UserDocument) => cachedUsers.set(user._id, user);
 
 export const addToWishlist = async (userId: Snowflake, cosmeticId: string) => {
 	const user = await userModel.findByIdAndUpdate(
@@ -32,7 +31,7 @@ export const removeFromWishlist = async (userId: Snowflake, cosmeticId: string) 
 	updateUserCache(user);
 };
 
-export const saveUser = async (user: HydratedDocument<IUser>) => {
+export const saveUser = async (user: UserDocument) => {
 	await user.save();
 	updateUserCache(user);
 };

@@ -1,6 +1,7 @@
 import type { DeviceAuthGrant } from '@squiddleton/epic';
 import type { DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
+import type { HydratedDocument } from 'mongoose';
 
 export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
@@ -191,6 +192,8 @@ export interface IUser {
 	epicAccountId: string | null;
 	wishlistCosmeticIds: string[];
 }
+
+export type UserDocument = HydratedDocument<IUser>;
 
 export interface LevelCommandOptions {
 	targetUser: User;
