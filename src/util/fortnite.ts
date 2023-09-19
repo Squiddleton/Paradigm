@@ -4,7 +4,7 @@ import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
+import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
@@ -133,7 +133,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 						continue;
 					}
 
-					messages.push(`\nIf you have purchased your item, use ${chatInputApplicationCommandMention('wishlist', 'remove', '1000092959875793080')}.\nDo you want to create your own wishlist?  Check out ${chatInputApplicationCommandMention('wishlist', 'add', '1000092959875793080')}!`);
+					messages.push(`\nIf you have purchased your item, use ${chatInputApplicationCommandMention('wishlist', 'remove', DiscordIds.CommandId.Wishlist)}.\nDo you want to create your own wishlist?  Check out ${chatInputApplicationCommandMention('wishlist', 'add', DiscordIds.CommandId.Wishlist)}!`);
 
 					const fullMsg = messages.join('\n');
 					if (debug) {
@@ -648,8 +648,8 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (userResult === null || userResult.epicAccountId === null) {
-			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`);
-			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', '1032454252024565821')}.`);
+			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 		}
 		else {
 			try {

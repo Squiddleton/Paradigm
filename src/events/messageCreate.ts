@@ -46,7 +46,7 @@ export default new ClientEvent({
 								}
 							};
 
-							const msg = await message.reply(`Discussion is not allowed in this channel. Please use ${chatInputApplicationCommandMention('suggest', '1000168121098842274')} for submissions.`);
+							const msg = await message.reply(`Discussion is not allowed in this channel. Please use ${chatInputApplicationCommandMention('suggest', DiscordIds.CommandId.Suggest)} for submissions.`);
 							if (botPermissions.has(PermissionFlagsBits.ManageMessages)) await tryToDelete(message);
 							setTimeout(() => tryToDelete(msg), 5000);
 						}

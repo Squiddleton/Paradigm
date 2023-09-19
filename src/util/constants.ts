@@ -35,6 +35,12 @@ export namespace DiscordIds {
 		STWCreativeLeaks = '740607796898168913',
 		UserCommands = '742803449493717134'
 	}
+	export enum CommandId {
+		Link = '1032454252024565821',
+		Settings = '1001289651862118471',
+		Suggest = '1000168121098842274',
+		Wishlist = '1000092959875793080'
+	}
 	export enum EmojiId {
 		Downvote = '492412142306197504',
 		Upvote = '492412118952574997'
