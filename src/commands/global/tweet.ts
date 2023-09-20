@@ -22,11 +22,11 @@ export default new SlashCommand({
 		const pickaxe = interaction.options.getString('pickaxe');
 		const glider = interaction.options.getString('glider');
 		const wrap = interaction.options.getString('wrap');
-		const chosenBackground = interaction.options.getString('background');
+		const background = interaction.options.getString('background');
 
 		await interaction.deferReply();
 
-		const attachment = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, chosenBackground);
+		const attachment = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, background);
 		if (typeof attachment === 'string') {
 			await interaction.editReply(attachment);
 			return;
@@ -43,7 +43,7 @@ export default new SlashCommand({
 			.setColor(0x29a8df)
 			.setFooter({ text: 'Twitter', iconURL: 'https://www.stickee.co.uk/wp-content/uploads/2017/02/twitter-logo-2-500x500.png' });
 
-		await createStyleListeners(interaction, attachment, outfit, backbling, pickaxe, glider, wrap, chosenBackground, [embed]);
+		await createStyleListeners(interaction, attachment, outfit, backbling, pickaxe, glider, wrap, background, [embed]);
 	}
 });
 
