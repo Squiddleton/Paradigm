@@ -16,6 +16,8 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
+		await interaction.deferReply();
+
 		const text = interaction.options.getString('text');
 		const outfit = interaction.options.getString('outfit');
 		const backbling = interaction.options.getString('backbling');
@@ -23,8 +25,6 @@ export default new SlashCommand({
 		const glider = interaction.options.getString('glider');
 		const wrap = interaction.options.getString('wrap');
 		const background = interaction.options.getString('background');
-
-		await interaction.deferReply();
 
 		const attachment = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, background);
 		if (typeof attachment === 'string') {
