@@ -49,12 +49,13 @@ export default new ClientEvent({
 		});
 
 		schedule('*/1 * * * *', async () => {
-			const guildResults = await guildModel.find({ giveaways: { $ne: [] } });
+			const now = Date.now() / 1000;
+			const guildResults = await guildModel.find({ giveaways: { $elemMatch: { completed: false, endTime: { $lte: now } } } });
 
 			for (const guildResult of guildResults) {
 				const guildId = guildResult._id;
 
-				for (const giveaway of guildResult.giveaways.filter(g => !g.completed && g.endTime <= (Date.now() / 1000))) {
+				for (const giveaway of guildResult.giveaways.filter(g => !g.completed && g.endTime <= now)) {
 					const deleteGiveaway = () => guildModel.findByIdAndUpdate(guildId, { $pull: { giveaways: giveaway } });
 
 					try {
