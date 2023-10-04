@@ -8,6 +8,7 @@ import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
+import { populateUsers, removeOldUsers } from '../util/users.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -27,7 +28,13 @@ export default new ClientEvent({
 		let postedShopSections = false;
 		schedule('0 0 * * *', async () => {
 			postedShopSections = false;
-			await userModel.deleteMany({ epicAccountId: null, wishlistCosmeticIds: { $size: 0 } });
+
+			const returned = await userModel.deleteMany({ epicAccountId: null, wishlistCosmeticIds: { $size: 0 } });
+			if (returned.deletedCount > 0) {
+				removeOldUsers();
+				await populateUsers();
+			}
+
 			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
 			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
 			await memberModel.deleteMany({ milestones: { $size: 0 }, dailyMessages: { $size: 0 } });
