@@ -21,7 +21,7 @@ export const getUser = (userId: Snowflake) => cachedUsers.get(userId) ?? null;
 
 export const populateUsers = async () => {
 	const users = await userModel.find();
-	users.forEach(user => updateUserCache(user));
+	users.forEach(updateUserCache);
 };
 
 export const removeFromWishlist = async (userId: Snowflake, cosmeticId: string) => {
