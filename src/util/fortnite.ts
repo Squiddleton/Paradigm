@@ -30,7 +30,9 @@ export const fetchItemShop = async () => {
 	const rawAPI = await fortniteAPI.shop({ combined: true });
 
 	const withoutDupes: Cosmetic[] = [];
-	const withDupes = rawAPI.featured!.entries.concat(rawAPI.daily!.entries).map(e => e.items).flat();
+	const featured = rawAPI.featured?.entries ?? [];
+	const daily = rawAPI.daily?.entries ?? [];
+	const withDupes = featured.concat(daily).map(e => e.items).flat();
 
 	for (const item of withDupes) {
 		if (!withoutDupes.some(c => c.id === item.id)) withoutDupes.push(item);
