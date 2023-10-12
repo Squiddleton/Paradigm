@@ -4,7 +4,7 @@ import epicClient from './clients/epic.js';
 import config from './config.js';
 import { fetchCosmetics } from './util/fortnite.js';
 import { handleDisconnect } from './util/functions.js';
-import { populateUsers } from './util/users.js';
+import { fetchUsers } from './util/users.js';
 
 await set('strictQuery', 'throw')
 	.connect(config.mongoPath)
@@ -12,7 +12,7 @@ await set('strictQuery', 'throw')
 console.log('Connected to MongoDB.');
 
 await fetchCosmetics();
-await populateUsers();
+await fetchUsers();
 console.log('Populated caches.');
 
 const authenticate = async () => {

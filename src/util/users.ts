@@ -19,7 +19,7 @@ export const addToWishlist = async (userId: Snowflake, cosmeticId: string) => {
 
 export const getUser = (userId: Snowflake) => cachedUsers.get(userId) ?? null;
 
-export const populateUsers = async () => {
+export const fetchUsers = async () => {
 	const users = await userModel.find();
 	users.forEach(updateUserCache);
 };
