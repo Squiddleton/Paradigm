@@ -76,11 +76,9 @@ export default new SlashCommand({
 					switch (i.customId) {
 						case 'featured': {
 							for (const component of components) {
-								component.setComponents(component.components.map(c => {
-									return c instanceof StringSelectMenuBuilder
-										? c.setOptions(c.options.map(o => ({ label: o.toJSON().label, value: o.toJSON().value })))
-										: c;
-								}
+								component.setComponents(component.components.map(c => c instanceof StringSelectMenuBuilder
+									? c.setOptions(c.options.map(o => ({ label: o.toJSON().label, value: o.toJSON().value })))
+									: c
 								));
 							}
 							await i.update({ components, embeds: [embed.setImage(cosmetic.images.featured ?? cosmetic.images.icon)] });
@@ -102,14 +100,12 @@ export default new SlashCommand({
 				if (optionChosen === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', `${optionChosen}`));
 
 				for (const component of components) {
-					component.setComponents(component.components.map(c => {
-						return c instanceof StringSelectMenuBuilder
-							? c.setOptions(c.options.map(o => {
-								const option = o.toJSON();
-								return { label: option.label, value: option.value, default: c.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
-							}))
-							: c;
-					}
+					component.setComponents(component.components.map(c => c instanceof StringSelectMenuBuilder
+						? c.setOptions(c.options.map(o => {
+							const option = o.toJSON();
+							return { label: option.label, value: option.value, default: c.toJSON().custom_id === i.customId && option.value === optionChosen.tag };
+						}))
+						: c
 					));
 				}
 
