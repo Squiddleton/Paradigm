@@ -51,32 +51,30 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
  *
  * @returns An array of buttons
  */
-export const createPaginationButtons = (): PaginationButtons => {
-	return [
-		new ButtonBuilder()
-			.setCustomId('first')
-			.setLabel('⏪')
-			.setStyle(ButtonStyle.Primary)
-			.setDisabled(true),
-		new ButtonBuilder()
-			.setCustomId('back')
-			.setLabel('◀️')
-			.setStyle(ButtonStyle.Primary)
-			.setDisabled(true),
-		new ButtonBuilder()
-			.setCustomId('next')
-			.setLabel('▶️')
-			.setStyle(ButtonStyle.Primary),
-		new ButtonBuilder()
-			.setCustomId('last')
-			.setLabel('⏩')
-			.setStyle(ButtonStyle.Primary),
-		new ButtonBuilder()
-			.setCustomId('quit')
-			.setLabel('Cancel')
-			.setStyle(ButtonStyle.Secondary)
-	];
-};
+export const createPaginationButtons = (): PaginationButtons => [
+	new ButtonBuilder()
+		.setCustomId('first')
+		.setLabel('⏪')
+		.setStyle(ButtonStyle.Primary)
+		.setDisabled(true),
+	new ButtonBuilder()
+		.setCustomId('back')
+		.setLabel('◀️')
+		.setStyle(ButtonStyle.Primary)
+		.setDisabled(true),
+	new ButtonBuilder()
+		.setCustomId('next')
+		.setLabel('▶️')
+		.setStyle(ButtonStyle.Primary),
+	new ButtonBuilder()
+		.setCustomId('last')
+		.setLabel('⏩')
+		.setStyle(ButtonStyle.Primary),
+	new ButtonBuilder()
+		.setCustomId('quit')
+		.setLabel('Cancel')
+		.setStyle(ButtonStyle.Secondary)
+];
 
 /**
  * Fetches the message linked to a specific giveaway.
