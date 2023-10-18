@@ -75,7 +75,7 @@ export default new ClientEvent({
 								const cosmetic = cosmetics.find(c => c.name === cosmeticName && c.type.displayValue === cosmeticType);
 								if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', target));
 
-								return { name: target, value: cosmetic.id };
+								return { name: target.slice(0, 100), value: cosmetic.id };
 							});
 						await interaction.respond(choices);
 						break;
