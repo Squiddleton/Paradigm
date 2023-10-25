@@ -4,7 +4,7 @@ import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RarityColors, Time } from './constants.js';
+import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
@@ -527,8 +527,8 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		if (track === undefined) throw new Error(`No track was found for guid ${trackguid}`);
 		return track;
 	};
-	const brTrack = getTrack('gXffl');
-	const zbTrack = getTrack('yHNFu');
+	const brTrack = getTrack(RankedTrack.C4S4BR);
+	const zbTrack = getTrack(RankedTrack.C4S4ZB);
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
 

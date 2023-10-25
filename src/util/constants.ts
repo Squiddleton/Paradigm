@@ -179,6 +179,13 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'PlayStation', value: 'psn' }
 ];
 
+export enum RankedTrack {
+	S0BR = 'ggOwuK',
+	S0ZB = 'AjRdrb',
+	C4S4BR = 'gXffl',
+	C4S4ZB = 'yHNFu'
+}
+
 export const RarityColors: Partial<Record<string, number>> = {
 	Common: 0xbebdb7,
 	Uncommon: 0x1edd1d,
