@@ -190,7 +190,7 @@ export const messageComponentCollectorFilter = (interaction: BaseInteraction) =>
  * @param inc - The amount of items shown per page
  */
 export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
-	const row = new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) });
+	const row = new ActionRowBuilder<ButtonBuilder>({ components: buttons });
 	const [first, back, next, last, quit] = buttons;
 	let index = 0;
 	// Create the collector on the channel since message collectors do not work on ephemeral messages
@@ -364,7 +364,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const willUseButtons = entrants.length > inc;
 	const buttons = createPaginationButtons();
 
-	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
+	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };

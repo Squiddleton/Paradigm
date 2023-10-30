@@ -827,7 +827,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	const buttons = createPaginationButtons();
 
 	const message = await interaction.editReply({
-		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: Object.values(buttons) })] : [],
+		components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [],
 		embeds: [embed]
 	});
 
