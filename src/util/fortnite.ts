@@ -457,7 +457,15 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			const overallSeason = parseInt(k.match(/\d+/)![0]);
 			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
 			const chapterIndex = index === -1 ? ChapterLengths.length : index;
-			return `Chapter ${chapterIndex + 1}, Season ${overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum)}: ${Math.floor((v ?? 0) / 100)}`;
+			const chapterName = [
+				'1',
+				'2',
+				'3',
+				'4',
+				'Fortnite: OG'
+			][chapterIndex];
+			const seasonName = chapterName === 'Fortnite: OG' ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
+			return `Chapter ${chapterName}, Season ${seasonName}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;
 
