@@ -57,6 +57,6 @@ export default new SlashCommand({
 		const buffer = await createRankedImage(stats.account, true);
 		await interaction.editReply({ files: [buffer] });
 
-		if (interaction.options.getString('link')) await linkEpicAccount(interaction, stats.account);
+		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
 	}
 });
