@@ -422,7 +422,7 @@ const getStatsErrorMessage = (e: unknown) => {
 	if (e instanceof FortniteAPIError) {
 		switch (e.code) {
 			case 403: {
-				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Show on Career Leaderboard => On.';
+				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
 			}
 			case 404: {
 				return 'No account was found with that username on that platform.';
