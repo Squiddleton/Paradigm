@@ -539,23 +539,27 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let seasonName = 'Fortnite: OG';
 	let brTrackguid = RankedTrack.OGBR;
 	let zbTrackguid = RankedTrack.OGZB;
+	let backgroundPath = 'general.jpg';
 	switch (season) {
 		case 'c4s4': {
 			seasonName = 'Chapter 4 Season 4';
 			brTrackguid = RankedTrack.C4S4BR;
 			zbTrackguid = RankedTrack.C4S4ZB;
+			backgroundPath = 'c4s4.png';
 			break;
 		}
 		case 'zero': {
 			seasonName = 'Season Zero';
 			brTrackguid = RankedTrack.S0BR;
 			zbTrackguid = RankedTrack.S0ZB;
+			backgroundPath = 'c4s3.png';
 			break;
 		}
 		case 'zeroprereset': {
 			seasonName = 'Season Zero (Pre-Reset)';
 			brTrackguid = RankedTrack.S0PBR;
 			zbTrackguid = RankedTrack.S0PZB;
+			backgroundPath = 'c4s3.png';
 		}
 	}
 	const brTrack = getTrack(brTrackguid);
@@ -563,7 +567,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
 
-	const background = await loadImage('./assets/ranked/background.jpg');
+	const background = await loadImage(`./assets/backgrounds/${backgroundPath}`);
 	const { height, width } = background;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
@@ -593,7 +597,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		const iconWidth = width / 5;
 
-		ctx.lineWidth = 30;
+		ctx.lineWidth = height / 36;
 
 		const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
 		const isUnknown = track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0;
@@ -604,7 +608,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		if (track.currentPlayerRanking === null) {
 			ctx.beginPath();
-			ctx.arc(vertexX, vertexY, iconWidth / 1.5, 0, 2 * Math.PI);
+			ctx.arc(vertexX, vertexY, radius * 0.85, 0, 2 * Math.PI);
 			ctx.fillStyle = 'midnightblue';
 			ctx.fill();
 
@@ -653,7 +657,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
 		if (divisionIconName === 'unreal') ctx.drawImage(divisionIcon, (width * 0.15 + xOffset) / 1.5, height / 4.5, iconWidth * 1.5, iconWidth * 1.5);
-		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height / 3, iconWidth, iconWidth);
+		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite`;
 		ctx.fillStyle = 'yellow';
