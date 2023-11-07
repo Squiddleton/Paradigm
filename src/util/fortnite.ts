@@ -516,9 +516,9 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true): Promise<Buffer>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean): Promise<Buffer | null>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean) {
+export function createRankedImage(account: EpicAccount, returnUnknown: true, season?: string): Promise<Buffer>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string): Promise<Buffer | null>;
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string) {
 	let trackProgress: HabaneroTrackProgress[];
 	try {
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
@@ -535,8 +535,25 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		if (track === undefined) throw new Error(`No track was found for guid ${trackguid}`);
 		return track;
 	};
-	const brTrack = getTrack(RankedTrack.OGBR);
-	const zbTrack = getTrack(RankedTrack.OGZB);
+
+	let seasonName = 'Fortnite: OG';
+	let brTrackguid = RankedTrack.OGBR;
+	let zbTrackguid = RankedTrack.OGZB;
+	switch (season) {
+		case 'c4s4': {
+			seasonName = 'Chapter 4 Season 4';
+			brTrackguid = RankedTrack.C4S4BR;
+			zbTrackguid = RankedTrack.C4S4ZB;
+			break;
+		}
+		case 'zero': {
+			seasonName = 'Season Zero';
+			brTrackguid = RankedTrack.S0BR;
+			zbTrackguid = RankedTrack.S0ZB;
+		}
+	}
+	const brTrack = getTrack(brTrackguid);
+	const zbTrack = getTrack(zbTrackguid);
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
 
@@ -554,7 +571,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.textAlign = 'center';
 	ctx.fillStyle = '#ffffff';
 
-	ctx.fillText(`Fortnite: OG Ranked: ${account.name}`, width / 2, fontSize, width);
+	ctx.fillText(`${seasonName} Ranked: ${account.name}`, width / 2, fontSize, width);
 
 	ctx.font = `${fontSize / 2}px fortnite`;
 	ctx.fillText('Battle Royale', width / 4, height - (fontSize / 4), width / 2);

@@ -16,6 +16,16 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String
 		},
 		{
+			name: 'season',
+			description: 'Which season to check ranked stats in; defaults to current',
+			type: ApplicationCommandOptionType.String,
+			choices: [
+				{ name: 'Fortnite: OG', value: 'og' },
+				{ name: 'Chapter 4 Season 4', value: 'c4s4' },
+				{ name: 'Season Zero', value: 'zero' }
+			]
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -32,6 +42,7 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const accountName = interaction.options.getString('player');
+		const season = interaction.options.getString('season') ?? 'og';
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		let stats: Stats<false>;
@@ -54,7 +65,7 @@ export default new SlashCommand({
 
 		}
 
-		const buffer = await createRankedImage(stats.account, true);
+		const buffer = await createRankedImage(stats.account, true, season);
 		await interaction.editReply({ files: [buffer] });
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
