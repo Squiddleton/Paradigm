@@ -530,7 +530,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
 	}
 
-	const getTrack = (trackguid: string) => {
+	const getTrack = (trackguid: RankedTrack) => {
 		const track = trackProgress.find(t => t.trackguid === trackguid);
 		if (track === undefined) throw new Error(`No track was found for guid ${trackguid}`);
 		return track;
