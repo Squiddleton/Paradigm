@@ -550,6 +550,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			seasonName = 'Season Zero';
 			brTrackguid = RankedTrack.S0BR;
 			zbTrackguid = RankedTrack.S0ZB;
+			break;
+		}
+		case 'zeroprereset': {
+			seasonName = 'Season Zero (Pre-Reset)';
+			brTrackguid = RankedTrack.S0PBR;
+			zbTrackguid = RankedTrack.S0PZB;
 		}
 	}
 	const brTrack = getTrack(brTrackguid);

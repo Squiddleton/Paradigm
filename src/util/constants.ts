@@ -180,6 +180,8 @@ export const PlatformChoices: StringChoices = [
 ];
 
 export enum RankedTrack {
+	S0PBR = '2776dc',
+	S0PZB = '9d7ebd',
 	S0BR = 'ggOwuK',
 	S0ZB = 'AjRdrb',
 	C4S4BR = 'gXffl',

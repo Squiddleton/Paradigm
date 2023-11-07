@@ -22,7 +22,8 @@ export default new SlashCommand({
 			choices: [
 				{ name: 'Fortnite: OG', value: 'og' },
 				{ name: 'Chapter 4 Season 4', value: 'c4s4' },
-				{ name: 'Season Zero', value: 'zero' }
+				{ name: 'Season Zero', value: 'zero' },
+				{ name: 'Season Zero (Pre-Reset)', value: 'zeroprereset' }
 			]
 		},
 		{
