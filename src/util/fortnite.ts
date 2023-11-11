@@ -656,7 +656,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		}
 
 		const divisionIcon = await loadImage(`./assets/ranked/${divisionIconName}.png`);
-		if (divisionIconName === 'unreal') ctx.drawImage(divisionIcon, (width * 0.15 + xOffset) / 1.5, height / 4.5, iconWidth * 1.5, iconWidth * 1.5);
+		if (divisionIconName === 'unreal') ctx.drawImage(divisionIcon, (width * 0.1) + xOffset, height / 4.5, iconWidth * 1.5, iconWidth * 1.5);
 		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite`;
