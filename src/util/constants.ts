@@ -55,29 +55,7 @@ export namespace DiscordIds {
 	export enum RoleId {
 		ItemShop = '568590143640961037',
 		Mod = '544952148790738954',
-		NitroBooster = '585533593565003819',
-		NitroBlack = '628072223923765289',
-		NitroBrown = '879076851207782431',
-		NitroRed = '879080226930434078',
-		NitroDarkOrange = '919964691504189533',
-		NitroOrange = '657690317734019114',
-		NitroYellow = '908041595281100872',
-		NitroGreen = '879079946037903380',
-		NitroSandGreen = '915657915191410768',
-		NitroTurquoise = '879077880330584124',
-		NitroBlue = '628078100176961536',
-		NitroDarkBlue = '915657649331273778',
-		NitroIndigo = '919964517922930699',
-		NitroCovenPurple = '919964437631365251',
-		NitroBossanovaPurple = '879077641330765894',
-		NitroCosmicPurple = '879080322661228604',
-		NitroAffairPurple = '879078048241188875',
-		NitroPurple = '628071774034067467',
-		NitroPsychicPink = '919964627775918120',
-		NitroPink = '628072263593492493',
-		NitroLondonPurple = '879080042578182215',
-		NitroSalmonPink = '915657840272764929',
-		NitroWhite = '923702586673102918'
+		NitroBooster = '585533593565003819'
 	}
 	export enum UserId {
 		Catalyst = '848452706791981056'
@@ -220,10 +198,6 @@ export enum RarityOrdering {
 }
 
 export const Rarities = getEnumKeys(RarityOrdering);
-
-export const Seasons = Array.from({
-	length: 25 // Increment this value every season
-}, (v, k) => k + 1).map(s => `s${s}_social_bp_level`).slice(10);
 
 export const TextBasedChannelTypes: (ApplicationCommandOptionAllowedChannelTypes & TextBasedChannel['type'])[] = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
 
