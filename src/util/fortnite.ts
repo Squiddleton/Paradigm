@@ -192,6 +192,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		const debut = cosmetic.shopHistory[0];
 		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))}\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
+	if (cosmetic.gameplayTags?.includes('Cosmetics.Gating.RatingMin.Teen')) embed.setFooter({ text: 'You cannot use this item in experiences rated Everyone 10+ or lower.' });
 	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
