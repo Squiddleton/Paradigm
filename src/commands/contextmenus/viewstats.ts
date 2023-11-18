@@ -7,14 +7,14 @@ export default new ContextMenu({
 	name: 'View Stats',
 	type: ApplicationCommandType.User,
 	scope: 'Global',
-	async execute(interaction) {
+	async execute(interaction, client) {
 		const levelsOptions: LevelCommandOptions = {
 			targetUser: interaction.targetUser,
 			accountName: null,
 			accountType: 'epic'
 		};
 
-		const { content } = await getLevelsString(interaction.client, levelsOptions);
+		const { content } = await getLevelsString(client, levelsOptions);
 
 		await sendStatsImages(interaction, {
 			...levelsOptions,
