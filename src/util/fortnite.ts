@@ -477,7 +477,22 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		}
 
 		try {
-			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [userResult.epicAccountId] });
+			let stats: Partial<Record<string, number>> | null = null;
+			const getStats = async (accountId: string) => {
+				const bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
+				return bulkStats[0].stats;
+			};
+
+			try {
+				stats = await getStats(userResult.epicAccountId);
+			}
+			catch (error) {
+				if (!(error instanceof EpicAPIError) || ![400, 401].includes(error.status)) throw error;
+
+				await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+				console.log('Reauthenticated to retrieve level stats.');
+				stats = await getStats(userResult.epicAccountId);
+			}
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
@@ -525,9 +540,10 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
 	}
 	catch (error) {
-		if (!(error instanceof EpicAPIError) || error.status !== 401) throw error;
+		if (!(error instanceof EpicAPIError) || ![400, 401].includes(error.status)) throw error;
 
 		await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+		console.log('Reauthenticated to retrieve ranked stats.');
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
 	}
 
