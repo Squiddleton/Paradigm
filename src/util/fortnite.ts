@@ -451,7 +451,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	 * @param name - The user's Epic Games account username
 	 * @returns A string with a header including the user's Epic Games username and a body of the user's levels in each season
 	 */
-	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold(`${formatPossessive(options.targetUser.username)} Battle Pass Levels`)}\n${Object
+	const formatLevels = (levels: Partial<Record<string, number>>) => `${bold('Battle Pass Levels')}\n${Object
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
