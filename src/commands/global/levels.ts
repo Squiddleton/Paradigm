@@ -26,11 +26,11 @@ export default new SlashCommand({
 		}
 	],
 	scope: 'Global',
-	async execute(interaction) {
+	async execute(interaction, client) {
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
-		const { account, ...content } = await getLevelsString(interaction.client, {
+		const { account, ...content } = await getLevelsString(client, {
 			targetUser: interaction.user,
 			accountName,
 			accountType
