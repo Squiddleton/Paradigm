@@ -1,16 +1,16 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
-import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
+import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
+import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
-import config from '../config.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
@@ -477,22 +477,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		}
 
 		try {
-			let stats: Partial<Record<string, number>> | null = null;
-			const getStats = async (accountId: string) => {
-				const bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
-				return bulkStats[0].stats;
-			};
-
-			try {
-				stats = await getStats(userResult.epicAccountId);
-			}
-			catch (error) {
-				if (!(error instanceof EpicAPIError) || ![400, 401].includes(error.status)) throw error;
-
-				await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
-				console.log('Reauthenticated to retrieve level stats.');
-				stats = await getStats(userResult.epicAccountId);
-			}
+			const stats = await getLevelStats(userResult.epicAccountId);
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
@@ -535,17 +520,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, season?: string): Promise<Buffer>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string): Promise<Buffer | null>;
 export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string) {
-	let trackProgress: HabaneroTrackProgress[];
-	try {
-		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
-	}
-	catch (error) {
-		if (!(error instanceof EpicAPIError) || ![400, 401].includes(error.status)) throw error;
-
-		await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
-		console.log('Reauthenticated to retrieve ranked stats.');
-		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId: account.id });
-	}
+	const trackProgress = await getTrackProgress(account.id);
 
 	const getTrack = (trackguid: RankedTrack) => {
 		const track = trackProgress.find(t => t.trackguid === trackguid);

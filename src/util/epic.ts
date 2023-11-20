@@ -1,4 +1,4 @@
-import type { AnyGrant, DeviceAuthGrant, EpicAuthResponse } from '@squiddleton/epic';
+import { type AnyGrant, type DeviceAuthGrant, EpicAPIError, type EpicAuthResponse, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
 import { EncodedClient, EpicEndpoint } from './constants.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
@@ -62,6 +62,38 @@ export const getDeviceAuth = async (accountName: string, authorizationCode: stri
 		device_id: deviceId,
 		secret
 	};
+};
+
+const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
+
+export const getLevelStats = async (accountId: string) => {
+	let bulkStats: EpicStats[];
+	try {
+		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
+	}
+	catch (error) {
+		if (!isEpicAuthError(error)) throw error;
+
+		await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+		console.log('Reauthenticated to retrieve level stats.');
+		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
+	}
+	return bulkStats[0].stats;
+};
+
+export const getTrackProgress = async (accountId: string) => {
+	let trackProgress: HabaneroTrackProgress[];
+	try {
+		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
+	}
+	catch (error) {
+		if (!isEpicAuthError(error)) throw error;
+
+		await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+		console.log('Reauthenticated to retrieve ranked stats.');
+		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
+	}
+	return trackProgress;
 };
 
 /**
