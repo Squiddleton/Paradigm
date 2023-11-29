@@ -41,7 +41,7 @@ export default new SlashCommand({
 
 				const shopSectionsRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(shopSectionsMenu);
 				const wishlistRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(wishlistMenu);
-				const message = await interaction.reply({ components: [shopSectionsRow, wishlistRow], content: 'Select the channels for the following automatic messages.' });
+				const message = await interaction.reply({ components: [shopSectionsRow, wishlistRow], content: 'Select the channels for the following automatic messages.', fetchReply: true });
 
 				const collector = message.createMessageComponentCollector({ componentType: ComponentType.ChannelSelect, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 				collector
