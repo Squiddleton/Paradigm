@@ -440,6 +440,9 @@ const getStatsErrorMessage = (e: unknown) => {
 			case 404: {
 				return 'No account was found with that username on that platform.';
 			}
+			case 500: {
+				return 'Fortnite-API was unable to fetch the account info. Please try again in a few minutes.';
+			}
 			case 503: {
 				return 'Fortnite-API is currently booting up. Please try again in a few minutes.';
 			}

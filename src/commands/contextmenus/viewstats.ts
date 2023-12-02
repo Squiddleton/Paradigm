@@ -1,4 +1,5 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
+import { EpicAPIError } from '@squiddleton/epic';
 import { ApplicationCommandType } from 'discord.js';
 import { getLevelsString, sendStatsImages } from '../../util/fortnite.js';
 import type { LevelCommandOptions } from '../../util/types.js';
@@ -14,13 +15,22 @@ export default new ContextMenu({
 			accountType: 'epic'
 		};
 
-		const { content } = await getLevelsString(client, levelsOptions);
+		try {
+			const { content } = await getLevelsString(client, levelsOptions);
 
-		await sendStatsImages(interaction, {
-			...levelsOptions,
-			content,
-			input: 'all',
-			timeWindow: 'lifetime'
-		});
+			await sendStatsImages(interaction, {
+				...levelsOptions,
+				content,
+				input: 'all',
+				timeWindow: 'lifetime'
+			});
+		}
+		catch (error) {
+			if (error instanceof EpicAPIError && error.status === 504) {
+				await interaction.reply('Epic Games\' response timed out. Please try again in a few minutes.');
+				return;
+			}
+			throw error;
+		}
 	}
 });

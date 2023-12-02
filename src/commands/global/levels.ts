@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { EpicAPIError } from '@squiddleton/epic';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
@@ -30,15 +31,26 @@ export default new SlashCommand({
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
-		const { account, ...content } = await getLevelsString(client, {
-			targetUser: interaction.user,
-			accountName,
-			accountType
-		});
+		await interaction.deferReply();
 
-		await interaction.reply(content);
-		if (account !== undefined && interaction.options.getBoolean('link')) {
-			await linkEpicAccount(interaction, account, true);
+		try {
+			const { account, ...content } = await getLevelsString(client, {
+				targetUser: interaction.user,
+				accountName,
+				accountType
+			});
+
+			await interaction.editReply(content);
+			if (account !== undefined && interaction.options.getBoolean('link')) {
+				await linkEpicAccount(interaction, account, true);
+			}
+		}
+		catch (error) {
+			if (error instanceof EpicAPIError && error.status === 504) {
+				await interaction.editReply('Epic Games\' response timed out. Please try again in a few minutes.');
+				return;
+			}
+			throw error;
 		}
 	}
 });
