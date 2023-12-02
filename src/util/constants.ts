@@ -20,30 +20,14 @@ export const ChapterLengths = [10, 8, 4, 4];
 
 export namespace DiscordIds {
 	export enum ChannelId {
-		BRLeaks = '509930374021775394',
-		BRSpeculation = '785210975733284915',
 		Dev = '863882874519814154',
-		General = '488040333310164992',
-		LeakPosts = '819870118720438273',
-		LeaksDiscussion = '509936143169748992',
-		Logs = '488112900276224010',
-		RegularApplications = '886083204690370630',
-		RoleAssignment = '879930518228050010',
-		SaltySprings = '488988723049136133',
 		ShopPosts = '489836390759268353',
-		StickerEmojiSubmissions = '895024792439251064',
-		STWCreativeLeaks = '740607796898168913',
 		UserCommands = '742803449493717134'
 	}
 	export enum CommandId {
 		Link = '1032454252024565821',
 		Settings = '1001289651862118471',
-		Suggest = '1000168121098842274',
 		Wishlist = '1000092959875793080'
-	}
-	export enum EmojiId {
-		Downvote = '492412142306197504',
-		Upvote = '492412118952574997'
 	}
 	export enum GuildId {
 		Dev = '614918461453238357',
@@ -53,9 +37,7 @@ export namespace DiscordIds {
 		CommandList = '1064964139094650971'
 	}
 	export enum RoleId {
-		ItemShop = '568590143640961037',
-		Mod = '544952148790738954',
-		NitroBooster = '585533593565003819'
+		ItemShop = '568590143640961037'
 	}
 	export enum UserId {
 		Catalyst = '848452706791981056',

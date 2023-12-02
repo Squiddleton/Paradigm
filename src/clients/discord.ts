@@ -32,7 +32,6 @@ const client = new DiscordClient({
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,
-		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.Guilds
 	],
@@ -44,9 +43,7 @@ const client = new DiscordClient({
 		ReactionUserManager: 10
 	}),
 	partials: [
-		Partials.Channel,
-		Partials.Message,
-		Partials.Reaction
+		Partials.Channel
 	],
 	presence: {
 		activities: [{

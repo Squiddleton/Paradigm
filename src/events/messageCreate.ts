@@ -1,5 +1,4 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import { DiscordAPIError, type Message, PermissionFlagsBits, RESTJSONErrorCodes, chatInputApplicationCommandMention } from 'discord.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds } from '../util/constants.js';
@@ -13,7 +12,6 @@ export default new ClientEvent({
 		DiscordClient.assertReadyClient(client);
 		if (message.inGuild()) {
 			const { guildId } = message;
-			const exclusiveGuildId = client.exclusiveGuildId;
 			const isBot = message.author.bot;
 
 			if (!isBot) {
@@ -31,31 +29,8 @@ export default new ClientEvent({
 					);
 				}
 			}
-
-			if (guildId === exclusiveGuildId) {
-				if (!isBot) {
-					if (message.channelId === DiscordIds.ChannelId.StickerEmojiSubmissions && message.member !== null && !message.member.roles.cache.has(DiscordIds.RoleId.Mod)) {
-						const botPermissions = message.channel.permissionsFor(client.user);
-						if (botPermissions !== null && botPermissions.has([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages])) {
-							const tryToDelete = async (m: Message) => {
-								try {
-									await m.delete();
-								}
-								catch (error) {
-									if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) console.error(error);
-								}
-							};
-
-							const msg = await message.reply(`Discussion is not allowed in this channel. Please use ${chatInputApplicationCommandMention('suggest', DiscordIds.CommandId.Suggest)} for submissions.`);
-							if (botPermissions.has(PermissionFlagsBits.ManageMessages)) await tryToDelete(message);
-							setTimeout(() => tryToDelete(msg), 5000);
-						}
-					}
-				}
-				else if (message.channelId === DiscordIds.ChannelId.ShopPosts && message.mentions.roles.has(DiscordIds.RoleId.ItemShop) && message.createdAt.getHours() !== 0) {
-					const roleIds: string[] = [DiscordIds.UserId.Catalyst, DiscordIds.UserId.Lexxy];
-					if (roleIds.includes(message.author.id)) await checkWishlists(client);
-				}
+			else if (message.channelId === DiscordIds.ChannelId.ShopPosts && message.mentions.roles.has(DiscordIds.RoleId.ItemShop) && message.createdAt.getHours() !== 0 && (message.author.id === DiscordIds.UserId.Catalyst || message.author.id === DiscordIds.UserId.Lexxy)) {
+				await checkWishlists(client);
 			}
 		}
 	}

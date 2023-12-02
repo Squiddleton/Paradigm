@@ -1,7 +1,7 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, type MessageReaction, type PartialMessageReaction, type PartialUser, RESTJSONErrorCodes, type Role, type Snowflake, type User, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
-import { DiscordIds, ErrorMessage, RarityOrdering, Time } from './constants.js';
+import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -115,46 +115,6 @@ export const grantMilestone = (userId: Snowflake, guildId: Snowflake, milestoneN
 export const handleDisconnect = (e: unknown) => {
 	console.error(e);
 	process.exit();
-};
-
-/**
- * Handles a reaction being added or removed.
- *
- * @param reaction - The reaction that was added or removed
- * @param user - The user that added or removed the reaction
- * @param added - Whether the reaction was added
- */
-export const handleReaction = async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser, added: boolean) => {
-	const { client } = reaction;
-	DiscordClient.assertReadyClient(client);
-	if (reaction.partial) {
-		try {
-			await reaction.fetch();
-		}
-		catch (error) {
-			console.error(`An error has occurred when fetching a${added ? 'n added' : ' removed'} reaction: `, error);
-			return;
-		}
-	}
-	const { message } = reaction;
-	if (message.guildId === DiscordIds.GuildId.FortniteBR) {
-		const emojiStr = reaction.emoji.toString();
-		const logChannel = client.getGuildChannel(DiscordIds.ChannelId.Logs);
-
-		await logChannel.send({
-			embeds: [
-				new EmbedBuilder()
-					.setDescription(`Reaction from ${user} (${user.id}) ${added ? 'added' : 'removed'}.`)
-					.setFields([
-						{ name: 'Reaction Name', value: reaction.emoji.name ?? emojiStr, inline: true },
-						{ name: 'Reaction URL', value: reaction.emoji.url ?? emojiStr, inline: true },
-						{ name: 'Message URL', value: message.url, inline: true }
-					])
-					.setColor(added ? Colors.Green : Colors.Purple)
-					.setFooter({ text: 'Logs: Reactions' })
-			]
-		});
-	}
 };
 
 /**
