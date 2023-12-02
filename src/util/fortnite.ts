@@ -1,6 +1,6 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type CombinedShop, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
@@ -18,7 +18,12 @@ let cachedCosmetics: Cosmetic[] = [];
 
 export const getCosmetics = () => cachedCosmetics;
 export const fetchCosmetics = async () => {
-	cachedCosmetics = await fortniteAPI.listCosmetics();
+	try {
+		cachedCosmetics = await fortniteAPI.listCosmetics();
+	}
+	catch (error) {
+		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
+	}
 };
 
 /**
@@ -27,7 +32,14 @@ export const fetchCosmetics = async () => {
  * @returns An array of cosmetic objects
  */
 export const fetchItemShop = async () => {
-	const rawAPI = await fortniteAPI.shop({ combined: true });
+	let rawAPI: CombinedShop;
+	try {
+		rawAPI = await fortniteAPI.shop({ combined: true });
+	}
+	catch (error) {
+		if (error instanceof FortniteAPIError && error.code === 503) return [];
+		throw error;
+	}
 
 	const withoutDupes: Cosmetic[] = [];
 	const featured = rawAPI.featured?.entries ?? [];
@@ -427,6 +439,9 @@ const getStatsErrorMessage = (e: unknown) => {
 			}
 			case 404: {
 				return 'No account was found with that username on that platform.';
+			}
+			case 503: {
+				return 'Fortnite-API is currently booting up. Please try again in a few minutes.';
 			}
 		}
 	}

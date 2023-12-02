@@ -1,6 +1,6 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import { EpicAPIError } from '@squiddleton/epic';
-import type { Cosmetic, Playlist } from '@squiddleton/fortnite-api';
+import { type Cosmetic, FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
 import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
@@ -37,6 +37,11 @@ export default new ClientEvent({
 				const sortByRating = (a: Rating, b: Rating) => (a.rating === b.rating) ? a.target.localeCompare(b.target) : (b.rating - a.rating);
 
 				const filterCosmetics = async (type: string) => {
+					if (cosmetics.length === 0) {
+						await interaction.respond([]);
+						return;
+					}
+
 					const filteredCosmetics = cosmetics
 						.filter(c => c.type.value === type)
 						.map(mapByName)
@@ -53,6 +58,11 @@ export default new ClientEvent({
 
 				switch (name) {
 					case 'cosmetic': {
+						if (cosmetics.length === 0) {
+							await interaction.respond([]);
+							return;
+						}
+
 						let filteredCosmetics = cosmetics;
 						if (interaction.commandName === 'wishlist' && interaction.options.getSubcommand() === 'remove') {
 							const userResult = getUser(userId);
@@ -81,8 +91,19 @@ export default new ClientEvent({
 						break;
 					}
 					case 'playlist': {
-						const playlists = removeDuplicates((await fortniteAPI.playlists()).map(mapByName).filter((n): n is string => n !== null));
-						const { ratings } = findBestMatch(input, playlists);
+						let playlists: Playlist[];
+						try {
+							playlists = await fortniteAPI.playlists();
+						}
+						catch (error) {
+							if (error instanceof FortniteAPIError && error.code === 503) {
+								await interaction.respond([]);
+								return;
+							}
+							throw error;
+						}
+						const playlistNames = removeDuplicates(playlists.map(mapByName).filter((n): n is string => n !== null));
+						const { ratings } = findBestMatch(input, playlistNames);
 						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);
 						break;

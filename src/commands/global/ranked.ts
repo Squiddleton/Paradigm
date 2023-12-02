@@ -62,7 +62,13 @@ export default new SlashCommand({
 				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 				return;
 			}
-			stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
+			try {
+				stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
+			}
+			catch (error) {
+				await handleStatsError(interaction, error);
+				return;
+			}
 
 		}
 

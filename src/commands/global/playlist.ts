@@ -1,4 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
+import { FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { normalize, removeDuplicates } from '@squiddleton/util';
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
@@ -17,10 +18,21 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
+		let playlists: Playlist[];
+		try {
+			playlists = await fortniteAPI.playlists();
+		}
+		catch (error) {
+			if (error instanceof FortniteAPIError && error.code === 503) {
+				await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', ephemeral: true });
+				return;
+			}
+			throw error;
+		}
+
 		await interaction.deferReply();
 
 		const input = interaction.options.getString('playlist', true);
-		const playlists = await fortniteAPI.playlists();
 
 		const playlist = playlists.find(p => [p.name, p.id].some(keyword => keyword !== null && normalize(keyword) === normalize(input)));
 		if (playlist === undefined) {

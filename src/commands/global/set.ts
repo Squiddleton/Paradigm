@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { Cosmetic } from '@squiddleton/fortnite-api';
+import { type Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, EmbedBuilder, bold } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 
@@ -22,9 +22,20 @@ export default new SlashCommand({
 		try {
 			cosmetics = await fortniteAPI.filterCosmetics({ set });
 		}
-		catch {
-			await interaction.editReply('No set matches your input.');
-			return;
+		catch (error) {
+			if (error instanceof FortniteAPIError) {
+				switch (error.code) {
+					case 404: {
+						await interaction.editReply('No set matches your input.');
+						return;
+					}
+					case 503: {
+						await interaction.editReply('Fortnite-API is currently booting up. Please try again in a few minutes.');
+						return;
+					}
+				}
+			}
+			throw error;
 		}
 
 		const cosmeticToAddedTime = (cosmetic: Cosmetic) => new Date(cosmetic.added).getTime();

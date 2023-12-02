@@ -1,15 +1,20 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { EmbedBuilder, bold } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
+import { getCosmetics } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: '1984',
 	description: 'View items that cannot be equipped in experiences rated Everyone 10+ or lower',
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply();
+		const cosmetics = getCosmetics();
+		if (cosmetics.length === 0) {
+			await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', ephemeral: true });
+			return;
+		}
 
-		const cosmetics = await fortniteAPI.listCosmetics();
+		await interaction.deferReply();
 		const restrictedCosmetics = await fortniteAPI.filterCosmetics({ gameplayTag: 'Cosmetics.Gating.RatingMin.Teen' });
 
 		const getValue = (type: string) => {
