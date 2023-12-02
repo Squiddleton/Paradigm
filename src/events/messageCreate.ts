@@ -52,8 +52,9 @@ export default new ClientEvent({
 						}
 					}
 				}
-				else if (message.channelId === DiscordIds.ChannelId.ShopPosts && message.author.id === DiscordIds.UserId.Catalyst && message.mentions.roles.has(DiscordIds.RoleId.ItemShop) && message.createdAt.getHours() !== 0) {
-					await checkWishlists(client);
+				else if (message.channelId === DiscordIds.ChannelId.ShopPosts && message.mentions.roles.has(DiscordIds.RoleId.ItemShop) && message.createdAt.getHours() !== 0) {
+					const roleIds: string[] = [DiscordIds.UserId.Catalyst, DiscordIds.UserId.Lexxy];
+					if (roleIds.includes(message.author.id)) await checkWishlists(client);
 				}
 			}
 		}

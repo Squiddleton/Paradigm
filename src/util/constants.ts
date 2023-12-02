@@ -58,7 +58,8 @@ export namespace DiscordIds {
 		NitroBooster = '585533593565003819'
 	}
 	export enum UserId {
-		Catalyst = '848452706791981056'
+		Catalyst = '848452706791981056',
+		Lexxy = '1063569119506608249'
 	}
 }
 
