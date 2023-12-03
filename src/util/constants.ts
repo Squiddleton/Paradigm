@@ -148,7 +148,9 @@ export enum RankedTrack {
 	C4S4BR = 'gXffl',
 	C4S4ZB = 'yHNFu',
 	OGBR = 'OiK9k9',
-	OGZB = 'hEKWqj'
+	OGZB = 'hEKWqj',
+	C5S1BR = 'EYpme7',
+	C5S1ZB = 'd0zEcd'
 }
 
 export const RarityColors: Partial<Record<string, number>> = {

@@ -546,11 +546,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		return track;
 	};
 
-	let seasonName = 'Fortnite: OG';
-	let brTrackguid = RankedTrack.OGBR;
-	let zbTrackguid = RankedTrack.OGZB;
+	let seasonName = 'Chapter 5 Season 1';
+	let brTrackguid = RankedTrack.C5S1BR;
+	let zbTrackguid = RankedTrack.C5S1ZB;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
+		case 'og': {
+			seasonName = 'Fortnite: OG';
+			brTrackguid = RankedTrack.OGBR;
+			zbTrackguid = RankedTrack.OGZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
 		case 'c4s4': {
 			seasonName = 'Chapter 4 Season 4';
 			brTrackguid = RankedTrack.C4S4BR;
@@ -589,7 +596,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	ctx.font = `${fontSize}px fortnite`;
 	ctx.textAlign = 'center';
-	ctx.fillStyle = '#ffffff';
+	ctx.fillStyle = season === 'og' ? 'black' : 'white';
 
 	ctx.fillText(`${seasonName} Ranked: ${account.name}`, width / 2, fontSize, width);
 
@@ -670,7 +677,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite`;
-		ctx.fillStyle = 'yellow';
+		ctx.fillStyle = season === 'og' ? 'purple' : 'yellow';
 		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
 		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
 		ctx.fillText(text, xOffset + (width / 4), height * 0.9, width / 2);
