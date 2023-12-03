@@ -481,7 +481,8 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 				'2',
 				'3',
 				'4',
-				'Fortnite: OG'
+				'Fortnite: OG',
+				'5'
 			][chapterIndex];
 			const seasonName = chapterName === 'Fortnite: OG' ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
 			return `Chapter ${chapterName}, Season ${seasonName}: ${Math.floor((v ?? 0) / 100)}`;
