@@ -1,7 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { getRandomItem } from '@squiddleton/util';
 import imgurClient from '../../clients/imgur.js';
-import { BorisAlbumIds } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'boris',
@@ -9,10 +8,10 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		try {
-			const data: string[] = (await Promise.all(BorisAlbumIds.map(a => imgurClient.Album.get(a))))
-				.map(a => a.data.images)
+			const data: string[] = (await imgurClient.Album.get('h9QexoV'))
+				.data.images
 				.flat()
-				.map(i => i.link);
+				.map((i: any) => i.link);
 
 			await interaction.reply(getRandomItem(data));
 		}

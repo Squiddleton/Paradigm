@@ -14,8 +14,6 @@ export enum BackgroundURL {
 
 export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b => ({ name: b, value: b }));
 
-export const BorisAlbumIds = ['l5t1sa4', 'Mwq1cMR', 'SIDS0Rx', 'h9QexoV', '1duqrpv', 'iLt9Ija'];
-
 export const ChapterLengths = [10, 8, 4, 4, 1, 1];
 
 export namespace DiscordIds {
