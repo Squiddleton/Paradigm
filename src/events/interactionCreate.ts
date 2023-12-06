@@ -187,7 +187,7 @@ export default new ClientEvent({
 				const date = new Date().toLocaleString('en-us', { timeZone: 'America/New_York' });
 
 				if (error instanceof EpicAPIError && error.status === 401) {
-					await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+					await epicClient.auth.authenticate(config.epicDeviceAuth);
 					console.log(`The Epic client's access token was unauthorized, but it successfully reauthenticated at ${date}.`);
 					const errorMessage: InteractionReplyOptions = {
 						content: 'An internal error occurred, but it has been resolved. Try the command again!',

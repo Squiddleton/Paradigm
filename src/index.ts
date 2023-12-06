@@ -18,7 +18,7 @@ await fetchUsers();
 console.log('Populated caches.');
 
 const authenticate = async () => {
-	await epicClient.auth.authenticate(config.epicDeviceAuth.device1);
+	await epicClient.auth.authenticate(config.epicDeviceAuth);
 	setTimeout(authenticate, 7200000);
 };
 

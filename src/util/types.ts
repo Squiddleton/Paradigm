@@ -16,12 +16,8 @@ export type ButtonOrMenu = ComponentType.Button | ComponentType.StringSelect;
 export interface Config {
 	/** The Discord bot token */
 	token: string;
-	/** Device authentications for multiple devices/accounts */
-	epicDeviceAuth: {
-		device1: DeviceAuthGrant;
-		device2: DeviceAuthGrant;
-		alt?: DeviceAuthGrant;
-	};
+	/** The Epic Games device auth grant */
+	epicDeviceAuth: DeviceAuthGrant;
 	/** A key for Fortnite-API.com */
 	fortniteAPIKey: string;
 	/** The MongoDB path to connect to */
