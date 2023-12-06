@@ -46,6 +46,16 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
 	return embed;
 };
 
+export const createGuildEmbed = (guild: Guild, created: boolean) => new EmbedBuilder()
+	.setTitle(guild.name)
+	.setImage(guild.iconURL())
+	.setFields(
+		{ name: 'Owner ID', value: guild.ownerId },
+		{ name: 'Member Count', value: guild.memberCount.toString() }
+	)
+	.setColor(created ? Colors.Green : Colors.Red)
+	.setFooter({ text: guild.id });
+
 /**
  * Returns an array of buttons used for paginated lists.
  *
