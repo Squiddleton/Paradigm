@@ -346,7 +346,7 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
 
 	const { guildId } = interaction;
-	const member = interaction.isChatInputCommand() ? (interaction.options.getMember('member') ?? interaction.member) : interaction.targetMember;
+	const member = (interaction.isChatInputCommand() ? interaction.options.getMember('member') : interaction.targetMember) ?? interaction.member;
 	const { displayName } = member;
 	const user = await member.user.fetch();
 
