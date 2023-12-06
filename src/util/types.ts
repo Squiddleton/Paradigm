@@ -24,8 +24,6 @@ export interface Config {
 	};
 	/** A key for Fortnite-API.com */
 	fortniteAPIKey: string;
-	/** An Imgur client id */
-	imgurClientId: string;
 	/** The MongoDB path to connect to */
 	mongoPath: string;
 }
