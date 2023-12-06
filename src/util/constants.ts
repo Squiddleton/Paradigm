@@ -28,8 +28,7 @@ export namespace DiscordIds {
 		Wishlist = '1000092959875793080'
 	}
 	export enum GuildId {
-		Dev = '614918461453238357',
-		FortniteBR = '486932163636232193'
+		Dev = '614918461453238357'
 	}
 	export enum MessageId {
 		CommandList = '1064964139094650971'

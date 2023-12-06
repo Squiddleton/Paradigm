@@ -28,7 +28,6 @@ const client = new DiscordClient({
 			return event;
 		})
 	),
-	exclusiveGuildId: DiscordIds.GuildId.FortniteBR,
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,
