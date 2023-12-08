@@ -1,4 +1,4 @@
-import{ EpicAPIError, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
+import { EpicAPIError, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
 
