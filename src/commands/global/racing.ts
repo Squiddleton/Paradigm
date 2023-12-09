@@ -7,25 +7,13 @@ import { createRankedImage, handleStatsError, linkEpicAccount } from '../../util
 import { getUser } from '../../util/users.js';
 
 export default new SlashCommand({
-	name: 'ranked',
-	description: 'Display a Fortnite player\'s Ranked stats',
+	name: 'racing',
+	description: 'Display a Fortnite player\'s Rocket Racing Ranked stats',
 	options: [
 		{
 			name: 'player',
 			description: 'The player\'s username; defaults to your linked account, if any',
 			type: ApplicationCommandOptionType.String
-		},
-		{
-			name: 'season',
-			description: 'Which season to check ranked stats in; defaults to current',
-			type: ApplicationCommandOptionType.String,
-			choices: [
-				{ name: 'Chapter 5 Season 1', value: 'c5s1' },
-				{ name: 'Fortnite: OG', value: 'og' },
-				{ name: 'Chapter 4 Season 4', value: 'c4s4' },
-				{ name: 'Season Zero', value: 'zero' },
-				{ name: 'Season Zero (Pre-Reset)', value: 'zeroprereset' }
-			]
 		},
 		{
 			name: 'platform',
@@ -44,7 +32,6 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const accountName = interaction.options.getString('player');
-		const season = interaction.options.getString('season') ?? 'c5s1';
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		let stats: Stats<false>;
@@ -73,7 +60,7 @@ export default new SlashCommand({
 
 		}
 
-		const buffer = await createRankedImage(stats.account, true, 'br', season);
+		const buffer = await createRankedImage(stats.account, true, 'rr', 's0');
 		await interaction.editReply({ files: [buffer] });
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);

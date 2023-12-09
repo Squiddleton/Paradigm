@@ -27,7 +27,7 @@ export default new ContextMenu({
 			return;
 		}
 
-		const buffer = await createRankedImage(stats.account, true);
+		const buffer = await createRankedImage(stats.account, true, 'br');
 		await interaction.editReply({ files: [buffer] });
 	}
 });

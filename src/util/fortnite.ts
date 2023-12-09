@@ -536,9 +536,9 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true, season?: string): Promise<Buffer>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string): Promise<Buffer | null>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, season?: string) {
+export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string) {
 	const trackProgress = await getTrackProgress(account.id);
 
 	const getTrack = (trackguid: RankedTrack) => {
@@ -550,6 +550,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let seasonName = 'Chapter 5 Season 1';
 	let brTrackguid = RankedTrack.C5S1BR;
 	let zbTrackguid = RankedTrack.C5S1ZB;
+	const racingTrackguid = RankedTrack.S0Racing;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
 		case 'og': {
@@ -582,6 +583,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	}
 	const brTrack = getTrack(brTrackguid);
 	const zbTrack = getTrack(zbTrackguid);
+	const racingTrack = getTrack(racingTrackguid);
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
 
@@ -602,8 +604,13 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.fillText(`${seasonName} Ranked: ${account.name}`, width / 2, fontSize, width);
 
 	ctx.font = `${fontSize / 2}px fortnite`;
-	ctx.fillText('Battle Royale', width / 4, height - (fontSize / 4), width / 2);
-	ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
+	if (rankingType === 'br') {
+		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
+		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
+	}
+	else if (rankingType === 'rr') {
+		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
+	}
 
 	const drawRankedImage = async (xOffset: number, track: HabaneroTrackProgress) => {
 		const start = 1.5 * Math.PI;
@@ -683,8 +690,14 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
 		ctx.fillText(text, xOffset + (width / 4), height * 0.9, width / 2);
 	};
-	await drawRankedImage(0, brTrack);
-	await drawRankedImage(width / 2, zbTrack);
+
+	if (rankingType === 'br') {
+		await drawRankedImage(0, brTrack);
+		await drawRankedImage(width * 0.5, zbTrack);
+	}
+	else if (rankingType === 'rr') {
+		await drawRankedImage(width * 0.25, racingTrack);
+	}
 
 	const buffer = await canvas.encode('jpeg');
 	return buffer;
@@ -711,7 +724,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 			try {
 				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 				await interaction.editReply({ content: options.content, files: [image] });
-				const buffer = await createRankedImage(account, isContextMenu);
+				const buffer = await createRankedImage(account, isContextMenu, 'br');
 				if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
 			}
 			catch (error) {
@@ -723,7 +736,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 		try {
 			const { account, image } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
-			const buffer = await createRankedImage(account, isContextMenu);
+			const buffer = await createRankedImage(account, isContextMenu, 'br');
 			if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
