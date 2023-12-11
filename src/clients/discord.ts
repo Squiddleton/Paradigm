@@ -28,6 +28,7 @@ const client = new DiscordClient({
 			return event;
 		})
 	),
+	exclusiveGuildId: DiscordIds.GuildId.Exclusive,
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,

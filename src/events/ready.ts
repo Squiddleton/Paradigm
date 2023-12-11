@@ -1,4 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
+import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
 import { type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
@@ -6,8 +7,9 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
+import { getTrackProgress } from '../util/epic.js';
 import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
-import { createGiveawayEmbed } from '../util/functions.js';
+import { createGiveawayEmbed, trackedModes as trackedUsers } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 
 export default new ClientEvent({
@@ -42,6 +44,36 @@ export default new ClientEvent({
 		}, { timezone: 'America/New_York' });
 
 		// Intervals
+
+		const rankedChannel = client.channels.cache.get('1170469502136356874');
+		if (!rankedChannel?.isTextBased()) return;
+		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
+		schedule('*/5 * * * *', async () => {
+			for (const [epicAccountId, trackedUser] of trackedUsers) {
+				const cachedProgresses = allCachedProgresses.get(epicAccountId);
+				const newProgresses = await getTrackProgress(epicAccountId);
+
+				if (cachedProgresses !== undefined) {
+					for (const trackedMode of trackedUser.trackedModes) {
+						const cachedProgress = cachedProgresses.find(track => track.trackguid === trackedMode.trackguid);
+						const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
+						if (cachedProgress === undefined || newProgress === undefined) return;
+
+						if (newProgress.currentDivision > cachedProgress.currentDivision) {
+							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+						}
+						else if (newProgress.currentDivision < cachedProgress.currentDivision) {
+							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+						}
+						else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
+							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+						}
+					}
+				}
+
+				allCachedProgresses.set(epicAccountId, newProgresses);
+			}
+		});
 
 		let cachedStates = await fetchStates();
 		schedule('*/3 * * * *', async () => {

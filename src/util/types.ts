@@ -2,6 +2,7 @@ import type { DeviceAuthGrant } from '@squiddleton/epic';
 import type { DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { HydratedDocument } from 'mongoose';
+import { type RankedTrack } from './constants.js';
 
 export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
@@ -214,3 +215,13 @@ export interface StatsCommandOptions extends LevelCommandOptions {
 export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
+
+export interface TrackedMode {
+	trackguid: RankedTrack;
+	displayName: string;
+}
+
+export interface TrackedUser {
+	displayUsername: string;
+	trackedModes: TrackedMode[];
+}

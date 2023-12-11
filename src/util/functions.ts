@@ -2,7 +2,7 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
-import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
+import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, TrackedUser } from './types.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 
@@ -346,6 +346,8 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
  * @returns The total amount of messages sent
  */
 export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
+
+export const trackedModes = new Map<string, TrackedUser>();
 
 /**
  * Responds with an embed listing a members's milestones in a guild.
