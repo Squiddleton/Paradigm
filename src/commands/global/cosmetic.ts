@@ -62,7 +62,7 @@ export default new SlashCommand({
 					.setCustomId(v.channel)
 					.setMinValues(1)
 					.setPlaceholder((v.type ?? v.channel).toUpperCase())
-					.setOptions(v.options.slice(0, 25).map(o => ({ label: o.name.toUpperCase(), value: o.tag })))
+					.setOptions(v.options.slice(0, 25).map(o => ({ label: (o.name ?? 'OTHER').toUpperCase(), value: o.tag })))
 				)
 			)
 		];
