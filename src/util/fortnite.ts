@@ -506,7 +506,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	else {
 		try {
 			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
-			const [{ stats }] = await epicClient.fortnite.getBulkStats({ accountIds: [account.id] });
+			const stats = await getLevelStats(account.id);
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
