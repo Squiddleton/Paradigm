@@ -78,15 +78,17 @@ export default new SlashCommand({
 			await buttonInteraction.showModal(modal);
 		});
 
-		const filter = (c: Cosmetic) => (i: ModalSubmitInteraction) => {
+		const normalizedName = normalize(cosmetic.name);
+
+		const filter = (i: ModalSubmitInteraction) => {
 			if (i.customId !== interaction.id) return false;
-			if (normalize(i.fields.getTextInputValue('outfit')) === normalize(c.name)) return true;
+			if (normalize(i.fields.getTextInputValue('outfit')) === normalizedName) return true;
 			i.reply({ content: 'Your guess is incorrect.', ephemeral: true });
 			return false;
 		};
 
 		try {
-			const modalInteraction = await interaction.awaitModalSubmit({ filter: filter(cosmetic), time: Time.GuessCollector });
+			const modalInteraction = await interaction.awaitModalSubmit({ filter, time: Time.GuessCollector });
 
 			if (modalInteraction.isFromMessage()) {
 				embed
@@ -106,7 +108,8 @@ export default new SlashCommand({
 				await interaction.editReply({ attachments: [], components: [], embeds: [embed] });
 			}
 			catch (error) {
-				if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+				const errorCodes: (string | number)[] = [RESTJSONErrorCodes.UnknownMessage, RESTJSONErrorCodes.InvalidWebhookToken];
+				if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 			}
 		}
 		collector.stop();
