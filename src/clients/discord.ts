@@ -36,11 +36,18 @@ const client = new DiscordClient({
 		GatewayIntentBits.Guilds
 	],
 	makeCache: Options.cacheWithLimits({
-		GuildBanManager: 10,
-		GuildInviteManager: 10,
-		GuildScheduledEventManager: 10,
-		PresenceManager: 10,
-		ReactionUserManager: 10
+		AutoModerationRuleManager: 0,
+		BaseGuildEmojiManager: 0,
+		DMMessageManager: 0,
+		GuildEmojiManager: 0,
+		GuildBanManager: 0,
+		GuildInviteManager: 0,
+		GuildScheduledEventManager: 0,
+		GuildStickerManager: 0,
+		PresenceManager: 0,
+		ReactionManager: 0,
+		ReactionUserManager: 0,
+		VoiceStateManager: 0
 	}),
 	partials: [
 		Partials.Channel
@@ -54,15 +61,15 @@ const client = new DiscordClient({
 	sweepers: {
 		...Options.DefaultSweeperSettings,
 		guildMembers: {
-			interval: 3600,
+			interval: 900,
 			filter: sweeperFilter
 		},
 		messages: {
-			interval: 1800,
-			lifetime: 1200
+			interval: 900,
+			filter: () => () => true
 		},
 		users: {
-			interval: 3600,
+			interval: 900,
 			filter: sweeperFilter
 		}
 	}
