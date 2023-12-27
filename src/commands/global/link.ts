@@ -29,13 +29,14 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
+		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 		let account: EpicAccount;
 		try {
-			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType: (interaction.options.getString('platform') ?? 'epic') as AccountType });
+			const stats = await fortniteAPI.stats({ name: interaction.options.getString('username', true), accountType });
 			account = stats.account;
 		}
 		catch (error) {
-			await handleStatsError(interaction, error);
+			await handleStatsError(interaction, error, accountType);
 			return;
 		}
 

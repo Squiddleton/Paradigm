@@ -1,6 +1,6 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type CombinedShop, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type AccountType, type CombinedShop, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
@@ -431,14 +431,19 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
  * @param e - The thrown error
  * @returns A string explaining the error to the command user
  */
-const getStatsErrorMessage = (e: unknown) => {
+const getStatsErrorMessage = (e: unknown, accountType: AccountType) => {
 	if (e instanceof FortniteAPIError) {
 		switch (e.code) {
 			case 403: {
 				return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
 			}
 			case 404: {
-				return 'No account was found with that username on that platform.';
+				const accountTypeNames: Record<AccountType, string> = {
+					epic: 'Epic Games',
+					xbl: 'Xbox',
+					psn: 'PlayStation'
+				};
+				return `No ${accountTypeNames[accountType]} account with that username exists.`;
 			}
 			case 500: {
 				return 'Fortnite-API was unable to fetch the account info. Please try again in a few minutes.';
@@ -500,7 +505,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
-			return { content: getStatsErrorMessage(error), ephemeral: true };
+			return { content: getStatsErrorMessage(error, accountType), ephemeral: true };
 		}
 	}
 	else {
@@ -510,7 +515,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
-			return { content: getStatsErrorMessage(error), ephemeral: true };
+			return { content: getStatsErrorMessage(error, accountType), ephemeral: true };
 		}
 	}
 };
@@ -522,7 +527,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
  * @param interaction - The command interaction that initiated this function call
  * @param e - The thrown error
  */
-export const handleStatsError = (interaction: CommandInteraction, e: unknown) => interaction[interaction.deferred || interaction.replied ? 'followUp' : 'reply'](getStatsErrorMessage(e));
+export const handleStatsError = (interaction: CommandInteraction, e: unknown, accountType: AccountType = 'epic') => interaction[interaction.deferred || interaction.replied ? 'followUp' : 'reply'](getStatsErrorMessage(e, accountType));
 
 /**
  * Links a Discord user's account to an Epic Games account.
@@ -742,7 +747,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}
 		catch (error) {
-			await handleStatsError(interaction, error);
+			await handleStatsError(interaction, error, options.accountType);
 		}
 	}
 };

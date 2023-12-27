@@ -40,7 +40,7 @@ export default new SlashCommand({
 				stats = await fortniteAPI.stats({ name: accountName, accountType });
 			}
 			catch (error) {
-				await handleStatsError(interaction, error);
+				await handleStatsError(interaction, error, accountType);
 				return;
 			}
 		}
