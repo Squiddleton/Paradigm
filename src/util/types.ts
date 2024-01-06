@@ -8,10 +8,6 @@ export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 
 export type AnyObject = Record<string, unknown>;
 
-export interface BlockList {
-	blockedUsers: string[];
-}
-
 export type ButtonOrMenu = ComponentType.Button | ComponentType.StringSelect;
 
 export interface Config {
