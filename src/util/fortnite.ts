@@ -7,7 +7,7 @@ import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { AnyCosmetic, ButtonOrMenu, Car, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, Instrument, JamTrack, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -15,11 +15,24 @@ import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
 let cachedCosmetics: Cosmetic[] = [];
+let cachedAllCosmetics: AnyCosmetic[] = [];
 
 export const getCosmetics = () => cachedCosmetics;
+export const getAllCosmetics = () => cachedAllCosmetics;
 export const fetchCosmetics = async () => {
 	try {
-		cachedCosmetics = await fortniteAPI.listCosmetics();
+		const cosmetics = await fortniteAPI.listCosmetics();
+		const cars: Car[] = await fetch('https://fortnite-api.com/v2/cosmetics/cars').then(r => r.json()).then(j => j.data);
+		const jamTracks: JamTrack[] = await fetch('https://fortnite-api.com/v2/cosmetics/tracks').then(r => r.json()).then(j => j.data);
+		const instruments: Instrument[] = await fetch('https://fortnite-api.com/v2/cosmetics/instruments').then(r => r.json()).then(j => j.data);
+
+		cachedCosmetics = cosmetics;
+		cachedAllCosmetics = [
+			...cosmetics,
+			...cars,
+			...jamTracks,
+			...instruments
+		];
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
@@ -878,14 +891,14 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		return;
 	}
 
-	const cosmetics = getCosmetics();
+	const cosmetics = getAllCosmetics();
 	const inc = 25;
 	const cosmeticStrings = userResult.wishlistCosmeticIds
 		.map(id => {
 			const cosmetic = cosmetics.find(c => c.id === id);
 			if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
-			const type = cosmetic.type.displayValue;
-			return `${cosmetic.name}${type === 'Outfit' ? '' : ` (${type})`}`;
+			const type = 'type' in cosmetic ? cosmetic.type.displayValue : 'Jam Track';
+			return `${'name' in cosmetic ? cosmetic.name : cosmetic.title}${type === 'Outfit' ? '' : ` (${type})`}`;
 		})
 		.sort((a, b) => a.localeCompare(b));
 

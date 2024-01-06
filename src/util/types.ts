@@ -1,5 +1,5 @@
 import type { DeviceAuthGrant } from '@squiddleton/epic';
-import type { DateString } from '@squiddleton/fortnite-api';
+import type { Cosmetic, CosmeticValues, DateString } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { HydratedDocument } from 'mongoose';
 import { type RankedTrack } from './constants.js';
@@ -9,6 +9,30 @@ export type AnyGuildTextChannel = GuildBasedChannel & TextBasedChannel;
 export type AnyObject = Record<string, unknown>;
 
 export type ButtonOrMenu = ComponentType.Button | ComponentType.StringSelect;
+
+export interface Car {
+	id: string;
+	vehicleId: string;
+	type: CosmeticValues;
+	rarity: CosmeticValues;
+	name: string;
+	description: string;
+	images: {
+		small: string;
+		large: string;
+	};
+	series: {
+		value: string;
+		image: null;
+		colors: string[];
+		backendValue: string;
+	} | null;
+	gameplayTags: string[] | null;
+	path: string;
+	showcaseVideo: null;
+	added: string;
+	shopHistory: string[] | null;
+}
 
 export interface Config {
 	/** The Discord bot token */
@@ -185,6 +209,55 @@ export interface IUser {
 }
 
 export type UserDocument = HydratedDocument<IUser>;
+
+export interface Instrument {
+	id: string;
+	type: CosmeticValues;
+	rarity: CosmeticValues;
+	name: string;
+	description: string;
+	images: {
+		small: string;
+		large: string;
+	};
+	series: {
+		value: string;
+		image: string;
+		colors: string[];
+		backendValue: string;
+	} | null;
+	gameplayTags: string[];
+	path: string;
+	showcaseVideo: null;
+	added: string;
+	shopHistory: string[] | null;
+}
+
+export interface JamTrack {
+	id: string;
+	devName: string;
+	title: string;
+	artist: string;
+	album: null;
+	releaseYear: number;
+	bpm: number;
+	duration: number;
+	difficulty: {
+		vocals: number;
+		guitar: number;
+		bass: number;
+		plasticBass: number;
+		drums: number;
+		plasticDrums: number;
+	};
+	gameplayTags: string[] | null;
+	genres: string[] | null;
+	albumArt: string;
+	added: string;
+	shopHistory: string[] | null;
+}
+
+export type AnyCosmetic = Cosmetic | Car | JamTrack | Instrument;
 
 export interface LevelCommandOptions {
 	targetUser: User;
