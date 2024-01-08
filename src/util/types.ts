@@ -1,5 +1,5 @@
 import type { DeviceAuthGrant } from '@squiddleton/epic';
-import type { Cosmetic, CosmeticValues, DateString } from '@squiddleton/fortnite-api';
+import type { CombinedShop, Cosmetic, CosmeticValues, DateString, ShopEntry } from '@squiddleton/fortnite-api';
 import type { ApplicationCommandOptionChoiceData, ButtonBuilder, ChatInputCommandInteraction, ComponentType, GuildBasedChannel, MessageContextMenuCommandInteraction, Snowflake, TextBasedChannel, User } from 'discord.js';
 import type { HydratedDocument } from 'mongoose';
 import { type RankedTrack } from './constants.js';
@@ -67,6 +67,15 @@ export type Template<T> = T & {
 	lastModified: DateString;
 	_locale: string;
 	_templateName: string;
+};
+
+export type ItemShop = Omit<CombinedShop, 'featured' | 'daily' | 'votes' | 'voteWinners'> & {
+	entries: (Omit<ShopEntry, 'items'> & {
+		brItems: Cosmetic[] | null;
+		tracks: JamTrack[] | null;
+		instruments: Instrument[] | null;
+		cars: Car[] | null;
+	})[];
 };
 
 export interface SubgameInfo {

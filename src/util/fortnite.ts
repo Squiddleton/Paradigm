@@ -1,13 +1,13 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type CombinedShop, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type AccountType, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { AnyCosmetic, ButtonOrMenu, Car, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, Instrument, JamTrack, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { AnyCosmetic, ButtonOrMenu, Car, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, Instrument, ItemShop, JamTrack, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -44,20 +44,14 @@ export const fetchCosmetics = async () => {
  *
  * @returns An array of cosmetic objects
  */
-export const fetchItemShop = async () => {
-	let rawAPI: CombinedShop;
-	try {
-		rawAPI = await fortniteAPI.shop({ combined: true });
-	}
-	catch (error) {
-		if (error instanceof FortniteAPIError && error.code === 503) return [];
-		throw error;
-	}
+export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
+	const shop: ItemShop = await fetch('https://fortnite-api.com/v2/shop').then(r => r.json()).then(j => j.data);
 
-	const withoutDupes: Cosmetic[] = [];
-	const featured = rawAPI.featured?.entries ?? [];
-	const daily = rawAPI.daily?.entries ?? [];
-	const withDupes = featured.concat(daily).map(e => e.items).flat();
+	const withoutDupes: AnyCosmetic[] = [];
+	const withDupes = shop.entries.map((e): AnyCosmetic[] => {
+		const cosmetics: AnyCosmetic[] = e.brItems ?? [];
+		return cosmetics.concat(e.tracks ?? [], e.instruments ?? [], e.cars ?? []);
+	}).flat();
 
 	for (const item of withDupes) {
 		if (!withoutDupes.some(c => c.id === item.id)) withoutDupes.push(item);
@@ -135,8 +129,8 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 				const messages = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
-					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => c.name));
-					if (items.length > 0) messages.push(`${userMention(user._id)}: ${items.slice(0, 10).join(', ')}${items.length > 10 ? ', and more!' : ''}`);
+					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => 'name' in c ? c.name : c.title));
+					if (items.length > 0) messages.push(`${userMention(user._id)}: ${items.slice(0, 10).join(', ')}${items.length > 10 ? `, and ${items.length - 10} more!` : ''}`);
 				}
 
 				if (messages.length !== 1 && guildResult.wishlistChannelId !== null) {
