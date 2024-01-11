@@ -182,7 +182,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @param cosmetic - A cosmetic object
  * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
  */
-export const getCosmeticColor = (cosmetic: Cosmetic): ColorResolvable | null => {
+export const getCosmeticColor = (cosmetic: Cosmetic | Car | Instrument): ColorResolvable | null => {
 	const seriesColor = cosmetic.series?.colors[0].slice(0, 6);
 	return seriesColor === undefined ? RarityColors[cosmetic.rarity.displayValue] ?? null : `#${seriesColor}`;
 };
@@ -193,18 +193,18 @@ export const getCosmeticColor = (cosmetic: Cosmetic): ColorResolvable | null => 
  * @param cosmetic - A cosmetic object
  * @returns An embed filled with information about the specified cosmetic
  */
-export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
+export const createCosmeticEmbed = (cosmetic: AnyCosmetic) => {
 	const embed = new EmbedBuilder()
-		.setTitle(cosmetic.name)
-		.setDescription(cosmetic.description)
-		.setColor(getCosmeticColor(cosmetic))
-		.setThumbnail(cosmetic.images.smallIcon)
-		.setImage(cosmetic.images.featured ?? cosmetic.images.icon)
+		.setTitle('name' in cosmetic ? cosmetic.name : cosmetic.title)
+		.setDescription('description' in cosmetic ? cosmetic.description : cosmetic.artist)
+		.setColor('series' in cosmetic ? getCosmeticColor(cosmetic) : null)
+		.setThumbnail('images' in cosmetic ? ('smallIcon' in cosmetic.images ? cosmetic.images.smallIcon : cosmetic.images.small) : cosmetic.albumArt)
+		.setImage('images' in cosmetic ? ('featured' in cosmetic.images ? cosmetic.images.featured ?? cosmetic.images.icon : cosmetic.images.large) : cosmetic.albumArt)
 		.setFields([
-			{ name: 'Type', value: cosmetic.type.displayValue, inline: true },
-			{ name: 'Rarity', value: cosmetic.rarity.displayValue, inline: true },
-			{ name: 'Set', value: cosmetic.set?.value ?? 'None', inline: true },
-			{ name: 'Introduction', value: cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`, inline: true }
+			{ name: 'Type', value: 'type' in cosmetic ? cosmetic.type.displayValue : 'Jam Track', inline: true },
+			{ name: 'Rarity', value: 'rarity' in cosmetic ? cosmetic.rarity.displayValue : 'None', inline: true },
+			{ name: 'Set', value: 'set' in cosmetic ? (cosmetic.set?.value ?? 'None') : 'None', inline: true },
+			{ name: 'Introduction', value: 'introduction' in cosmetic ? (cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`) : 'N/A', inline: true }
 		]);
 	// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if (cosmetic.shopHistory !== null) {
@@ -212,7 +212,7 @@ export const createCosmeticEmbed = (cosmetic: Cosmetic) => {
 		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))}\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
 	if (cosmetic.gameplayTags?.includes('Cosmetics.Gating.RatingMin.Teen')) embed.setFooter({ text: 'You cannot use this item in experiences rated Everyone 10+ or lower.' });
-	if (cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
+	if ('customExclusiveCallout' in cosmetic && cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
 

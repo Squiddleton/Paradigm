@@ -1,9 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Language } from '@squiddleton/fortnite-api';
+import { normalize } from '@squiddleton/util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, type MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
-import { createCosmeticEmbed, findCosmetic } from '../../util/fortnite.js';
+import { createCosmeticEmbed, getAllCosmetics } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import type { ButtonOrMenu } from '../../util/types.js';
 
@@ -29,16 +30,21 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const cosmetic = await findCosmetic(interaction.options.getString('cosmetic', true));
+		const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 		const language = interaction.options.getString('language') as Language | null;
 
-		if (cosmetic === null) {
+		if (cosmetic === undefined) {
 			await interaction.editReply('No cosmetic matches your query.');
 			return;
 		}
 
-		const { variants } = cosmetic;
 		const embed = createCosmeticEmbed(language === null ? cosmetic : await fortniteAPI.findCosmetic({ id: cosmetic.id, language }));
+		if (!('variants' in cosmetic)) {
+			await interaction.editReply({ embeds: [embed] });
+			return;
+		}
+
+		const { variants } = cosmetic;
 
 		if (!variants?.length) {
 			await interaction.editReply({ embeds: [embed] });
