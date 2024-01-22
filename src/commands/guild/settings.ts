@@ -28,20 +28,14 @@ export default new SlashCommand({
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
-				const shopSectionsMenu = new ChannelSelectMenuBuilder()
-					.setChannelTypes(TextBasedChannelTypes)
-					.setCustomId('shopSectionsChannelId')
-					.setPlaceholder('Leaked Shop Sections')
-					.setMinValues(0);
 				const wishlistMenu = new ChannelSelectMenuBuilder()
 					.setChannelTypes(TextBasedChannelTypes)
 					.setCustomId('wishlistChannelId')
 					.setPlaceholder('Wishlist Notifications')
 					.setMinValues(0);
 
-				const shopSectionsRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(shopSectionsMenu);
 				const wishlistRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(wishlistMenu);
-				const message = await interaction.reply({ components: [shopSectionsRow, wishlistRow], content: 'Select the channels for the following automatic messages.', fetchReply: true });
+				const message = await interaction.reply({ components: [wishlistRow], content: 'Select the channels for the following automatic messages.', fetchReply: true });
 
 				const collector = message.createMessageComponentCollector({ componentType: ComponentType.ChannelSelect, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 				collector
@@ -61,10 +55,6 @@ export default new SlashCommand({
 							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
 							return;
 						}
-						else if (customId === 'shopSectionsChannelId' && !permissions.has([...AccessibleChannelPermissions, PermissionFlagsBits.EmbedLinks])) {
-							await channelInteraction.reply({ content: `I need the View Channel, Send Messages, and Embed Links permissions in ${channel} to set it.`, ephemeral: true });
-							return;
-						}
 
 						await guildModel.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
 						await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
@@ -80,7 +70,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'view': {
-				const { giveaways, milestones, shopSectionsChannelId, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const { giveaways, milestones, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
@@ -89,7 +79,6 @@ export default new SlashCommand({
 							.setFields(
 								{ name: 'Total Giveaways', value: giveaways.length.toString(), inline: true },
 								{ name: 'Total Milestones', value: milestones.length.toString(), inline: true },
-								{ name: 'Leaked Shop Sections', value: shopSectionsChannelId === null ? 'No Channel Set' : channelMention(shopSectionsChannelId), inline: true },
 								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : channelMention(wishlistChannelId), inline: true }
 							)
 					],

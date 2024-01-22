@@ -8,7 +8,7 @@ import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { getTrackProgress } from '../util/epic.js';
-import { checkWishlists, fetchCosmetics, fetchShopNames, fetchStates, postShopSections } from '../util/fortnite.js';
+import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
 import { createGiveawayEmbed, trackedModes as trackedUsers } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 
@@ -27,10 +27,7 @@ export default new ClientEvent({
 			await checkWishlists(client);
 		}, { timezone: 'Etc/UTC' });
 
-		let postedShopSections = false;
 		schedule('0 0 * * *', async () => {
-			postedShopSections = false;
-
 			const returned = await userModel.deleteMany({ epicAccountId: null, wishlistCosmeticIds: { $size: 0 } });
 			if (returned.deletedCount > 0) {
 				removeOldUsers();
@@ -73,18 +70,6 @@ export default new ClientEvent({
 
 				allCachedProgresses.set(epicAccountId, newProgresses);
 			}
-		});
-
-		let cachedStates = await fetchStates();
-		schedule('*/3 * * * *', async () => {
-			const currentStates = await fetchStates();
-
-			if (currentStates.length === 2 && cachedStates.length === 1 && !postedShopSections) {
-				const cachedNames = await fetchShopNames(cachedStates[0]);
-				const currentNames = await fetchShopNames(currentStates[1]);
-				postedShopSections = await postShopSections(client, currentNames, cachedNames);
-			}
-			cachedStates = currentStates;
 		});
 
 		schedule('*/1 * * * *', async () => {
