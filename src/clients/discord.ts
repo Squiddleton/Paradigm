@@ -1,12 +1,12 @@
-import { readdirSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { ClientEvent, ContextMenu, type ContextMenuType, SlashCommand } from '@squiddleton/discordjs-util';
 import { ActivityType, GatewayIntentBits, type GuildMember, Options, Partials, type User } from 'discord.js';
 import { DiscordClient } from '../util/classes.js';
 import { DiscordIds, ErrorMessage } from '../util/constants.js';
 
 const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
-for (const folder of readdirSync('./dist/commands')) {
-	const commandFiles = readdirSync(`./dist/commands/${folder}`).filter(file => file.endsWith('.js'));
+for (const folder of await readdir('./dist/commands')) {
+	const commandFiles = (await readdir(`./dist/commands/${folder}`)).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
 		const { default: command } = await import(`../commands/${folder}/${file}`);
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
@@ -22,7 +22,7 @@ const client = new DiscordClient({
 	commands,
 	devGuildId: DiscordIds.GuildId.Dev,
 	events: await Promise.all(
-		readdirSync('./dist/events').filter(file => file.endsWith('.js')).map(async file => {
+		(await readdir('./dist/events')).filter(file => file.endsWith('.js')).map(async file => {
 			const { default: event } = await import(`../events/${file}`);
 			if (!(event instanceof ClientEvent)) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 			return event;
