@@ -34,9 +34,7 @@ export default new ClientEvent({
 				await fetchUsers();
 			}
 
-			await memberModel.updateMany({}, { $inc: { 'dailyMessages.$[].day': -1 } });
-			await memberModel.updateMany({}, { $pull: { dailyMessages: { day: { $lte: 0 } } } });
-			await memberModel.deleteMany({ milestones: { $size: 0 }, dailyMessages: { $size: 0 } });
+			await memberModel.deleteMany({ milestones: { $size: 0 } });
 			await fetchCosmetics();
 		}, { timezone: 'America/New_York' });
 

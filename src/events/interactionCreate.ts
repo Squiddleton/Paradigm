@@ -12,7 +12,6 @@ import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
 import { getAllCosmetics, getCosmetics } from '../util/fortnite.js';
-import { sumMessages } from '../util/functions.js';
 import { getUser } from '../util/users.js';
 
 export default new ClientEvent({
@@ -250,16 +249,6 @@ export default new ClientEvent({
 
 			if (giveawayResult.entrants.includes(userId)) {
 				await interaction.editReply('You have already entered this giveaway.');
-				return;
-			}
-
-			const { dailyMessages } = await memberModel.findOneAndUpdate(
-				{ userId, guildId },
-				{},
-				{ new: true, upsert: true }
-			);
-			if (sumMessages(dailyMessages) < giveawayResult.messages) {
-				await interaction.editReply('You do not currently have enough messages to enter. Continue actively participating, then try again later.');
 				return;
 			}
 

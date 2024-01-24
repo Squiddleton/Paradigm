@@ -178,7 +178,6 @@ export interface IGiveaway {
 	startTime: number;
 	endTime: number;
 	completed: boolean;
-	messages: number;
 	bonusRoles: IBonusRole[];
 	winnerNumber: number;
 	entrants: Snowflake[];
@@ -196,13 +195,7 @@ export interface IGuild {
 export interface IMember {
 	userId: Snowflake;
 	guildId: Snowflake;
-	dailyMessages: IMessage[];
 	milestones: string[];
-}
-
-export interface IMessage {
-	day: number;
-	messages: number;
 }
 
 export interface IMilestone {

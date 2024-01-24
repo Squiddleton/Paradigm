@@ -1,16 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { IMember, IMessage } from '../util/types.js';
-
-const messageSchema = new Schema<IMessage>({
-	day: {
-		type: Number,
-		required: true
-	},
-	messages: {
-		type: Number,
-		required: true
-	}
-});
+import type { IMember } from '../util/types.js';
 
 const memberSchema = new Schema<IMember>({
 	userId: {
@@ -20,11 +9,6 @@ const memberSchema = new Schema<IMember>({
 	guildId: {
 		type: String,
 		required: true
-	},
-	dailyMessages: {
-		type: [messageSchema],
-		required: true,
-		default: [{ day: 30, messages: 0 }]
 	},
 	milestones: {
 		type: [String],

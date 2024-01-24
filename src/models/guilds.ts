@@ -37,10 +37,6 @@ const giveawaySchema = new Schema<IGiveaway>({
 		type: Boolean,
 		required: true
 	},
-	messages: {
-		type: Number,
-		required: true
-	},
 	bonusRoles: {
 		type: [bonusRoleSchema],
 		default: []

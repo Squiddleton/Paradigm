@@ -44,12 +44,6 @@ export default new SlashCommand({
 					minValue: 0
 				},
 				{
-					name: 'messages',
-					description: 'The giveaway\'s updated minimum messages to enter',
-					type: ApplicationCommandOptionType.Integer,
-					minValue: 0
-				},
-				{
 					name: 'bonusrole1',
 					description: 'Role that receives extra entries',
 					type: ApplicationCommandOptionType.Role
@@ -145,12 +139,6 @@ export default new SlashCommand({
 					minValue: 0
 				},
 				{
-					name: 'messages',
-					description: 'Amount of monthly messages necessary for entering; defaults to 0',
-					type: ApplicationCommandOptionType.Integer,
-					minValue: 0
-				},
-				{
 					name: 'bonusrole1',
 					description: 'Role that receives extra entries',
 					type: ApplicationCommandOptionType.Role
@@ -190,7 +178,6 @@ export default new SlashCommand({
 				const giveawayTime = interaction.options.getInteger('time');
 				const units = interaction.options.getString('unit');
 				const winners = interaction.options.getInteger('winners');
-				const messages = interaction.options.getInteger('messages');
 				const role1 = interaction.options.getRole('bonusrole1');
 				const role2 = interaction.options.getRole('bonusrole2');
 				const role1Amount = interaction.options.getInteger('bonusrole1amount');
@@ -231,7 +218,6 @@ export default new SlashCommand({
 							await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
 							return;
 						}
-						if (messages !== null) giveaway.messages = messages;
 						if (role1 !== null || role2 !== null) {
 							giveaway.bonusRoles = [];
 							if (role1 !== null && role1Amount !== null) giveaway.bonusRoles.push({ id: role1.id, amount: role1Amount });
@@ -275,7 +261,6 @@ export default new SlashCommand({
 			case 'start': {
 				const text = interaction.options.getString('text', true);
 				const winners = interaction.options.getInteger('winners', true);
-				const messages = interaction.options.getInteger('messages') ?? 0;
 				const channel = interaction.options.getChannel('channel', true, TextBasedChannelTypes);
 				const giveawayTime = interaction.options.getInteger('time', true);
 				const units = interaction.options.getString('unit', true);
@@ -309,7 +294,6 @@ export default new SlashCommand({
 					startTime,
 					endTime,
 					completed: false,
-					messages,
 					bonusRoles,
 					winnerNumber: winners,
 					entrants: [],

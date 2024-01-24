@@ -32,7 +32,6 @@ const client = new DiscordClient({
 	failIfNotExists: false,
 	intents: [
 		GatewayIntentBits.GuildMembers,
-		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.Guilds
 	],
 	makeCache: Options.cacheWithLimits({

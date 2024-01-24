@@ -2,7 +2,7 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
-import type { IGiveaway, IMessage, PaginationButtons, SlashOrMessageContextMenu, TrackedUser } from './types.js';
+import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu, TrackedUser } from './types.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 
@@ -327,7 +327,6 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 			{ name: 'Channel', value: channelMention(giveaway.channelId), inline: true },
 			{ name: 'Winners', value: giveaway.completed ? giveaway.winners.map((id, i) => `${i >= giveaway.winnerNumber ? '*' : ''}${i + 1}. ${userMention(id)}${i >= giveaway.winnerNumber ? '*' : ''}`).join('\n') || 'None' : giveaway.winnerNumber.toString(), inline: true },
 			{ name: 'Time', value: `${time(giveaway.startTime)} - ${time(giveaway.endTime)}> `, inline: true },
-			{ name: 'Message Requirement', value: giveaway.messages === 0 ? 'None' : giveaway.messages.toString(), inline: true },
 			{ name: 'Role Bonuses', value: giveaway.bonusRoles.length === 0 ? 'None' : giveaway.bonusRoles.map(r => `${interaction.guild.roles.cache.get(r.id)?.name ?? 'Deleted Role'}: ${r.amount} Entries`).join('\n'), inline: true }
 		]);
 
@@ -338,14 +337,6 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };
-
-/**
- * Returns the total amount of messages sent over multiple days.
- *
- * @param messages - The message objects containing the amount of messages sent each day
- * @returns The total amount of messages sent
- */
-export const sumMessages = (messages: IMessage[]) => messages.reduce((previous, current) => previous + current.messages, 0);
 
 export const trackedModes = new Map<string, TrackedUser>();
 
