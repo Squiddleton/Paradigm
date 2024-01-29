@@ -1,5 +1,5 @@
 import * as timers from 'timers/promises';
-import * as Sentry from '@sentry/node';
+import { init } from '@sentry/node';
 import { EpicAPIError } from '@squiddleton/epic';
 import { set } from 'mongoose';
 import client from './clients/discord.js';
@@ -9,7 +9,7 @@ import { fetchCosmetics } from './util/fortnite.js';
 import { handleDisconnect } from './util/functions.js';
 import { fetchUsers } from './util/users.js';
 
-Sentry.init({
+init({
 	dsn: config.sentryDSN,
 	tracesSampleRate: 1.0
 });
