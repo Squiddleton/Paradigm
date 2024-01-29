@@ -64,7 +64,8 @@ export default new SlashCommand({
 							await interaction.deleteReply();
 						}
 						catch (error) {
-							if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+							const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
+							if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 						}
 					});
 				break;

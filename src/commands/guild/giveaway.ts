@@ -239,10 +239,11 @@ export default new SlashCommand({
 						return;
 					}
 					catch (error) {
-						if (error instanceof DiscordAPIError && error.code === RESTJSONErrorCodes.UnknownMessage) {
-							await interaction.reply({ content: 'That giveaway message has been deleted.', ephemeral: true });
-							return;
-						}
+						const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
+						if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
+
+						await interaction.reply({ content: 'That giveaway message has been deleted.', ephemeral: true });
+						return;
 					}
 				}
 				catch (error) {

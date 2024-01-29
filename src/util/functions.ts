@@ -236,7 +236,8 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 					await interaction.editReply({ components: [] });
 				}
 				catch (error) {
-					if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+					const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
+					if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 				}
 			}
 		});

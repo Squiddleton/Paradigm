@@ -108,7 +108,7 @@ export default new SlashCommand({
 				await interaction.editReply({ attachments: [], components: [], embeds: [embed] });
 			}
 			catch (error) {
-				const errorCodes: (string | number)[] = [RESTJSONErrorCodes.UnknownMessage, RESTJSONErrorCodes.InvalidWebhookToken];
+				const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
 				if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 			}
 		}
