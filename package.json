@@ -19,6 +19,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@napi-rs/canvas": "^0.1.30",
+		"@sentry/node": "^7.98.0",
 		"@squiddleton/discordjs-util": "^1.2.0",
 		"@squiddleton/epic": "^0.5.0",
 		"@squiddleton/fortnite-api": "^1.1.1",

@@ -1,4 +1,5 @@
 import * as timers from 'timers/promises';
+import * as Sentry from '@sentry/node';
 import { EpicAPIError } from '@squiddleton/epic';
 import { set } from 'mongoose';
 import client from './clients/discord.js';
@@ -7,6 +8,12 @@ import config from './config.js';
 import { fetchCosmetics } from './util/fortnite.js';
 import { handleDisconnect } from './util/functions.js';
 import { fetchUsers } from './util/users.js';
+
+Sentry.init({
+	dsn: config.sentryDSN,
+	tracesSampleRate: 1.0,
+	profilesSampleRate: 1.0
+});
 
 await set('strictQuery', 'throw')
 	.connect(config.mongoPath)

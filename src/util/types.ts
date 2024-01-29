@@ -43,6 +43,7 @@ export interface Config {
 	fortniteAPIKey: string;
 	/** The MongoDB path to connect to */
 	mongoPath: string;
+	sentryDSN: string;
 }
 
 export interface DisplayUserProperties {
