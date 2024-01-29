@@ -11,8 +11,7 @@ import { fetchUsers } from './util/users.js';
 
 Sentry.init({
 	dsn: config.sentryDSN,
-	tracesSampleRate: 1.0,
-	profilesSampleRate: 1.0
+	tracesSampleRate: 1.0
 });
 
 await set('strictQuery', 'throw')
