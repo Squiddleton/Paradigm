@@ -75,7 +75,12 @@ export default new SlashCommand({
 
 		const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: Time.GuessCollector });
 		collector.on('collect', async buttonInteraction => {
-			await buttonInteraction.showModal(modal);
+			try {
+				await buttonInteraction.showModal(modal);
+			}
+			catch (error) {
+				if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownInteraction) throw error;
+			}
 		});
 
 		const normalizedName = normalize(cosmetic.name);
