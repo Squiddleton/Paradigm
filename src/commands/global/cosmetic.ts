@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { Language } from '@squiddleton/fortnite-api';
 import { normalize } from '@squiddleton/util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, type MessageActionRowComponentBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, type MessageActionRowComponentBuilder, RESTJSONErrorCodes, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
 import { createCosmeticEmbed, getAllCosmetics } from '../../util/fortnite.js';
@@ -118,7 +118,15 @@ export default new SlashCommand({
 				await i.update({ components, embeds: [embed.setImage(optionChosen.image)] });
 			})
 			.once('end', async (collected, reason) => {
-				if (reason === 'time') await interaction.editReply({ components: [] });
+				if (reason === 'time') {
+					try {
+						await interaction.editReply({ components: [] });
+					}
+					catch (error) {
+						const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
+						if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
+					}
+				}
 			});
 	}
 });
