@@ -22,12 +22,13 @@ export default new ClientEvent({
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
-		const measureInterval = (name: string, callback: (...params: any[]) => void) => () => {
+		const measureInterval = (name: string, callback: (...params: any[]) => Promise<void>) => () => {
 			const debug = process.argv[2] === 'debug';
 			const start = new Date();
 			if (debug) console.log(`${name} starting at ${start}...`);
-			callback();
-			if (debug) console.log(`${name} completed in ${Date.now() - start.getTime()}ms.`);
+			callback().then(() => {
+				if (debug) console.log(`${name} completed in ${Date.now() - start.getTime()}ms.`);
+			});
 		};
 
 		// Specific times
