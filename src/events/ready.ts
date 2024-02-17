@@ -22,12 +22,20 @@ export default new ClientEvent({
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
-		// Specific times
-		schedule('30 0 0 * * *', async () => {
-			await checkWishlists(client);
-		}, { timezone: 'Etc/UTC' });
+		const measureInterval = (name: string, callback: (...params: any[]) => void) => () => {
+			const debug = process.argv[2] === 'debug';
+			const start = new Date();
+			if (debug) console.log(`${name} starting at ${start}...`);
+			callback();
+			if (debug) console.log(`${name} completed in ${Date.now() - start.getTime()}ms.`);
+		};
 
-		schedule('0 0 * * *', async () => {
+		// Specific times
+		schedule('30 0 0 * * *', measureInterval('Wishlist check', async () => {
+			await checkWishlists(client);
+		}), { timezone: 'Etc/UTC' });
+
+		schedule('0 0 * * *', measureInterval('Daily chores', async () => {
 			const returned = await userModel.deleteMany({ epicAccountId: null, wishlistCosmeticIds: { $size: 0 } });
 			if (returned.deletedCount > 0) {
 				removeOldUsers();
@@ -36,14 +44,14 @@ export default new ClientEvent({
 
 			await memberModel.deleteMany({ milestones: { $size: 0 } });
 			await fetchCosmetics();
-		}, { timezone: 'America/New_York' });
+		}), { timezone: 'America/New_York' });
 
 		// Intervals
 
 		const rankedChannel = client.channels.cache.get('1170469502136356874');
 		if (!rankedChannel?.isTextBased()) return;
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
-		schedule('*/5 * * * *', async () => {
+		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
 			for (const [epicAccountId, trackedUser] of trackedUsers) {
 				const cachedProgresses = allCachedProgresses.get(epicAccountId);
 				const newProgresses = await getTrackProgress(epicAccountId);
@@ -68,9 +76,9 @@ export default new ClientEvent({
 
 				allCachedProgresses.set(epicAccountId, newProgresses);
 			}
-		});
+		}));
 
-		schedule('*/1 * * * *', async () => {
+		schedule('*/1 * * * *', measureInterval('Giveaway check', async () => {
 			const now = Date.now() / 1000;
 			const guildResults = await guildModel.find({ giveaways: { $elemMatch: { completed: false, endTime: { $lte: now } } } });
 
@@ -131,6 +139,6 @@ export default new ClientEvent({
 					}
 				}
 			}
-		});
+		}));
 	}
 });
