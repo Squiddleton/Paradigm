@@ -27,7 +27,10 @@ export default new ClientEvent({
 			const start = new Date();
 			if (debug) console.log(`${name} starting at ${start}...`);
 			callback().then(() => {
-				if (debug) console.log(`${name} completed in ${Date.now() - start.getTime()}ms.`);
+				if (debug) {
+					const difference = Date.now() - start.getTime();
+					console[difference > 5000 ? 'error' : 'log'](`${name} completed in ${difference}ms.`);
+				}
 			});
 		};
 
