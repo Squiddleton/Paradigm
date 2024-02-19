@@ -7,9 +7,9 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
-import { getTrackProgress } from '../util/epic.js';
+import { getTrackProgress, trackedModes } from '../util/epic.js';
 import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
-import { createGiveawayEmbed, trackedModes as trackedUsers } from '../util/functions.js';
+import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 
 export default new ClientEvent({
@@ -56,7 +56,7 @@ export default new ClientEvent({
 		if (!rankedChannel?.isTextBased()) return;
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
 		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
-			for (const [epicAccountId, trackedUser] of trackedUsers) {
+			for (const [epicAccountId, trackedUser] of trackedModes) {
 				const cachedProgresses = allCachedProgresses.get(epicAccountId);
 				const newProgresses = await getTrackProgress(epicAccountId);
 

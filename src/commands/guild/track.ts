@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ApplicationCommandOptionType, chatInputApplicationCommandMention } from 'discord.js';
 import { DiscordIds, RankedTrack } from '../../util/constants.js';
-import { trackedModes } from '../../util/functions.js';
+import { trackedModes } from '../../util/epic.js';
 import { getUser } from '../../util/users.js';
 
 export default new SlashCommand({

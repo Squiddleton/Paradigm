@@ -1,6 +1,9 @@
 import { EpicAPIError, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
+import type { TrackedUser } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
+
+export const trackedModes = new Map<string, TrackedUser>();
 
 const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
 

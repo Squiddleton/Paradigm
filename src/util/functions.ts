@@ -2,7 +2,7 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
-import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu, TrackedUser } from './types.js';
+import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 
@@ -338,8 +338,6 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };
-
-export const trackedModes = new Map<string, TrackedUser>();
 
 /**
  * Responds with an embed listing a members's milestones in a guild.
