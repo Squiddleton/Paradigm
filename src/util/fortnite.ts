@@ -837,7 +837,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 	/**
 	 * Returns properties of a user or member used in a wishlist embed.
 	 *
-	 * @returns An object containing properties such as a color and avatar URL
+	 * @returns An object containing properties like a color and avatar URL
 	 */
 	const getUserProperties = async (): Promise<DisplayUserProperties> => {
 		const unfetchedUser = interaction.options.getUser('user') ?? interaction.user;
@@ -853,7 +853,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 			same: isSameUser
 		};
 
-		// Return as a User if the interaction was received in DMs
+		// Return global user data if the interaction was received in DMs
 		if (!interaction.inCachedGuild()) return userData;
 
 		if (isSameUser) {

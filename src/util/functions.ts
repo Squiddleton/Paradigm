@@ -7,7 +7,7 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 
 /**
- * Checks if a role with bonus giveaways entries has a matching amount of bonus entries provided, and if the entry amount has a matching role as well.
+ * Checks if a role with bonus giveaways entries has a matching amount of bonus entries provided, and if the entry amount has a matching role.
  *
  * @param role - The role that will receive bonus entries
  * @param roleAmount - The amount of bonus entries that the role will receive
@@ -131,7 +131,7 @@ export const handleDisconnect = (e: unknown) => {
  * Returns whether a string is a key of an object, or whether the string is a member of an enum.
  *
  * @param str - A potential key to an object
- * @param obj - An object that may containing the string as a key
+ * @param obj - An object that may have the key
  * @returns Whether the string is a key of the object
  */
 export const isKey = <T extends Record<string, unknown>>(str: string, obj: T): str is string & keyof T => str in obj;
@@ -140,7 +140,7 @@ export const isKey = <T extends Record<string, unknown>>(str: string, obj: T): s
  * Filters a message component collector to only allow the initial interaction's user to interact with the components.
  *
  * @param interaction - The initial interaction
- * @returns A function that checks whether the user who interacted with the components is the same as the initial interaction's user
+ * @returns A function that checks whether the user who interacted with the components is the initial interaction's user
  */
 export const messageComponentCollectorFilter = (interaction: BaseInteraction) => (i: MessageComponentInteraction) => {
 	if (i.user.id === interaction.user.id) return true;
