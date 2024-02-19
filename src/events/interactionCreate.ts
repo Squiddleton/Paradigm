@@ -19,8 +19,6 @@ export default new ClientEvent({
 	async execute(interaction) {
 		const userId = interaction.user.id;
 		const inCachedGuild = interaction.inCachedGuild();
-		const { client } = interaction;
-		DiscordClient.assertReadyClient(client);
 
 		if (interaction.isAutocomplete()) {
 			const { name, value } = interaction.options.getFocused(true);
@@ -164,6 +162,9 @@ export default new ClientEvent({
 		}
 
 		else if (interaction.isCommand()) {
+			const { client } = interaction;
+			DiscordClient.assertReadyClient(client);
+
 			const command = client.commands.get(interaction.commandName);
 			if (command === undefined) {
 				await interaction.reply({ content: 'I could not find a command matching that name!', ephemeral: true });

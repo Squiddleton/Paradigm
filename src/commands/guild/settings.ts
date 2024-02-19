@@ -24,7 +24,6 @@ export default new SlashCommand({
 	scope: 'Guild',
 	async execute(interaction, client) {
 		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
-		DiscordClient.assertReadyClient(client);
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
@@ -50,6 +49,8 @@ export default new SlashCommand({
 						else if (channel.isDMBased()) {
 							throw new Error(`The channel ${channel.id} is from a DM.`);
 						}
+
+						DiscordClient.assertReadyClient(client);
 						const permissions = client.getPermissions(channel);
 						if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
 							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
