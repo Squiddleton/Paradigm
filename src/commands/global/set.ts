@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { type Cosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type BRCosmetic, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, EmbedBuilder, bold } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 
@@ -18,7 +18,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 		const set = interaction.options.getString('set', true);
-		let cosmetics: Cosmetic[] = [];
+		let cosmetics: BRCosmetic[] = [];
 		try {
 			cosmetics = await fortniteAPI.filterCosmetics({ set });
 		}
@@ -38,7 +38,7 @@ export default new SlashCommand({
 			throw error;
 		}
 
-		const cosmeticToAddedTime = (cosmetic: Cosmetic) => new Date(cosmetic.added).getTime();
+		const cosmeticToAddedTime = (cosmetic: BRCosmetic) => new Date(cosmetic.added).getTime();
 
 		await interaction.editReply({
 			embeds: [

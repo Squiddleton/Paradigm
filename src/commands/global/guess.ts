@@ -1,6 +1,6 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { Cosmetic } from '@squiddleton/fortnite-api';
+import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { Time } from '../../util/constants.js';
@@ -15,14 +15,14 @@ export default new SlashCommand({
 
 		const cosmetics = getCosmetics();
 
-		const getCosmeticWithImage = (): [Cosmetic, string | null] => {
+		const getCosmeticWithImage = (): [BRCosmetic, string | null] => {
 			const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
 			const cosmetic = getRandomItem(items);
 			const image = cosmetic.images.featured ?? cosmetic.images.icon;
 			return [cosmetic, image];
 		};
 
-		let cosmetic: Cosmetic | null = null;
+		let cosmetic: BRCosmetic | null = null;
 		let image: string | null = null;
 		while (cosmetic === null || image === null) {
 			[cosmetic, image] = getCosmeticWithImage();

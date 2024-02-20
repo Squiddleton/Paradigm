@@ -1,12 +1,12 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { Cosmetic } from '@squiddleton/fortnite-api';
+import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { BackgroundURL } from '../../util/constants.js';
 import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
 
-const getImage = (cosmetic: Cosmetic) => cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
+const getImage = (cosmetic: BRCosmetic) => cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
 
 export default new SlashCommand({
 	name: 'random',

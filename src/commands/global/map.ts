@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { FortniteAPIError, type Map } from '@squiddleton/fortnite-api';
+import { FortniteAPIError, type FortniteMap } from '@squiddleton/fortnite-api';
 import { EmbedBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 
@@ -8,7 +8,7 @@ export default new SlashCommand({
 	description: 'Display info about the current Fortnite island',
 	scope: 'Global',
 	async execute(interaction) {
-		let map: Map;
+		let map: FortniteMap;
 		try {
 			map = await fortniteAPI.map();
 		}
@@ -23,7 +23,7 @@ export default new SlashCommand({
 		await interaction.reply({
 			embeds: [
 				new EmbedBuilder()
-					.setTitle('Artemis')
+					.setTitle('Helios')
 					.setImage(map.images.pois)
 					.setFields([
 						{ name: 'Named POIs', value: map.pois.filter(p => !p.id.includes('UnNamedPOI')).length.toString(), inline: true },

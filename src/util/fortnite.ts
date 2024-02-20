@@ -1,20 +1,20 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type Cosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type TrackCosmetic } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { AnyCosmetic, ButtonOrMenu, Car, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, Instrument, ItemShop, JamTrack, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
-let cachedCosmetics: Cosmetic[] = [];
+let cachedCosmetics: BRCosmetic[] = [];
 let cachedAllCosmetics: AnyCosmetic[] = [];
 
 export const getCosmetics = () => cachedCosmetics;
@@ -22,17 +22,10 @@ export const getAllCosmetics = () => cachedAllCosmetics;
 export const fetchCosmetics = async () => {
 	try {
 		const cosmetics = await fortniteAPI.listCosmetics();
-		const cars: Car[] = await fetch('https://fortnite-api.com/v2/cosmetics/cars').then(r => r.json()).then(j => j.data);
-		const jamTracks: JamTrack[] = await fetch('https://fortnite-api.com/v2/cosmetics/tracks').then(r => r.json()).then(j => j.data);
-		const instruments: Instrument[] = await fetch('https://fortnite-api.com/v2/cosmetics/instruments').then(r => r.json()).then(j => j.data);
+		const allCosmetics = await fortniteAPI.cosmetics();
 
 		cachedCosmetics = cosmetics;
-		cachedAllCosmetics = [
-			...cosmetics,
-			...cars,
-			...jamTracks,
-			...instruments
-		];
+		cachedAllCosmetics = Object.values(allCosmetics).flat();
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
@@ -45,7 +38,7 @@ export const fetchCosmetics = async () => {
  * @returns An array of cosmetic objects
  */
 export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
-	const shop: ItemShop = await fetch('https://fortnite-api.com/v2/shop').then(r => r.json()).then(j => j.data);
+	const shop = await fortniteAPI.newShop();
 
 	const withoutDupes: AnyCosmetic[] = [];
 	const withDupes = shop.entries.map((e): AnyCosmetic[] => {
@@ -182,7 +175,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @param cosmetic - A cosmetic object
  * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
  */
-export const getCosmeticColor = (cosmetic: Cosmetic | Car | Instrument): ColorResolvable | null => {
+export const getCosmeticColor = (cosmetic: Exclude<AnyCosmetic, TrackCosmetic>): ColorResolvable | null => {
 	const seriesColor = cosmetic.series?.colors[0].slice(0, 6);
 	return seriesColor === undefined ? RarityColors[cosmetic.rarity.displayValue] ?? null : `#${seriesColor}`;
 };
@@ -347,7 +340,7 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 									.setMinValues(1)
 									.setOptions([
 										{ label: `Default ${displayType}`, value: 'truedefault', default: true },
-										...variants.options.map(o => ({ label: o.name, value: o.tag })).slice(0, 24)
+										...variants.options.map(o => ({ label: o.name ?? 'Unknown', value: o.tag })).slice(0, 24)
 									])
 							]
 						})
@@ -415,8 +408,8 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 
 							if (menu instanceof StringSelectMenuBuilder) {
 								menu.setOptions(value.startsWith('truedefault')
-									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(v => ({ label: v.name, value: v.tag })).slice(0, 24)]
-									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(v => ({ label: v.name, value: v.tag, default: v.tag === value })).slice(0, 24)]
+									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(v => ({ label: v.name ?? 'Unknown', value: v.tag })).slice(0, 24)]
+									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(v => ({ label: v.name ?? 'Unknown', value: v.tag, default: v.tag === value })).slice(0, 24)]
 								);
 							}
 							return c.setComponents([menu]);

@@ -1,6 +1,6 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import { EpicAPIError } from '@squiddleton/epic';
-import { type Cosmetic, FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
+import { type BRCosmetic, FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
 import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
@@ -28,7 +28,7 @@ export default new ClientEvent({
 				const cosmetics = getCosmetics();
 				const allCosmetics = getAllCosmetics();
 
-				const mapByName = (item: Cosmetic | Playlist) => item.name;
+				const mapByName = (item: BRCosmetic | Playlist) => item.name;
 
 				const mapByTarget = (rating: Rating): ApplicationCommandOptionChoiceData => ({ name: rating.target, value: rating.target });
 
