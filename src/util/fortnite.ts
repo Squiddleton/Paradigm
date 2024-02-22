@@ -41,13 +41,18 @@ export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
 	const shop = await fortniteAPI.newShop();
 
 	const withoutDupes: AnyCosmetic[] = [];
-	const withDupes = shop.entries.map((e): AnyCosmetic[] => {
-		const cosmetics: AnyCosmetic[] = e.brItems ?? [];
-		return cosmetics.concat(e.tracks ?? [], e.instruments ?? [], e.cars ?? []);
-	}).flat();
+	if (shop.entries === null) {
+		console.log(`No shop entries were found at ${new Date()}.`);
+	}
+	else {
+		const withDupes = shop.entries.map((e): AnyCosmetic[] => {
+			const cosmetics: AnyCosmetic[] = e.brItems ?? [];
+			return cosmetics.concat(e.tracks ?? [], e.instruments ?? [], e.cars ?? []);
+		}).flat();
 
-	for (const item of withDupes) {
-		if (!withoutDupes.some(c => c.id === item.id)) withoutDupes.push(item);
+		for (const item of withDupes) {
+			if (!withoutDupes.some(c => c.id === item.id)) withoutDupes.push(item);
+		}
 	}
 	return withoutDupes;
 };
