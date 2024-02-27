@@ -5,11 +5,11 @@ import type { StringChoices } from './types.js';
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
 
 export enum BackgroundURL {
-	Gold = 'https://cdn.discordapp.com/attachments/713250274214543360/828073686870392842/gold.jpg',
-	Orange = 'https://cdn.discordapp.com/attachments/713250274214543360/828073689752141874/orange.jpg',
-	Purple = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688834113566/purple.jpg',
-	Blue = 'https://cdn.discordapp.com/attachments/713250274214543360/828073694717804584/blue.jpg',
-	Green = 'https://cdn.discordapp.com/attachments/713250274214543360/828073688074289172/green.jpg'
+	Gold = './assets/backgrounds/gold.jpg',
+	Orange = './assets/backgrounds/orange.jpg',
+	Purple = './assets/backgrounds/purple.jpg',
+	Blue = './assets/backgrounds/blue.jpg',
+	Green = './assets/backgrounds/green.jpg'
 }
 
 export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b => ({ name: b, value: b }));
