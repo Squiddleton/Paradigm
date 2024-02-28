@@ -25,7 +25,7 @@ export const fetchCosmetics = async () => {
 		const allCosmetics = await fortniteAPI.cosmetics();
 
 		cachedCosmetics = cosmetics;
-		cachedAllCosmetics = Object.values(allCosmetics).flat();
+		cachedAllCosmetics = Object.values(allCosmetics).flat().filter(c => 'name' in c || 'title' in c);
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
