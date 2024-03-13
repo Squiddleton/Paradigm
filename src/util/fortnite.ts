@@ -567,7 +567,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			seasonName = 'Chapter 5 Season 1';
 			brTrackguid = RankedTrack.C5S1BR;
 			zbTrackguid = RankedTrack.C5S1ZB;
-			backgroundPath = 'c5s1.png';
+			backgroundPath = 'c5s1.jpg';
 			break;
 		}
 		case 'og': {
