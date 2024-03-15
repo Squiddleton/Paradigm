@@ -25,7 +25,6 @@ console.log('Populated caches.');
 
 const authenticate = async () => {
 	await epicClient.auth.authenticate(config.epicDeviceAuth);
-	setTimeout(authenticate, 7200000);
 };
 
 let authenticated = false;
@@ -34,6 +33,7 @@ while (!authenticated) {
 	try {
 		await authenticate();
 		authenticated = true;
+		setInterval(authenticate, 7200000);
 	}
 	catch (error) {
 		if (error instanceof EpicAPIError && error.status === 503) {
