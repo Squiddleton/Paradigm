@@ -64,7 +64,7 @@ export default new SlashCommand({
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
-				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
@@ -139,7 +139,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'remove': {
-				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;

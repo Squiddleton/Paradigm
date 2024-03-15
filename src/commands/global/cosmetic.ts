@@ -30,7 +30,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+		const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 		const language = interaction.options.getString('language') as Language | null;
 
 		if (cosmetic === undefined) {

@@ -1,6 +1,6 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type TrackCosmetic } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type LEGOKit, type TrackCosmetic } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, EmbedBuilder, type InteractionReplyOptions, type MessageActionRowComponentBuilder, PermissionFlagsBits, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
@@ -15,7 +15,7 @@ import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
 let cachedCosmetics: BRCosmetic[] = [];
-let cachedAllCosmetics: AnyCosmetic[] = [];
+let cachedAllCosmetics: (AnyCosmetic | LEGOKit)[] = [];
 
 export const getCosmetics = () => cachedCosmetics;
 export const getAllCosmetics = () => cachedAllCosmetics;
@@ -191,10 +191,10 @@ export const getCosmeticColor = (cosmetic: Exclude<AnyCosmetic, TrackCosmetic>):
  * @param cosmetic - A cosmetic object
  * @returns An embed filled with information about the specified cosmetic
  */
-export const createCosmeticEmbed = (cosmetic: AnyCosmetic) => {
+export const createCosmeticEmbed = (cosmetic: AnyCosmetic | LEGOKit) => {
 	const embed = new EmbedBuilder()
 		.setTitle('name' in cosmetic ? cosmetic.name : cosmetic.title)
-		.setDescription('description' in cosmetic ? cosmetic.description : cosmetic.artist)
+		.setDescription('description' in cosmetic ? cosmetic.description : 'artist' in cosmetic ? cosmetic.artist : null)
 		.setColor('series' in cosmetic ? getCosmeticColor(cosmetic) : null)
 		.setThumbnail('images' in cosmetic ? ('smallIcon' in cosmetic.images ? cosmetic.images.smallIcon : cosmetic.images.small) : cosmetic.albumArt)
 		.setImage('images' in cosmetic ? ('featured' in cosmetic.images ? cosmetic.images.featured ?? cosmetic.images.icon : cosmetic.images.large) : cosmetic.albumArt)
