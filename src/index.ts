@@ -41,6 +41,9 @@ while (!authenticated) {
 			console.log(`Reuauthenticating in ${delay} minutes...`);
 			await timers.setTimeout(delay * 60000);
 		}
+		else {
+			throw error;
+		}
 	}
 }
 console.log('Authenticated with Epic Games.');
