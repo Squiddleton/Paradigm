@@ -4,7 +4,7 @@ import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { BackgroundURL } from '../../util/constants.js';
-import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
+import { createCosmeticEmbed, getBRCosmetics } from '../../util/fortnite.js';
 
 const getImage = (cosmetic: BRCosmetic) => cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
 
@@ -37,7 +37,7 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		await interaction.deferReply();
-		const cosmetics = getCosmetics();
+		const cosmetics = getBRCosmetics();
 		const type = interaction.options.getString('type');
 		if (type) {
 			await interaction.editReply({ embeds: [createCosmeticEmbed(getRandomItem(cosmetics.filter(c => c.type.value === type)))] });

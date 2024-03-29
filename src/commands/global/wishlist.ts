@@ -3,7 +3,7 @@ import { normalize } from '@squiddleton/util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType, chatInputApplicationCommandMention, italic } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordIds, Time } from '../../util/constants.js';
-import { getAllCosmetics, viewWishlist } from '../../util/fortnite.js';
+import { getCosmetics, viewWishlist } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import { addToWishlist, getUser, removeFromWishlist, saveUser } from '../../util/users.js';
 
@@ -64,7 +64,7 @@ export default new SlashCommand({
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
-				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
@@ -139,7 +139,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'remove': {
-				const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;

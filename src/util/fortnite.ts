@@ -14,18 +14,18 @@ import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
-let cachedCosmetics: BRCosmetic[] = [];
-let cachedAllCosmetics: (AnyCosmetic | LEGOKit)[] = [];
+let cachedBRCosmetics: BRCosmetic[] = [];
+let cachedCosmetics: (AnyCosmetic | LEGOKit)[] = [];
 
+export const getBRCosmetics = () => cachedBRCosmetics;
 export const getCosmetics = () => cachedCosmetics;
-export const getAllCosmetics = () => cachedAllCosmetics;
 export const fetchCosmetics = async () => {
 	try {
 		const cosmetics = await fortniteAPI.listCosmetics();
 		const allCosmetics = await fortniteAPI.cosmetics();
 
-		cachedCosmetics = cosmetics;
-		cachedAllCosmetics = Object.values(allCosmetics).flat().filter(c => 'name' in c || 'title' in c);
+		cachedBRCosmetics = cosmetics;
+		cachedCosmetics = Object.values(allCosmetics).flat().filter(c => 'name' in c || 'title' in c);
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
@@ -97,7 +97,7 @@ export const findCosmetic = async (input: string) => {
 			return cosmeticByName;
 		}
 		catch {
-			const list = getCosmetics();
+			const list = getBRCosmetics();
 			input = normalize(input);
 			return list.find(c => normalize(c.name) === input) ?? null;
 		}
@@ -227,7 +227,7 @@ export const createCosmeticEmbed = (cosmetic: AnyCosmetic | LEGOKit) => {
  * @returns A Discord attachment containing the image of the loadout or a string containing an error message
  */
 export const createLoadoutAttachment = async (outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, links: Links = {}) => {
-	const cosmetics = getCosmetics();
+	const cosmetics = getBRCosmetics();
 	const noBackground = chosenBackground === null;
 	if (!noBackground && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 	const rawBackground = noBackground ? getRandomItem(Object.values(BackgroundURL)) : BackgroundURL[chosenBackground];
@@ -326,7 +326,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
  * @param embeds - An array of embeds imitating a Twitter post
  */
 export const createStyleListeners = async (interaction: ChatInputCommandInteraction, attachment: AttachmentBuilder, outfit: StringOption, backbling: StringOption, pickaxe: StringOption, glider: StringOption, wrap: StringOption, chosenBackground: StringOption, embeds: EmbedBuilder[] = []) => {
-	const cosmetics = getCosmetics();
+	const cosmetics = getBRCosmetics();
 	if (chosenBackground !== null && !isKey(chosenBackground, BackgroundURL)) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', chosenBackground));
 
 	let components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
@@ -897,7 +897,7 @@ export const viewWishlist = async (interaction: CommandInteraction) => {
 		return;
 	}
 
-	const cosmetics = getAllCosmetics();
+	const cosmetics = getCosmetics();
 	const inc = 25;
 	const cosmeticStrings = userResult.wishlistCosmeticIds
 		.map(id => {

@@ -11,7 +11,7 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
-import { getAllCosmetics, getCosmetics } from '../util/fortnite.js';
+import { getBRCosmetics, getCosmetics } from '../util/fortnite.js';
 import { getUser } from '../util/users.js';
 
 export default new ClientEvent({
@@ -25,8 +25,8 @@ export default new ClientEvent({
 			const input = value === '' ? 'a' : value;
 
 			try {
-				const cosmetics = getCosmetics();
-				const allCosmetics = getAllCosmetics();
+				const cosmetics = getBRCosmetics();
+				const allCosmetics = getCosmetics();
 
 				const mapByName = (item: BRCosmetic | Playlist) => item.name;
 

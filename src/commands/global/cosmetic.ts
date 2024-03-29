@@ -4,7 +4,7 @@ import { normalize } from '@squiddleton/util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, type MessageActionRowComponentBuilder, RESTJSONErrorCodes, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
-import { createCosmeticEmbed, getAllCosmetics } from '../../util/fortnite.js';
+import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import type { ButtonOrMenu } from '../../util/types.js';
 
@@ -30,7 +30,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const cosmetic = getAllCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+		const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
 		const language = interaction.options.getString('language') as Language | null;
 
 		if (cosmetic === undefined) {
