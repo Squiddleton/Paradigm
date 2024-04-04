@@ -60,25 +60,27 @@ export default new ClientEvent({
 				const cachedProgresses = allCachedProgresses.get(epicAccountId);
 				const newProgresses = await getTrackProgress(epicAccountId);
 
-				if (cachedProgresses !== undefined) {
-					for (const trackedMode of trackedUser.trackedModes) {
-						const cachedProgress = cachedProgresses.find(track => track.trackguid === trackedMode.trackguid);
-						const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
-						if (cachedProgress === undefined || newProgress === undefined) return;
+				if (newProgresses !== null) {
+					if (cachedProgresses !== undefined) {
+						for (const trackedMode of trackedUser.trackedModes) {
+							const cachedProgress = cachedProgresses.find(track => track.trackguid === trackedMode.trackguid);
+							const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
+							if (cachedProgress === undefined || newProgress === undefined) return;
 
-						if (newProgress.currentDivision > cachedProgress.currentDivision) {
-							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
-						}
-						else if (newProgress.currentDivision < cachedProgress.currentDivision) {
-							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
-						}
-						else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
-							await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+							if (newProgress.currentDivision > cachedProgress.currentDivision) {
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+							}
+							else if (newProgress.currentDivision < cachedProgress.currentDivision) {
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+							}
+							else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+							}
 						}
 					}
-				}
 
-				allCachedProgresses.set(epicAccountId, newProgresses);
+					allCachedProgresses.set(epicAccountId, newProgresses);
+				}
 			}
 		}));
 

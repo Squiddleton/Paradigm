@@ -514,6 +514,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 
 		try {
 			const stats = await getLevelStats(userResult.epicAccountId);
+			if (stats === null) return { content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' };
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
@@ -524,6 +525,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		try {
 			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
 			const stats = await getLevelStats(account.id);
+			if (stats === null) return { content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' };
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
@@ -553,10 +555,11 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
+export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null | 'Unknown'>;
 export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string) {
 	const trackProgress = await getTrackProgress(account.id);
+	if (trackProgress === null) return null;
 
 	const getTrack = (trackguid: RankedTrack) => {
 		const track = trackProgress.find(t => t.trackguid === trackguid);
@@ -609,7 +612,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	const zbTrack = getTrack(zbTrackguid);
 	const racingTrack = getTrack(racingTrackguid);
 
-	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return null;
+	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return 'Unknown';
 
 	const background = await loadImage(`./assets/backgrounds/${backgroundPath}`);
 	const { height, width } = background;
@@ -749,7 +752,10 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 				await interaction.editReply({ content: options.content, files: [image] });
 				const buffer = await createRankedImage(account, isContextMenu, 'br');
-				if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+				if (buffer !== 'Unknown') {
+					if (buffer === null) await interaction.followUp({ ephemeral: isContextMenu, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
+					else await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+				}
 			}
 			catch (error) {
 				await handleStatsError(interaction, error);
@@ -761,7 +767,10 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 			const { account, image } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
 			const buffer = await createRankedImage(account, isContextMenu, 'br');
-			if (buffer !== null) await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+			if (buffer !== 'Unknown') {
+				if (buffer === null) await interaction.followUp({ ephemeral: isContextMenu, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
+				else await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+			}
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}

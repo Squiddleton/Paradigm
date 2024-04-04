@@ -28,6 +28,7 @@ export default new ContextMenu({
 		}
 
 		const buffer = await createRankedImage(stats.account, true, 'br');
-		await interaction.editReply({ files: [buffer] });
+		if (buffer === null) await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
+		else await interaction.editReply({ files: [buffer] });
 	}
 });
