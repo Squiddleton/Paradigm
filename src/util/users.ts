@@ -4,9 +4,7 @@ import userModel from '../models/users.js';
 
 const cachedUsers = new Map<Snowflake, UserDocument>();
 
-const updateUserCache = (user: UserDocument) => {
-	cachedUsers.set(user._id, user);
-};
+const updateUserCache = (user: UserDocument) => void cachedUsers.set(user._id, user);
 
 export const addToWishlist = async (userId: Snowflake, cosmeticId: string) => {
 	const user = await userModel.findByIdAndUpdate(
@@ -33,9 +31,7 @@ export const removeFromWishlist = async (userId: Snowflake, cosmeticId: string) 
 	updateUserCache(user);
 };
 
-export const removeOldUsers = () => {
-	cachedUsers.clear();
-};
+export const removeOldUsers = () => cachedUsers.clear();
 
 export const saveUser = async (user: UserDocument) => {
 	await user.save();
