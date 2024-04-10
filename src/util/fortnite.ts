@@ -432,7 +432,15 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 				}
 			})
 			.once('end', async (collected, reason) => {
-				if (reason === 'time') await interaction.editReply({ components: [], content, embeds });
+				if (reason === 'time') {
+					try {
+						await interaction.editReply({ components: [] });
+					}
+					catch (error) {
+						const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
+						if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
+					}
+				}
 			});
 	}
 };
