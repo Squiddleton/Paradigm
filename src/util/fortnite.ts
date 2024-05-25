@@ -575,12 +575,19 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		return track;
 	};
 
-	let seasonName = 'Chapter 5 Season 2';
-	let brTrackguid = RankedTrack.C5S2BR;
-	let zbTrackguid = RankedTrack.C5S2ZB;
-	const racingTrackguid = RankedTrack.S0Racing;
+	let seasonName = 'Chapter 5 Season 3';
+	let brTrackguid = RankedTrack.C5S3BR;
+	let zbTrackguid = RankedTrack.C5S3ZB;
+	const racingTrackguid = RankedTrack.NeonRushRacing;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
+		case 'c5s2': {
+			seasonName = 'Chapter 5 Season 2';
+			brTrackguid = RankedTrack.C5S2BR;
+			zbTrackguid = RankedTrack.C5S2ZB;
+			backgroundPath = 'c5s2.png';
+			break;
+		}
 		case 'c5s1': {
 			seasonName = 'Chapter 5 Season 1';
 			brTrackguid = RankedTrack.C5S1BR;

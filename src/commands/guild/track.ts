@@ -14,9 +14,9 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String,
 			required: true,
 			choices: [
-				{ name: 'Battle Royale', value: RankedTrack.C5S2BR },
-				{ name: 'Zero Build', value: RankedTrack.C5S2ZB },
-				{ name: 'Rocket Racing', value: RankedTrack.S0Racing }
+				{ name: 'Battle Royale', value: RankedTrack.C5S3BR },
+				{ name: 'Zero Build', value: RankedTrack.C5S3ZB },
+				{ name: 'Rocket Racing', value: RankedTrack.NeonRushRacing }
 			]
 		}
 	],
@@ -28,15 +28,15 @@ export default new SlashCommand({
 			return;
 		}
 
-		const track = interaction.options.getString('mode', true) as RankedTrack.C5S2BR | RankedTrack.C5S2ZB | RankedTrack.S0Racing;
+		const track = interaction.options.getString('mode', true) as RankedTrack.C5S3BR | RankedTrack.C5S3ZB | RankedTrack.NeonRushRacing;
 
 		if (!trackedModes.has(userResult.epicAccountId)) trackedModes.set(userResult.epicAccountId, { displayUsername: interaction.user.displayName, trackedModes: [] });
 		const trackedUser = trackedModes.get(userResult.epicAccountId)!;
 
 		const trackDisplayName = {
-			[RankedTrack.C5S2BR]: 'Battle Royale',
-			[RankedTrack.C5S2ZB]: 'Zero Build',
-			[RankedTrack.S0Racing]: 'Rocket Racing'
+			[RankedTrack.C5S3BR]: 'Battle Royale',
+			[RankedTrack.C5S3ZB]: 'Zero Build',
+			[RankedTrack.NeonRushRacing]: 'Rocket Racing'
 		}[track];
 		const existingTrack = trackedUser.trackedModes.find(t => t.trackguid === track);
 

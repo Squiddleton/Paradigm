@@ -20,6 +20,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'Chapter 5 Season 3', value: 'c5s3' },
 				{ name: 'Chapter 5 Season 2', value: 'c5s2' },
 				{ name: 'Chapter 5 Season 1', value: 'c5s1' },
 				{ name: 'Fortnite: OG', value: 'og' },
@@ -45,7 +46,7 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const accountName = interaction.options.getString('player');
-		const season = interaction.options.getString('season') ?? 'c5s2';
+		const season = interaction.options.getString('season') ?? 'c5s3';
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		let stats: Stats<false>;
