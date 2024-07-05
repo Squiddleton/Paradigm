@@ -76,19 +76,19 @@ export enum ErrorMessage {
 }
 
 export const LanguageChoices: StringChoices = Object.entries({
-	ar: 'اَلْعَرَبِيَّةُ',
-	de: 'Deutsch',
-	en: 'English',
-	es: 'Español',
+	'ar': 'اَلْعَرَبِيَّةُ',
+	'de': 'Deutsch',
+	'en': 'English',
+	'es': 'Español',
 	'es-419': 'Español (América Latina)',
-	fr: 'Français',
-	it: 'Italiano',
-	ja: '日本語',
-	ko: '한국어',
-	pl: 'Język Polski',
+	'fr': 'Français',
+	'it': 'Italiano',
+	'ja': '日本語',
+	'ko': '한국어',
+	'pl': 'Język Polski',
 	'pt-BR': 'Português',
-	ru: 'Русский язык',
-	tr: 'Türkçe',
+	'ru': 'Русский язык',
+	'tr': 'Türkçe',
 	'zh-CN': '官话',
 	'zh-Hant': '官話'
 }).map(([k, v]) => ({ name: v, value: k }));
@@ -158,13 +158,13 @@ export enum RankedTrack {
 }
 
 export const RarityColors: Partial<Record<string, number>> = {
-	Common: 0xbebdb7,
-	Uncommon: 0x1edd1d,
-	Rare: 0x4e5afe,
-	Epic: 0xa745cf,
-	Legendary: 0xf76b11,
-	Mythic: 0xfadb4b,
-	Exotic: 0x7afff4,
+	'Common': 0xbebdb7,
+	'Uncommon': 0x1edd1d,
+	'Rare': 0x4e5afe,
+	'Epic': 0xa745cf,
+	'Legendary': 0xf76b11,
+	'Mythic': 0xfadb4b,
+	'Exotic': 0x7afff4,
 	'Icon Series': 0x10626f,
 	'MARVEL SERIES': 0x630303,
 	'DC SERIES': 0x101b2a,

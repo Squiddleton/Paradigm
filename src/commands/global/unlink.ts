@@ -8,13 +8,13 @@ export default new SlashCommand({
 	description: 'Unlink your Epic Games account from the bot',
 	scope: 'Global',
 	async execute(interaction) {
-		const user = getUser(interaction.user.id);
-		if (user === null || user.epicAccountId === null) {
+		const userResult = getUser(interaction.user.id);
+		if (!userResult?.epicAccountId) {
 			await interaction.reply({ content: `You have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
 		}
 		else {
-			user.epicAccountId = null;
-			await saveUser(user);
+			userResult.epicAccountId = null;
+			await saveUser(userResult);
 			await interaction.reply({ content: 'You have unlinked your account.', ephemeral: true });
 		}
 	}

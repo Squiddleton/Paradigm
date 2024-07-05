@@ -23,7 +23,7 @@ export default new SlashCommand({
 	scope: 'Exclusive',
 	async execute(interaction) {
 		const userResult = getUser(interaction.user.id);
-		if (userResult === null || userResult.epicAccountId === null) {
+		if (!userResult?.epicAccountId) {
 			await interaction.reply({ content: `You have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
 			return;
 		}
@@ -31,7 +31,11 @@ export default new SlashCommand({
 		const track = interaction.options.getString('mode', true) as RankedTrack.C5S3BR | RankedTrack.C5S3ZB | RankedTrack.NeonRushRacing;
 
 		if (!trackedModes.has(userResult.epicAccountId)) trackedModes.set(userResult.epicAccountId, { displayUsername: interaction.user.displayName, trackedModes: [] });
-		const trackedUser = trackedModes.get(userResult.epicAccountId)!;
+		const trackedUser = trackedModes.get(userResult.epicAccountId);
+		if (trackedUser === undefined) {
+			await interaction.reply('An error occurred while getting the current mode to track.');
+			return;
+		}
 
 		const trackDisplayName = {
 			[RankedTrack.C5S3BR]: 'Battle Royale',
@@ -50,4 +54,3 @@ export default new SlashCommand({
 		}
 	}
 });
-

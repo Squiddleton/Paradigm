@@ -2,7 +2,7 @@ import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canva
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type LEGOKit, type TrackCosmetic } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
@@ -25,7 +25,8 @@ export const fetchCosmetics = async () => {
 		const allCosmetics = await fortniteAPI.cosmetics();
 
 		cachedBRCosmetics = cosmetics;
-		cachedCosmetics = Object.values(allCosmetics).flat().filter(c => 'name' in c || 'title' in c);
+		const unflat = Object.values(allCosmetics) as (AnyCosmetic | LEGOKit)[][];
+		cachedCosmetics = unflat.flat().filter(c => 'name' in c || 'title' in c);
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
@@ -41,6 +42,7 @@ export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
 	const shop = await fortniteAPI.newShop();
 
 	const withoutDupes: AnyCosmetic[] = [];
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (shop.entries === null) {
 		console.log(`No shop entries were found at ${new Date()}.`);
 	}
@@ -64,7 +66,7 @@ export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
  * @returns An array of shop tab names
  */
 export const fetchShopNames = async (state: TimelineChannelData<TimelineClientEventsState>) => {
-	const fortniteWebsite: FortniteWebsite = await fetch(EpicEndpoint.Website).then(res => res.json());
+	const fortniteWebsite = await fetch(EpicEndpoint.Website).then(res => res.json()) as FortniteWebsite;
 	const shopSections = fortniteWebsite.shopSections.sectionList.sections;
 
 	const shopIds = Object.keys(state.state.sectionStoreEnds);
@@ -262,7 +264,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 
 		if (image !== null) {
 			const dimensions: Dimensions = {
-				Outfit: [
+				'Outfit': [
 					(background.width - (background.height * image.width / image.height)) / 2,
 					0,
 					background.height * image.width / image.height,
@@ -274,19 +276,19 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 					background.height * image.width / image.height / 2,
 					background.height / 2
 				],
-				Pickaxe: [
+				'Pickaxe': [
 					0,
 					background.height / 2,
 					background.height * image.width / image.height / 2,
 					background.height / 2
 				],
-				Glider: [
+				'Glider': [
 					background.width - (background.height * image.width / image.height / 2),
 					0,
 					background.height * image.width / image.height / 2,
 					background.height / 2
 				],
-				Wrap: [
+				'Wrap': [
 					background.width - (background.height * image.width / image.height / 2),
 					background.height / 2,
 					background.height * image.width / image.height / 2,
@@ -361,7 +363,9 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 		[pickaxe, ['pickaxe'], 'Pickaxe'],
 		[glider, ['glider'], 'Glider']
 	];
-	variantArgs.forEach(arg => handleVariants(...arg));
+	variantArgs.forEach(arg => {
+		handleVariants(...arg);
+	});
 
 	if (components.length > 0) {
 		components.push(
@@ -498,7 +502,9 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
-			const overallSeason = parseInt(k.match(/\d+/)![0]);
+			const match = k.match(/\d+/);
+			if (match === null) return 'null';
+			const overallSeason = parseInt(match[0]);
 			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));
 			const chapterIndex = index === -1 ? ChapterLengths.length : index;
 			const chapterName = [
@@ -516,7 +522,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 
 	if (accountName === null) {
 		const userResult = getUser(options.targetUser.id);
-		if (userResult === null || userResult.epicAccountId === null) {
+		if (!userResult?.epicAccountId) {
 			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
 		}
 
@@ -650,7 +656,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
 		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
 	}
-	else if (rankingType === 'rr') {
+	else {
 		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
 	}
 
@@ -671,7 +677,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		const divisionIconName = isUnknown
 			? 'unknown'
 			: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
-
 
 		if (track.currentPlayerRanking === null) {
 			ctx.beginPath();
@@ -737,7 +742,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		await drawRankedImage(0, brTrack);
 		await drawRankedImage(width * 0.5, zbTrack);
 	}
-	else if (rankingType === 'rr') {
+	else {
 		await drawRankedImage(width * 0.25, racingTrack);
 	}
 
@@ -758,7 +763,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
-		if (userResult === null || userResult.epicAccountId === null) {
+		if (!userResult?.epicAccountId) {
 			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 		}
@@ -805,7 +810,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
  */
 export const postShopSections = async (client: DiscordClient<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
 	const [oldState, newState] = await fetchStates();
-	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState ?? oldState);
+	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState);
 
 	const addedNames = currentNames
 		.filter(n => !cachedNames.includes(n))
@@ -869,7 +874,7 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
  *
  * @param interaction - The command interaction that initiated this function call
  */
-export const viewWishlist = async (interaction: CommandInteraction) => {
+export const viewWishlist = async (interaction: UserContextMenuCommandInteraction | ChatInputCommandInteraction) => {
 	/**
 	 * Returns properties of a user or member used in a wishlist embed.
 	 *

@@ -95,7 +95,6 @@ export default new SlashCommand({
 		const wrapImage = await loadImage(wrapIcon);
 		ctx.drawImage(wrapImage, background.width - (background.height * wrapImage.width / wrapImage.height / 2), background.height / 2, background.height * wrapImage.width / wrapImage.height / 2, background.height / 2);
 
-
 		const attachment = new AttachmentBuilder(await canvas.encode('png'), { name: 'loadout.png' });
 
 		await interaction.editReply({

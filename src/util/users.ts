@@ -31,7 +31,9 @@ export const removeFromWishlist = async (userId: Snowflake, cosmeticId: string) 
 	updateUserCache(user);
 };
 
-export const removeOldUsers = () => cachedUsers.clear();
+export const removeOldUsers = () => {
+	cachedUsers.clear();
+};
 
 export const saveUser = async (user: UserDocument) => {
 	await user.save();

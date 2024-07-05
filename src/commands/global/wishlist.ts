@@ -84,7 +84,7 @@ export default new SlashCommand({
 
 				if (interaction.inCachedGuild()) {
 					const guildResult = await guildModel.findById(interaction.guildId);
-					if (guildResult === null || guildResult.wishlistChannelId === null) {
+					if (!guildResult?.wishlistChannelId) {
 						await interaction.followUp({ content: `Please note that this server does not have a wishlist channel set up. By default, members with the Manage Server permission can use ${chatInputApplicationCommandMention('settings', 'edit', DiscordIds.CommandId.Settings)} to set one.`, ephemeral: true });
 					}
 					else if (!interaction.guild.channels.cache.has(guildResult.wishlistChannelId)) {

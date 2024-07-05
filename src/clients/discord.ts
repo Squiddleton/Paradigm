@@ -8,7 +8,7 @@ const commands: (SlashCommand | ContextMenu<ContextMenuType>)[] = [];
 for (const folder of await readdir('./dist/commands')) {
 	const commandFiles = (await readdir(`./dist/commands/${folder}`)).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
-		const { default: command } = await import(`../commands/${folder}/${file}`);
+		const { default: command } = await import(`../commands/${folder}/${file}`) as { default: unknown };
 		if (command instanceof ContextMenu || command instanceof SlashCommand) commands.push(command);
 	}
 }
@@ -23,7 +23,7 @@ const client = new DiscordClient({
 	devGuildId: DiscordIds.GuildId.Dev,
 	events: await Promise.all(
 		(await readdir('./dist/events')).filter(file => file.endsWith('.js')).map(async file => {
-			const { default: event } = await import(`../events/${file}`);
+			const { default: event } = await import(`../events/${file}`) as { default: unknown };
 			if (!(event instanceof ClientEvent)) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', typeof event));
 			return event;
 		})

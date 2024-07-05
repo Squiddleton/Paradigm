@@ -46,7 +46,7 @@ export default new SlashCommand({
 		}
 		else {
 			const userResult = getUser(interaction.user.id);
-			if (userResult === null || userResult.epicAccountId === null) {
+			if (!userResult?.epicAccountId) {
 				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 				return;
 			}
@@ -57,7 +57,6 @@ export default new SlashCommand({
 				await handleStatsError(interaction, error);
 				return;
 			}
-
 		}
 
 		const buffer = await createRankedImage(stats.account, true, 'rr', 's0');

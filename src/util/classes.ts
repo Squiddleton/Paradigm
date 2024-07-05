@@ -10,6 +10,7 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		if (permissions === null) throw new Error(ErrorMessage.UncachedClient);
 		return permissions;
 	}
+
 	getGuildChannel(channelId: Snowflake, checkPermissions = true): AnyGuildTextChannel {
 		DiscordClient.assertReadyClient(this);
 		const channel = validateChannel(this, channelId);
@@ -17,14 +18,17 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		if (checkPermissions && !this.getPermissions(channel).has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
 		return channel;
 	}
+
 	getVisibleChannel(channelId: Snowflake) {
 		const channel = this.getGuildChannel(channelId, false);
 		if (!this.getPermissions(channel).has(PermissionFlagsBits.ViewChannel)) throw new Error(ErrorMessage.InvisibleChannel.replace('{channelId}', channelId));
 		return channel;
 	}
+
 	get devChannel() {
 		return this.getGuildChannel(DiscordIds.ChannelId.Dev);
 	}
+
 	static assertReadyClient(client: BaseClient): asserts client is DiscordClient<true> {
 		if (!client.isReady()) throw new Error(ErrorMessage.UnreadyClient);
 	}

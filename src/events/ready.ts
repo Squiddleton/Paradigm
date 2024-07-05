@@ -22,7 +22,7 @@ export default new ClientEvent({
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
-		const measureInterval = (name: string, callback: (...params: any[]) => Promise<void>) => () => {
+		const measureInterval = (name: string, callback: (...params: unknown[]) => Promise<void>) => () => {
 			const debug = process.argv[2] === 'debug';
 			const start = new Date();
 			if (debug) console.log(`${name} starting at ${start}...`);
@@ -131,7 +131,7 @@ export default new ClientEvent({
 
 						await guildModel.updateOne(
 							{
-								_id: guildId,
+								'_id': guildId,
 								'giveaways.messageId': giveaway.messageId
 							},
 							{ $set: { 'giveaways.$': giveaway } }

@@ -30,4 +30,3 @@ export default new SlashCommand({
 		return createStyleListeners(interaction, attachment, outfit, backbling, pickaxe, glider, wrap, chosenBackground);
 	}
 });
-

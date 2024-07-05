@@ -256,14 +256,14 @@ export default new ClientEvent({
 			const entries = [userId];
 			for (const role of giveawayResult.bonusRoles) {
 				if (interaction.member.roles.cache.has(role.id)) {
-					const bonusEntries: Snowflake[] = new Array(role.amount).fill(userId);
+					const bonusEntries = new Array<Snowflake>(role.amount).fill(userId);
 					entries.push(...bonusEntries);
 				}
 			}
 
 			await guildModel.updateOne(
 				{
-					_id: guildId,
+					'_id': guildId,
 					'giveaways.messageId': interaction.message.id
 				},
 				{ $push: { 'giveaways.$.entrants': { $each: entries } } }

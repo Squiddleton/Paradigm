@@ -226,7 +226,7 @@ export default new SlashCommand({
 
 						await guildModel.findOneAndUpdate(
 							{
-								_id: interaction.guildId,
+								'_id': interaction.guildId,
 								'giveaways.messageId': messageId
 							},
 							{
@@ -236,14 +236,12 @@ export default new SlashCommand({
 
 						await giveawayMessage.edit({ embeds: [createGiveawayEmbed(giveaway, interaction.guild)] });
 						await interaction.reply({ content: 'The giveaway has been updated.', ephemeral: true });
-
 					}
 					catch (error) {
 						const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
 						if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 
 						await interaction.reply({ content: 'That giveaway message has been deleted.', ephemeral: true });
-
 					}
 				}
 				catch (error) {

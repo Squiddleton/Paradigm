@@ -104,7 +104,7 @@ export default new SlashCommand({
 				const milestoneName = interaction.options.getString('milestone', true);
 
 				const guildResult = await guildModel.findOneAndUpdate(
-					{ _id: guildId, 'milestones.name': milestoneName },
+					{ '_id': guildId, 'milestones.name': milestoneName },
 					{ $pull: { milestones: { name: milestoneName } } });
 				if (guildResult === null) {
 					await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });

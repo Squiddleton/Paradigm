@@ -46,4 +46,3 @@ export default new SlashCommand({
 		await createStyleListeners(interaction, attachment, outfit, backbling, pickaxe, glider, wrap, background, [embed]);
 	}
 });
-

@@ -30,13 +30,11 @@ export const createGiveawayEmbed = (giveaway: Omit<IGiveaway, 'messageId'>, guil
 		.setColor(ended ? Colors.Red : Colors.Green)
 		.setFields(
 			ended
-				?
-				[
+				? [
 					{ name: 'Winners', value: giveaway.winners.length === 0 ? 'None' : giveaway.winners.map((id, i) => `${i + 1}. ${userMention(id)} (${id})`).join('\n'), inline: true },
 					{ name: 'Time', value: `Started ${time(giveaway.startTime, 'R')}\nEnded ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
-				:
-				[
+				: [
 					{ name: 'Winner Amount', value: giveaway.winnerNumber.toString(), inline: true },
 					{ name: 'Time', value: `Ends ${time(giveaway.endTime, 'R')}`, inline: true }
 				]
@@ -166,7 +164,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	// Create the collector on the channel since message collectors do not work on ephemeral messages
 	const collector = message.channel.createMessageComponentCollector({
 		componentType: ComponentType.Button,
-		filter: (i) => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
+		filter: i => i.message.id === message.id && messageComponentCollectorFilter(interaction)(i),
 		time: Time.CollectorDefault
 	});
 	collector
@@ -288,7 +286,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 
 	await guildModel.findOneAndUpdate(
 		{
-			_id: interaction.guildId,
+			'_id': interaction.guildId,
 			'giveaways.messageId': messageId
 		},
 		{ $set: { 'giveaways.$.winners': winners } }

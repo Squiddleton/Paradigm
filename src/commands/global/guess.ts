@@ -102,7 +102,6 @@ export default new SlashCommand({
 					.setColor(Colors.Green);
 				await modalInteraction.update({ attachments: [], components: [], embeds: [embed] });
 			}
-
 		}
 		catch {
 			embed

@@ -12,7 +12,7 @@ export default new ContextMenu({
 	scope: 'Global',
 	async execute(interaction) {
 		const userResult = getUser(interaction.targetUser.id);
-		if (userResult === null || userResult.epicAccountId === null) {
+		if (!userResult?.epicAccountId) {
 			await interaction.reply({ content: `The target user has not yet linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
 			return;
 		}

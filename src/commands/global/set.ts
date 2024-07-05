@@ -43,7 +43,7 @@ export default new SlashCommand({
 		await interaction.editReply({
 			embeds: [
 				new EmbedBuilder()
-					.setTitle(`Set: ${bold(cosmetics[0].set!.value)}`)
+					.setTitle(`Set: ${bold(cosmetics[0].set?.value ?? 'Unknown')}`)
 					.setDescription(cosmetics
 						.sort((a, b) => cosmeticToAddedTime(a) - cosmeticToAddedTime(b))
 						.map(c => `${c.name} (${c.type.displayValue})`)
