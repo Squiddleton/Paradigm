@@ -14,7 +14,7 @@ export enum BackgroundURL {
 
 export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b => ({ name: b, value: b }));
 
-export const ChapterLengths = [10, 8, 4, 4, 1, 3];
+export const ChapterLengths = [10, 8, 4, 4, 1, 4];
 
 export namespace DiscordIds {
 	export enum ChannelId {
@@ -154,7 +154,9 @@ export enum RankedTrack {
 	C5S2ZB = 'a1m0n3',
 	NeonRushRacing = 'rrwpwg',
 	C5S3BR = 'N4PK1N',
-	C5S3ZB = 'L1GHT5'
+	C5S3ZB = 'L1GHT5',
+	C5S4BR = 'S4LT3D',
+	C5S4ZB = 'P0T4T0'
 }
 
 export const RarityColors: Partial<Record<string, number>> = {
