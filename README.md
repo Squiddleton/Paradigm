@@ -11,7 +11,7 @@ The developer-hosted bot's invite link can be found [here](https://discord.com/a
 For self-hosting with all features, the bot's `src/config.ts` file should be of the following structure (filing out all properties as needed):
 
 ```ts
-import type { Config } from './types.js';
+import type { Config } from './util/types.js';
 
 const config: Config = { ... }; // Make object based on the Config interface
 
