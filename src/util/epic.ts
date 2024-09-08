@@ -1,7 +1,8 @@
-import { EpicAPIError, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
+import { EpicAPIError, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress } from '@squiddleton/epic';
 import type { TrackedUser } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
+import { ChapterLengths } from './constants.js';
 
 export const trackedModes = new Map<string, TrackedUser>();
 
@@ -9,9 +10,11 @@ const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && err
 const isEpicInternalError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
 
 export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | null> => {
+	const seasons = ChapterLengths.reduce((p, c) => p + c, 0);
+	const stats = getBattlePassLevels(seasons).filter(s => s !== 's12_social_bp_level').slice(-20);
 	let bulkStats: EpicStats[];
 	try {
-		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
+		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
 	}
 	catch (error) {
 		if (isEpicInternalError(error)) return null;
@@ -19,7 +22,7 @@ export const getLevelStats = async (accountId: string): Promise<Partial<Record<s
 
 		await epicClient.auth.authenticate(config.epicDeviceAuth);
 		console.log('Reauthenticated to retrieve level stats.');
-		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId] });
+		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
 	}
 	return bulkStats[0].stats;
 };
