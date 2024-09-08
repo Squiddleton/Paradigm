@@ -155,6 +155,7 @@ export enum RankedTrack {
 	NeonRushRacing = 'rrwpwg',
 	C5S3BR = 'N4PK1N',
 	C5S3ZB = 'L1GHT5',
+	InfernoIslandRacing = 'rrzuel',
 	C5S4BR = 'S4LT3D',
 	C5S4ZB = 'P0T4T0'
 }

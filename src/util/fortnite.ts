@@ -584,7 +584,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let seasonName = 'Chapter 5 Season 4';
 	let brTrackguid = RankedTrack.C5S4BR;
 	let zbTrackguid = RankedTrack.C5S4ZB;
-	const racingTrackguid = RankedTrack.NeonRushRacing;
+	const racingTrackguid = RankedTrack.InfernoIslandRacing;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
 		case 'c5s3': {
