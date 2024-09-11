@@ -523,7 +523,7 @@ export const getLevelsString = async (client: Client<true>, options: LevelComman
 	if (accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (!userResult?.epicAccountId) {
-			return { content: `No player username was provided, and you have not linked your account with ${client.user.username}.`, ephemeral: true };
+			return { content: `No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true };
 		}
 
 		try {
