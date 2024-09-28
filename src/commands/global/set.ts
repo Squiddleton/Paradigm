@@ -20,7 +20,7 @@ export default new SlashCommand({
 		const set = interaction.options.getString('set', true);
 		let cosmetics: BRCosmetic[] = [];
 		try {
-			cosmetics = await fortniteAPI.filterCosmetics({ set });
+			cosmetics = await fortniteAPI.brCosmeticsSearchAll({ set });
 		}
 		catch (error) {
 			if (error instanceof FortniteAPIError) {

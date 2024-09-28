@@ -11,7 +11,7 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
-import { getBRCosmetics, getCosmetics } from '../util/fortnite.js';
+import { getBRCosmetics, getCosmeticName, getCosmetics } from '../util/fortnite.js';
 import { getUser } from '../util/users.js';
 
 export default new ClientEvent({
@@ -43,7 +43,7 @@ export default new ClientEvent({
 					const filteredCosmetics = cosmetics
 						.filter(c => c.type.value === type)
 						.map(mapByName)
-						.filter((n): n is string => n !== null);
+						.filter((n): n is string => n !== undefined);
 
 					const { ratings } = findBestMatch(input, filteredCosmetics);
 
@@ -72,7 +72,7 @@ export default new ClientEvent({
 							filteredCosmetics = filteredCosmetics.filter(cosmetic => userResult.wishlistCosmeticIds.includes(cosmetic.id));
 						}
 
-						const { ratings } = findBestMatch(input, filteredCosmetics.map(c => `${'name' in c ? c.name : c.title} (${'type' in c ? c.type.displayValue : 'Jam Track'})`));
+						const { ratings } = findBestMatch(input, filteredCosmetics.map(c => `${getCosmeticName(c)} (${'type' in c ? c.type.displayValue : 'Jam Track'})`));
 						const choices = ratings
 							.sort(sortByRating)
 							.slice(0, 25)
@@ -81,7 +81,7 @@ export default new ClientEvent({
 								if (match === null) throw new TypeError(`The target ${target} did not match the RegExp`);
 
 								const [, cosmeticName, cosmeticType] = match;
-								const cosmetic = filteredCosmetics.find(c => ('name' in c ? c.name : c.title) === cosmeticName && ('type' in c ? c.type.displayValue : 'Jam Track') === cosmeticType);
+								const cosmetic = filteredCosmetics.find(c => getCosmeticName(c) === cosmeticName && ('type' in c ? c.type.displayValue : 'Jam Track') === cosmeticType);
 								if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', target));
 
 								return { name: target.slice(0, 100), value: cosmetic.id };
@@ -101,7 +101,7 @@ export default new ClientEvent({
 							}
 							throw error;
 						}
-						const playlistNames = removeDuplicates(playlists.map(mapByName).filter((n): n is string => n !== null));
+						const playlistNames = removeDuplicates(playlists.map(mapByName).filter((n): n is string => n !== undefined));
 						const { ratings } = findBestMatch(input, playlistNames);
 						const choices = ratings.sort(sortByRating).map(mapByTarget).slice(0, 25);
 						await interaction.respond(choices);

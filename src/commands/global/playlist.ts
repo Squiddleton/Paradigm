@@ -34,7 +34,7 @@ export default new SlashCommand({
 
 		const input = interaction.options.getString('playlist', true);
 
-		const playlist = playlists.find(p => [p.name, p.id].some(keyword => keyword !== null && normalize(keyword) === normalize(input)));
+		const playlist = playlists.find(p => [p.name, p.id].some(keyword => keyword !== undefined && normalize(keyword) === normalize(input)));
 		if (playlist === undefined) {
 			await interaction.editReply('No playlist matches your query.');
 			return;
@@ -45,7 +45,7 @@ export default new SlashCommand({
 				new EmbedBuilder()
 					.setTitle(playlist.name ?? 'Unnamed Playlist')
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
-					.setImage(playlist.images.showcase)
+					.setImage(playlist.images.showcase ?? null)
 					.setFields([
 						{ name: 'Modes', value: removeDuplicates(playlists.filter(p => p.name === playlist.name).map(p => p.subName)).join('/') || 'N/A', inline: true },
 						{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }

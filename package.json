@@ -22,7 +22,7 @@
 		"@sentry/node": "^7.98.0",
 		"@squiddleton/discordjs-util": "^1.2.0",
 		"@squiddleton/epic": "^0.5.0",
-		"@squiddleton/fortnite-api": "^1.1.1",
+		"@squiddleton/fortnite-api": "^2.0.2",
 		"@squiddleton/util": "^1.0.1",
 		"discord.js": "^14.13.0",
 		"mongoose": "^8.2.3",

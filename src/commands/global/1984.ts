@@ -15,7 +15,7 @@ export default new SlashCommand({
 		}
 
 		await interaction.deferReply();
-		const restrictedCosmetics = await fortniteAPI.filterCosmetics({ gameplayTag: 'Cosmetics.Gating.RatingMin.Teen' });
+		const restrictedCosmetics = await fortniteAPI.brCosmeticsSearchAll({ gameplayTag: 'Cosmetics.Gating.RatingMin.Teen' });
 
 		const getValue = (type: string) => {
 			const all = cosmetics.filter(c => c.type.value == type).length;

@@ -3,7 +3,7 @@ import { normalize } from '@squiddleton/util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, type ButtonInteraction, ButtonStyle, ComponentType, chatInputApplicationCommandMention, italic } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordIds, Time } from '../../util/constants.js';
-import { getCosmetics, viewWishlist } from '../../util/fortnite.js';
+import { getCosmeticName, getCosmetics, viewWishlist } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import { addToWishlist, getUser, removeFromWishlist, saveUser } from '../../util/users.js';
 
@@ -64,13 +64,13 @@ export default new SlashCommand({
 
 		switch (interaction.options.getSubcommand()) {
 			case 'add': {
-				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize(getCosmeticName(c))].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
 				}
 
-				const cosmeticName = 'name' in cosmetic ? cosmetic.name : cosmetic.title;
+				const cosmeticName = getCosmeticName(cosmetic);
 				const userResult = getUser(userId);
 				await addToWishlist(userId, cosmetic.id);
 
@@ -78,8 +78,8 @@ export default new SlashCommand({
 					await interaction.editReply({ content: `${cosmeticName} is already on your wishlist.` });
 				}
 				else {
-					const limitedTag = cosmetic.gameplayTags?.find(tag => ['SeasonShop', 'BattlePass', 'LimitedTimeReward'].some(phrase => tag.includes(phrase)));
-					await interaction.editReply(`${cosmeticName} has been added to your wishlist.${(limitedTag === undefined || (cosmetic.shopHistory !== null && cosmetic.shopHistory.length > 0)) ? '' : italic(`\nWarning: This cosmetic has the gameplay tag "${limitedTag}" which implies that it may never appear in the item shop.`)}`);
+					const limitedTag = 'gameplayTags' in cosmetic ? cosmetic.gameplayTags?.find(tag => ['SeasonShop', 'BattlePass', 'LimitedTimeReward'].some(phrase => tag.includes(phrase))) : undefined;
+					await interaction.editReply(`${cosmeticName} has been added to your wishlist.${(limitedTag === undefined || ('shopHistory' in cosmetic && cosmetic.shopHistory !== undefined && cosmetic.shopHistory.length > 0)) ? '' : italic(`\nWarning: This cosmetic has the gameplay tag "${limitedTag}" which implies that it may never appear in the item shop.`)}`);
 				}
 
 				if (interaction.inCachedGuild()) {
@@ -139,7 +139,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'remove': {
-				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+				const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize(getCosmeticName(c))].includes(normalize(interaction.options.getString('cosmetic', true))));
 				if (cosmetic === undefined) {
 					await interaction.editReply({ content: 'I could not find a cosmetic with that name.' });
 					return;
@@ -156,7 +156,7 @@ export default new SlashCommand({
 				}
 
 				await removeFromWishlist(userId, cosmetic.id);
-				await interaction.editReply(`${'name' in cosmetic ? cosmetic.name : cosmetic.title} has been removed from your wishlist.`);
+				await interaction.editReply(`${getCosmeticName(cosmetic)} has been removed from your wishlist.`);
 				break;
 			}
 			case 'view': {

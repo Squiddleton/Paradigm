@@ -1,12 +1,9 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem } from '@squiddleton/util';
 import { ApplicationCommandOptionType, AttachmentBuilder, EmbedBuilder } from 'discord.js';
 import { BackgroundURL } from '../../util/constants.js';
-import { createCosmeticEmbed, getBRCosmetics } from '../../util/fortnite.js';
-
-const getImage = (cosmetic: BRCosmetic) => cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
+import { createCosmeticEmbed, getBRCosmetics, getCosmeticLargeIcon } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'random',
@@ -55,7 +52,7 @@ export default new SlashCommand({
 		const ctx = canvas.getContext('2d');
 		ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 
-		const outfitIcon = getImage(outfit);
+		const outfitIcon = getCosmeticLargeIcon(outfit);
 		if (outfitIcon === null) {
 			await interaction.editReply('Your Outfit has no image; please try a different one!');
 			return;
@@ -63,7 +60,7 @@ export default new SlashCommand({
 		const outfitImage = await loadImage(outfitIcon);
 		ctx.drawImage(outfitImage, (background.width - (background.height * outfitImage.width / outfitImage.height)) / 2, 0, background.height * outfitImage.width / outfitImage.height, background.height);
 
-		const backBlingIcon = getImage(backBling);
+		const backBlingIcon = getCosmeticLargeIcon(backBling);
 		if (backBlingIcon === null) {
 			await interaction.editReply('Your Back Bling has no image; please try a different one!');
 			return;
@@ -71,7 +68,7 @@ export default new SlashCommand({
 		const backBlingImage = await loadImage(backBlingIcon);
 		ctx.drawImage(backBlingImage, 0, 0, background.height * backBlingImage.width / backBlingImage.height / 2, background.height / 2);
 
-		const pickaxeIcon = getImage(pickaxe);
+		const pickaxeIcon = getCosmeticLargeIcon(pickaxe);
 		if (pickaxeIcon === null) {
 			await interaction.editReply('Your Pickaxe has no image; please try a different one!');
 			return;
@@ -79,7 +76,7 @@ export default new SlashCommand({
 		const pickaxeImage = await loadImage(pickaxeIcon);
 		ctx.drawImage(pickaxeImage, 0, background.height / 2, background.height * pickaxeImage.width / pickaxeImage.height / 2, background.height / 2);
 
-		const gliderIcon = getImage(glider);
+		const gliderIcon = getCosmeticLargeIcon(glider);
 		if (gliderIcon === null) {
 			await interaction.editReply('Your Glider has no image; please try a different one!');
 			return;
@@ -87,7 +84,7 @@ export default new SlashCommand({
 		const gliderImage = await loadImage(gliderIcon);
 		ctx.drawImage(gliderImage, background.width - (background.height * gliderImage.width / gliderImage.height / 2), 0, background.height * gliderImage.width / gliderImage.height / 2, background.height / 2);
 
-		const wrapIcon = getImage(wrap);
+		const wrapIcon = getCosmeticLargeIcon(wrap);
 		if (wrapIcon === null) {
 			await interaction.editReply('Your Wrap has no image; please try a different one!');
 			return;

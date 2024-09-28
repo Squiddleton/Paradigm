@@ -1,10 +1,10 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type LEGOKit, type TrackCosmetic } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type TrackCosmetic } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
+import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, EpicEndpoint, ErrorMessage, RankedTrack, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
@@ -15,22 +15,26 @@ import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 
 let cachedBRCosmetics: BRCosmetic[] = [];
-let cachedCosmetics: (AnyCosmetic | LEGOKit)[] = [];
+let cachedCosmetics: AnyCosmetic[] = [];
 
 export const getBRCosmetics = () => cachedBRCosmetics;
 export const getCosmetics = () => cachedCosmetics;
 export const fetchCosmetics = async () => {
 	try {
-		const cosmetics = await fortniteAPI.listCosmetics();
-		const allCosmetics = await fortniteAPI.cosmetics();
+		const cosmetics = await fortniteAPI.cosmetics({ includeGameplayTags: true, includePaths: true, includeShopHistory: true });
+		const allCosmetics = await fortniteAPI.cosmetics({ includeGameplayTags: true, includePaths: true, includeShopHistory: true });
 
-		cachedBRCosmetics = cosmetics;
-		const unflat = Object.values(allCosmetics) as (AnyCosmetic | LEGOKit)[][];
+		cachedBRCosmetics = cosmetics.br;
+		const unflat = Object.values(allCosmetics) as AnyCosmetic[][];
 		cachedCosmetics = unflat.flat().filter(c => 'name' in c || 'title' in c);
 	}
 	catch (error) {
 		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
 	}
+};
+
+export const getCosmeticName = (c: AnyCosmetic): string => {
+	return 'name' in c ? c.name ?? 'Unnamed Cosmetic' : 'title' in c ? c.title : c.id;
 };
 
 /**
@@ -39,7 +43,7 @@ export const fetchCosmetics = async () => {
  * @returns An array of cosmetic objects
  */
 export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
-	const shop = await fortniteAPI.newShop();
+	const shop = await fortniteAPI.shop();
 
 	const withoutDupes: AnyCosmetic[] = [];
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -90,12 +94,12 @@ export const fetchStates = () => epicClient.fortnite.getTimeline().then(timeline
 
 export const findCosmetic = async (input: string) => {
 	try {
-		const cosmeticById = await fortniteAPI.findCosmetic({ id: input });
+		const cosmeticById = await fortniteAPI.brCosmeticsSearch({ id: input });
 		return cosmeticById;
 	}
 	catch {
 		try {
-			const cosmeticByName = await fortniteAPI.findCosmetic({ name: input });
+			const cosmeticByName = await fortniteAPI.brCosmeticsSearch({ name: input });
 			return cosmeticByName;
 		}
 		catch {
@@ -129,7 +133,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 				const messages = ['Today\'s shop includes the following items from members\' wishlists:\n'];
 
 				for (const user of userResults.filter(u => members.has(u._id))) {
-					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => 'name' in c ? c.name : c.title));
+					const items = removeDuplicates(entries.filter(e => user.wishlistCosmeticIds.includes(e.id)).map(c => getCosmeticName(c)));
 					if (items.length > 0) messages.push(`${userMention(user._id)}: ${items.slice(0, 10).join(', ')}${items.length > 10 ? `, and ${items.length - 10} more!` : ''}`);
 				}
 
@@ -183,9 +187,13 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
  */
 export const getCosmeticColor = (cosmetic: Exclude<AnyCosmetic, TrackCosmetic>): ColorResolvable | null => {
-	const seriesColor = cosmetic.series?.colors[0].slice(0, 6);
-	return seriesColor === undefined ? RarityColors[cosmetic.rarity.displayValue] ?? null : `#${seriesColor}`;
+	const seriesColor = 'series' in cosmetic ? cosmetic.series?.colors[0].slice(0, 6) : undefined;
+	return seriesColor === undefined ? null : `#${seriesColor}`;
 };
+
+export const getCosmeticSmallIcon = (cosmetic: AnyCosmetic): string | null => 'images' in cosmetic ? ('smallIcon' in cosmetic.images ? cosmetic.images.smallIcon ?? null : 'small' in cosmetic.images ? cosmetic.images.small : cosmetic.images.icon ?? null) : cosmetic.albumArt;
+
+export const getCosmeticLargeIcon = (cosmetic: AnyCosmetic): string | null => 'images' in cosmetic ? ('featured' in cosmetic.images ? cosmetic.images.featured ?? cosmetic.images.icon ?? null : 'large' in cosmetic.images ? cosmetic.images.large : getCosmeticSmallIcon(cosmetic)) : cosmetic.albumArt;
 
 /**
  * Returns an embed describing a cosmetic.
@@ -193,25 +201,25 @@ export const getCosmeticColor = (cosmetic: Exclude<AnyCosmetic, TrackCosmetic>):
  * @param cosmetic - A cosmetic object
  * @returns An embed filled with information about the specified cosmetic
  */
-export const createCosmeticEmbed = (cosmetic: AnyCosmetic | LEGOKit) => {
+export const createCosmeticEmbed = (cosmetic: AnyCosmetic) => {
 	const embed = new EmbedBuilder()
-		.setTitle('name' in cosmetic ? cosmetic.name : cosmetic.title)
+		.setTitle(getCosmeticName(cosmetic))
 		.setDescription('description' in cosmetic ? cosmetic.description : 'artist' in cosmetic ? cosmetic.artist : null)
 		.setColor('series' in cosmetic ? getCosmeticColor(cosmetic) : null)
-		.setThumbnail('images' in cosmetic ? ('smallIcon' in cosmetic.images ? cosmetic.images.smallIcon : cosmetic.images.small) : cosmetic.albumArt)
-		.setImage('images' in cosmetic ? ('featured' in cosmetic.images ? cosmetic.images.featured ?? cosmetic.images.icon : cosmetic.images.large) : cosmetic.albumArt)
+		.setThumbnail(getCosmeticSmallIcon(cosmetic))
+		.setImage(getCosmeticLargeIcon(cosmetic))
 		.setFields([
 			{ name: 'Type', value: 'type' in cosmetic ? cosmetic.type.displayValue : 'Jam Track', inline: true },
 			{ name: 'Rarity', value: 'rarity' in cosmetic ? cosmetic.rarity.displayValue : 'None', inline: true },
 			{ name: 'Set', value: 'set' in cosmetic ? (cosmetic.set?.value ?? 'None') : 'None', inline: true },
-			{ name: 'Introduction', value: 'introduction' in cosmetic ? (cosmetic.introduction === null ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`) : 'N/A', inline: true }
+			{ name: 'Introduction', value: 'introduction' in cosmetic ? (cosmetic.introduction === undefined ? 'N/A' : `Chapter ${cosmetic.introduction.chapter}, Season ${cosmetic.introduction.season}`) : 'N/A', inline: true }
 		]);
 	// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
-	if (cosmetic.shopHistory !== null) {
+	if ('shopHistory' in cosmetic && cosmetic.shopHistory !== undefined) {
 		const debut = cosmetic.shopHistory[0];
 		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))}\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
-	if (cosmetic.gameplayTags?.includes('Cosmetics.Gating.RatingMin.Teen')) embed.setFooter({ text: 'You cannot use this item in experiences rated Everyone 10+ or lower.' });
+	if ('gameplayTags' in cosmetic && cosmetic.gameplayTags?.includes('Cosmetics.Gating.RatingMin.Teen')) embed.setFooter({ text: 'You cannot use this item in experiences rated Everyone 10+ or lower.' });
 	if ('customExclusiveCallout' in cosmetic && cosmetic.customExclusiveCallout !== undefined) embed.addFields({ name: 'Exclusive', value: cosmetic.customExclusiveCallout, inline: true });
 	return embed;
 };
@@ -258,7 +266,7 @@ export const createLoadoutAttachment = async (outfit: StringOption, backbling: S
 			if (cosmetic === undefined) return `No ${displayType} matches your query.`;
 
 			const icon = cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon;
-			if (icon === null) return `Your ${displayType} has no image; please try a different one!`;
+			if (icon === undefined) return `Your ${displayType} has no image; please try a different one!`;
 			image = await loadImage(icon);
 		}
 
@@ -940,7 +948,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 			const cosmetic = cosmetics.find(c => c.id === id);
 			if (cosmetic === undefined) throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', id));
 			const type = 'type' in cosmetic ? cosmetic.type.displayValue : 'Jam Track';
-			return `${'name' in cosmetic ? cosmetic.name : cosmetic.title}${type === 'Outfit' ? '' : ` (${type})`}`;
+			return `${getCosmeticName(cosmetic)}${type === 'Outfit' ? '' : ` (${type})`}`;
 		})
 		.sort((a, b) => a.localeCompare(b));
 

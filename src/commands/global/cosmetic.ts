@@ -4,7 +4,7 @@ import { normalize } from '@squiddleton/util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, type MessageActionRowComponentBuilder, RESTJSONErrorCodes, StringSelectMenuBuilder } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { ErrorMessage, LanguageChoices, Time } from '../../util/constants.js';
-import { createCosmeticEmbed, getCosmetics } from '../../util/fortnite.js';
+import { createCosmeticEmbed, getCosmeticLargeIcon, getCosmeticName, getCosmetics } from '../../util/fortnite.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 import type { ButtonOrMenu } from '../../util/types.js';
 
@@ -30,7 +30,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize('name' in c ? c.name ?? c.id : c.title)].includes(normalize(interaction.options.getString('cosmetic', true))));
+		const cosmetic = getCosmetics().find(c => [normalize(c.id), normalize(getCosmeticName(c))].includes(normalize(interaction.options.getString('cosmetic', true))));
 		const language = interaction.options.getString('language') as Language | null;
 
 		if (cosmetic === undefined) {
@@ -38,7 +38,7 @@ export default new SlashCommand({
 			return;
 		}
 
-		const embed = createCosmeticEmbed(language === null ? cosmetic : await fortniteAPI.findCosmetic({ id: cosmetic.id, language }));
+		const embed = createCosmeticEmbed(language === null ? cosmetic : await fortniteAPI.brCosmeticsSearch({ id: cosmetic.id, language }));
 		if (!('variants' in cosmetic)) {
 			await interaction.editReply({ embeds: [embed] });
 			return;
@@ -87,7 +87,7 @@ export default new SlashCommand({
 									: c
 								));
 							}
-							await i.update({ components, embeds: [embed.setImage(cosmetic.images.featured ?? cosmetic.images.icon)] });
+							await i.update({ components, embeds: [embed.setImage(getCosmeticLargeIcon(cosmetic))] });
 							break;
 						}
 						case 'lock': {

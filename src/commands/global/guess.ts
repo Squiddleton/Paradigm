@@ -4,7 +4,7 @@ import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { Time } from '../../util/constants.js';
-import { getBRCosmetics, getCosmeticColor } from '../../util/fortnite.js';
+import { getBRCosmetics, getCosmeticColor, getCosmeticLargeIcon } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'guess',
@@ -18,7 +18,7 @@ export default new SlashCommand({
 		const getCosmeticWithImage = (): [BRCosmetic, string | null] => {
 			const items = cosmetics.filter(c => c.type.displayValue === 'Outfit' && c.name !== 'TBD');
 			const cosmetic = getRandomItem(items);
-			const image = cosmetic.images.featured ?? cosmetic.images.icon;
+			const image = getCosmeticLargeIcon(cosmetic);
 			return [cosmetic, image];
 		};
 
