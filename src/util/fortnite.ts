@@ -595,6 +595,13 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	const racingTrackguid = RankedTrack.InfernoIslandRacing;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
+		case 'reload1': {
+			seasonName = 'Reload';
+			brTrackguid = RankedTrack.Reload1BR;
+			zbTrackguid = RankedTrack.Reload1ZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
 		case 'c5s3': {
 			seasonName = 'Chapter 5 Season 3';
 			brTrackguid = RankedTrack.C5S3BR;
@@ -663,17 +670,17 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	ctx.font = `${fontSize}px fortnite, jetbrains`;
 	ctx.textAlign = 'center';
-	ctx.fillStyle = season === 'og' ? 'black' : 'white';
+	ctx.fillStyle = backgroundPath === 'og.jpg' ? 'black' : 'white';
 
-	ctx.fillText(`${seasonName} Ranked: ${account.name}`, width / 2, fontSize, width);
+	ctx.fillText(`${seasonName === 'Reload' ? 'Ranked Reload' : `${seasonName} Ranked`}: ${account.name}`, width / 2, fontSize, width);
 
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
-	if (rankingType === 'br') {
-		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
-		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
+	if (rankingType === 'rr') {
+		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
 	}
 	else {
-		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
+		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
+		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
 	}
 
 	const drawRankedImage = async (xOffset: number, track: HabaneroTrackProgress) => {
@@ -748,18 +755,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite, jetbrains`;
-		ctx.fillStyle = season === 'og' ? 'purple' : 'yellow';
+		ctx.fillStyle = backgroundPath === 'og.jpg' ? 'purple' : 'yellow';
 		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
 		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
 		ctx.fillText(text, xOffset + (width / 4), height * 0.9, width / 2);
 	};
 
-	if (rankingType === 'br') {
-		await drawRankedImage(0, brTrack);
-		await drawRankedImage(width * 0.5, zbTrack);
+	if (rankingType === 'rr') {
+		await drawRankedImage(width * 0.25, racingTrack);
 	}
 	else {
-		await drawRankedImage(width * 0.25, racingTrack);
+		await drawRankedImage(0, brTrack);
+		await drawRankedImage(width * 0.5, zbTrack);
 	}
 
 	const buffer = await canvas.encode('jpeg');
