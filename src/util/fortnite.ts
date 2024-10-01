@@ -658,15 +658,16 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.drawImage(background, 0, 0);
 
 	GlobalFonts.registerFromPath('./fonts/fortnite.otf', 'fortnite');
+	GlobalFonts.registerFromPath('./fonts/jetbrains-mono.ttf', 'jetbrains');
 	const fontSize = height / 8;
 
-	ctx.font = `${fontSize}px fortnite`;
+	ctx.font = `${fontSize}px fortnite, jetbrains`;
 	ctx.textAlign = 'center';
 	ctx.fillStyle = season === 'og' ? 'black' : 'white';
 
 	ctx.fillText(`${seasonName} Ranked: ${account.name}`, width / 2, fontSize, width);
 
-	ctx.font = `${fontSize / 2}px fortnite`;
+	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
 	if (rankingType === 'br') {
 		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
 		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
@@ -746,7 +747,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		if (divisionIconName === 'unreal') ctx.drawImage(divisionIcon, (width * 0.1) + xOffset, height / 4.5, iconWidth * 1.5, iconWidth * 1.5);
 		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
-		ctx.font = `${fontSize * 0.5}px fortnite`;
+		ctx.font = `${fontSize * 0.5}px fortnite, jetbrains`;
 		ctx.fillStyle = season === 'og' ? 'purple' : 'yellow';
 		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
 		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
