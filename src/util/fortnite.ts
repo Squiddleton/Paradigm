@@ -573,8 +573,16 @@ export const handleStatsError = (interaction: CommandInteraction, e: unknown, ac
  * @param ephemeral - Whether the response should only be visible to the user
  */
 export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, account: EpicAccount, ephemeral = false) => {
-	await setEpicAccount(interaction.user.id, account.id);
-	await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
+	const userId = interaction.user.id;
+	const userDocument = getUser(userId);
+
+	if (account.id === userDocument?.epicAccountId) {
+		await interaction.followUp({ content: 'You have already linked that Epic account with this bot.', ephemeral: true });
+	}
+	else {
+		await setEpicAccount(userId, account.id);
+		await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
+	}
 };
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
