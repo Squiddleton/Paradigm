@@ -16,6 +16,8 @@ export default new SlashCommand({
 			choices: [
 				{ name: 'Battle Royale', value: RankedTrack.C5S4BR },
 				{ name: 'Zero Build', value: RankedTrack.C5S4ZB },
+				{ name: 'Reload (BR)', value: RankedTrack.Reload1BR },
+				{ name: 'Reload (ZB)', value: RankedTrack.Reload1ZB },
 				{ name: 'Rocket Racing', value: RankedTrack.InfernoIslandRacing }
 			]
 		}
@@ -28,7 +30,7 @@ export default new SlashCommand({
 			return;
 		}
 
-		const track = interaction.options.getString('mode', true) as RankedTrack.C5S4BR | RankedTrack.C5S4ZB | RankedTrack.InfernoIslandRacing;
+		const track = interaction.options.getString('mode', true) as RankedTrack.C5S4BR | RankedTrack.C5S4ZB | RankedTrack.InfernoIslandRacing | RankedTrack.Reload1BR | RankedTrack.Reload1ZB;
 
 		if (!trackedModes.has(userResult.epicAccountId)) trackedModes.set(userResult.epicAccountId, { displayUsername: interaction.user.displayName, trackedModes: [] });
 		const trackedUser = trackedModes.get(userResult.epicAccountId);
@@ -40,7 +42,9 @@ export default new SlashCommand({
 		const trackDisplayName = {
 			[RankedTrack.C5S4BR]: 'Battle Royale',
 			[RankedTrack.C5S4ZB]: 'Zero Build',
-			[RankedTrack.InfernoIslandRacing]: 'Rocket Racing'
+			[RankedTrack.InfernoIslandRacing]: 'Rocket Racing',
+			[RankedTrack.Reload1BR]: 'Reload (Battle Royale)',
+			[RankedTrack.Reload1ZB]: 'Reload (Zero Build)'
 		}[track];
 		const existingTrack = trackedUser.trackedModes.find(t => t.trackguid === track);
 
