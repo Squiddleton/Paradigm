@@ -11,6 +11,7 @@ import { getTrackProgress, trackedModes } from '../util/epic.js';
 import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
+import { divisionNames } from '../util/constants.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -68,13 +69,13 @@ export default new ClientEvent({
 							if (cachedProgress === undefined || newProgress === undefined) return;
 
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.currentDivision < cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${cachedProgress.currentDivision} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${newProgress.currentDivision} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! Division ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 						}
 					}

@@ -43,6 +43,8 @@ export namespace DiscordIds {
 	}
 }
 
+export const divisionNames = ['Bronze I', 'Bronze II', 'Bronze III', 'Silver I', 'Silver II', 'Silver III', 'Gold I', 'Gold II', 'Gold III', 'Platinum I', 'Platinum II', 'Platinum III', 'Diamond I', 'Diamond II', 'Diamond III', 'Elite', 'Champion', 'Unreal'];
+
 /**
  * fortniteIOSGameClient in `clientId:secret` format and encoded in Base64
  */
