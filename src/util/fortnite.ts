@@ -1,10 +1,10 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type TrackCosmetic } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, Time } from './constants.js';
+import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
@@ -186,9 +186,11 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @param cosmetic - A cosmetic object
  * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
  */
-export const getCosmeticColor = (cosmetic: Exclude<AnyCosmetic, TrackCosmetic>): ColorResolvable | null => {
+export const getCosmeticColor = (cosmetic: AnyCosmetic): ColorResolvable | null => {
 	const seriesColor = 'series' in cosmetic ? cosmetic.series?.colors[0].slice(0, 6) : undefined;
-	return seriesColor === undefined ? null : `#${seriesColor}`;
+	return seriesColor === undefined
+		? 'rarity' in cosmetic ? RarityColors[cosmetic.rarity.displayValue] ?? null : null
+		: `#${seriesColor}`;
 };
 
 export const getCosmeticSmallIcon = (cosmetic: AnyCosmetic): string | null => 'images' in cosmetic ? ('smallIcon' in cosmetic.images ? cosmetic.images.smallIcon ?? null : 'small' in cosmetic.images ? cosmetic.images.small : cosmetic.images.icon ?? null) : cosmetic.albumArt;
@@ -205,7 +207,7 @@ export const createCosmeticEmbed = (cosmetic: AnyCosmetic) => {
 	const embed = new EmbedBuilder()
 		.setTitle(getCosmeticName(cosmetic))
 		.setDescription('description' in cosmetic ? cosmetic.description : 'artist' in cosmetic ? cosmetic.artist : null)
-		.setColor('series' in cosmetic ? getCosmeticColor(cosmetic) : null)
+		.setColor(getCosmeticColor(cosmetic))
 		.setThumbnail(getCosmeticSmallIcon(cosmetic))
 		.setImage(getCosmeticLargeIcon(cosmetic))
 		.setFields([
