@@ -8,7 +8,7 @@ export default new ContextMenu({
 	name: 'View Stats',
 	type: ApplicationCommandType.User,
 	scope: 'Global',
-	async execute(interaction, client) {
+	async execute(interaction) {
 		const levelsOptions: LevelCommandOptions = {
 			targetUser: interaction.targetUser,
 			accountName: null,
@@ -16,7 +16,7 @@ export default new ContextMenu({
 		};
 
 		try {
-			const { content } = await getLevelsString(client, levelsOptions);
+			const { content } = await getLevelsString(levelsOptions);
 
 			await sendStatsImages(interaction, {
 				...levelsOptions,

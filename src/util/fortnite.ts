@@ -2,7 +2,7 @@ import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canva
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underscore, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
@@ -494,11 +494,10 @@ const getStatsErrorMessage = (e: unknown, accountType: AccountType) => {
 /**
  * Returns the content for a message containing a user's final level in each Fortnite season.
  *
- * @param client - A ready Discord client
  * @param options - Options specifying the Discord user and their Epic Games account
  * @returns Options for replying to an interaction and, if found, the user's Epic Games account
  */
-export const getLevelsString = async (client: Client<true>, options: LevelCommandOptions): Promise<InteractionReplyOptions & { account?: EpicAccount }> => {
+export const getLevelsString = async (options: LevelCommandOptions): Promise<InteractionReplyOptions & { account?: EpicAccount }> => {
 	const { accountName, accountType } = options;
 
 	/**
