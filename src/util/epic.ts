@@ -9,24 +9,26 @@ export const trackedModes = new Map<string, TrackedUser>();
 const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && error.status === 500;
 const isEpicInternalError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
 
-export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | null> => {
+export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | string> => {
 	const seasons = ChapterLengths.reduce((p, c) => p + c, 0);
 	const stats = getBattlePassLevels(seasons).filter(s => s !== 's12_social_bp_level').slice(-20);
 	let bulkStats: EpicStats[];
 	try {
 		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
+		if (bulkStats.length == 0) console.log(bulkStats, stats, accountId);
 	}
 	catch {
 		try {
 			await epicClient.auth.authenticate(config.epicDeviceAuth);
 		}
 		catch (error) {
-			if (isEpicInternalError(error)) return null;
+			if (isEpicInternalError(error)) return 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.';
 			else if (!isEpicAuthError(error)) throw error;
 		}
 		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
 		console.log('Reauthenticated to retrieve level stats.');
 	}
+	if (bulkStats.length === 0) return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
 	return bulkStats[0].stats;
 };
 

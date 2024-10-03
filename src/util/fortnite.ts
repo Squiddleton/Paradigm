@@ -537,7 +537,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 
 		try {
 			const stats = await getLevelStats(userResult.epicAccountId);
-			if (stats === null) return { content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' };
+			if (typeof stats === 'string') return { content: stats };
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
@@ -548,7 +548,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 		try {
 			const { account } = await fortniteAPI.stats({ name: accountName, accountType });
 			const stats = await getLevelStats(account.id);
-			if (stats === null) return { content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' };
+			if (typeof stats === 'string') return { content: stats };
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
