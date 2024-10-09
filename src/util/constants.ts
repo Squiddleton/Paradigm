@@ -1,5 +1,5 @@
 import { getEnumKeys } from '@squiddleton/util';
-import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits, type TextBasedChannel } from 'discord.js';
+import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from 'discord.js';
 import type { StringChoices } from './types.js';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
@@ -195,7 +195,7 @@ export enum RarityOrdering {
 
 export const Rarities = getEnumKeys(RarityOrdering);
 
-export const TextBasedChannelTypes: (ApplicationCommandOptionAllowedChannelTypes & TextBasedChannel['type'])[] = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice];
+export const TextBasedChannelTypes = [ChannelType.GuildAnnouncement, ChannelType.GuildText, ChannelType.GuildVoice] as const satisfies ApplicationCommandOptionAllowedChannelTypes[];
 
 export enum Time {
 	/** 3 minutes */

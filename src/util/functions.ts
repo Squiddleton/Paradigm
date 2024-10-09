@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -158,6 +158,8 @@ export const messageComponentCollectorFilter = (interaction: BaseInteraction) =>
  * @param inc - The amount of items shown per page
  */
 export const paginate = (interaction: CommandInteraction, message: Message, embed: EmbedBuilder, buttons: PaginationButtons, itemName: string, items: string[], inc = 25) => {
+	if (message.channel.type === ChannelType.GroupDM) return;
+
 	const row = new ActionRowBuilder<ButtonBuilder>({ components: buttons });
 	const [first, back, next, last, quit] = buttons;
 	let index = 0;

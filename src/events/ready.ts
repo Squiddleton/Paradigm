@@ -54,7 +54,7 @@ export default new ClientEvent({
 		// Intervals
 
 		const rankedChannel = client.channels.cache.get('1170469502136356874');
-		if (!rankedChannel?.isTextBased()) return;
+		if (!rankedChannel?.isSendable()) return;
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
 		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
 			for (const [epicAccountId, trackedUser] of trackedModes) {
