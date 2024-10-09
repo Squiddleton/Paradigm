@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underscore, userMention } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -171,7 +171,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 	});
 	collector
 		.on('collect', async i => {
-			const getDescription = () => `${underscore(`${itemName} (${items.length}):`)}\n${items.slice(index, index + inc).join('\n')}`;
+			const getDescription = () => `${underline(`${itemName} (${items.length}):`)}\n${items.slice(index, index + inc).join('\n')}`;
 
 			switch (i.customId) {
 				case 'quit': {
