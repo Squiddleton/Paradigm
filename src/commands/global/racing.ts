@@ -59,7 +59,7 @@ export default new SlashCommand({
 			}
 		}
 
-		const buffer = await createRankedImage(stats.account, true, 'rr', 's0');
+		const buffer = await createRankedImage(stats.account, true, 'rr', 'c5s4');
 		if (buffer === null) await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
 		else await interaction.editReply({ files: [buffer] });
 
