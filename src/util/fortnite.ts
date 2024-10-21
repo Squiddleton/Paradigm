@@ -1,8 +1,8 @@
 import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
@@ -553,6 +553,39 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 		}
 		catch (error) {
 			return { content: getStatsErrorMessage(error, accountType), ephemeral: true };
+		}
+	}
+};
+
+export const getStats = async (interaction: ChatInputCommandInteraction, accountName: string | null, accountType: AccountType, user: User | null): Promise<Stats<false> | null> => {
+	if (accountName !== null) {
+		try {
+			const stats = await fortniteAPI.stats({ name: accountName, accountType });
+			return stats;
+		}
+		catch (error) {
+			await handleStatsError(interaction, error, accountType);
+			return null;
+		}
+	}
+	else {
+		const userResult = getUser(user?.id ?? interaction.user.id);
+		if (!userResult?.epicAccountId) {
+			if (user === null) {
+				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+			}
+			else {
+				await interaction.editReply(`${user.displayName} has not yet linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+			}
+			return null;
+		}
+		try {
+			const stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
+			return stats;
+		}
+		catch (error) {
+			await handleStatsError(interaction, error);
+			return null;
 		}
 	}
 };

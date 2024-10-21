@@ -1,10 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { AccountType, Stats } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType, chatInputApplicationCommandMention, EmbedBuilder } from 'discord.js';
-import fortniteAPI from '../../clients/fortnite.js';
-import { DiscordIds, PlatformChoices, RankedEmojiIds, RankedTrack } from '../../util/constants.js';
-import { handleStatsError, linkEpicAccount } from '../../util/fortnite.js';
-import { getUser } from '../../util/users.js';
+import type { AccountType } from '@squiddleton/fortnite-api';
+import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
+import { PlatformChoices, RankedEmojiIds, RankedTrack } from '../../util/constants.js';
+import { getStats, linkEpicAccount } from '../../util/fortnite.js';
 import { getTrackProgress } from '../../util/epic.js';
 import type { HabaneroTrackProgress } from '@squiddleton/epic';
 
@@ -42,35 +40,8 @@ export default new SlashCommand({
 		const user = interaction.options.getUser('user');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
-		let stats: Stats<false>;
-		if (accountName !== null) {
-			try {
-				stats = await fortniteAPI.stats({ name: accountName, accountType });
-			}
-			catch (error) {
-				await handleStatsError(interaction, error, accountType);
-				return;
-			}
-		}
-		else {
-			const userResult = getUser(user?.id ?? interaction.user.id);
-			if (!userResult?.epicAccountId) {
-				if (user === null) {
-					await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
-				}
-				else {
-					await interaction.editReply(`${user.displayName} has not linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
-				}
-				return;
-			}
-			try {
-				stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
-			}
-			catch (error) {
-				await handleStatsError(interaction, error);
-				return;
-			}
-		}
+		const stats = await getStats(interaction, accountName, accountType, user);
+		if (stats === null) return;
 
 		const progress = await getTrackProgress(stats.account.id);
 		if (progress === null) {

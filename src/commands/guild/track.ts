@@ -1,11 +1,9 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType, chatInputApplicationCommandMention } from 'discord.js';
-import { DiscordIds, PlatformChoices, RankedTrack } from '../../util/constants.js';
+import { ApplicationCommandOptionType } from 'discord.js';
+import { PlatformChoices, RankedTrack } from '../../util/constants.js';
 import { trackedModes } from '../../util/epic.js';
-import { getUser } from '../../util/users.js';
-import { handleStatsError } from '../../util/fortnite.js';
-import fortniteAPI from '../../clients/fortnite.js';
-import type { AccountType, EpicAccount } from '@squiddleton/fortnite-api';
+import { getStats } from '../../util/fortnite.js';
+import type { AccountType } from '@squiddleton/fortnite-api';
 
 export default new SlashCommand({
 	name: 'track',
@@ -30,6 +28,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String
 		},
 		{
+			name: 'user',
+			description: 'The player who linked their Epic account with the bot; defaults to yourself or the "player" option',
+			type: ApplicationCommandOptionType.User
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -41,26 +44,10 @@ export default new SlashCommand({
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
-		let account: EpicAccount;
-		if (accountName !== null) {
-			try {
-				const stats = await fortniteAPI.stats({ name: accountName, accountType });
-				account = stats.account;
-			}
-			catch (error) {
-				await handleStatsError(interaction, error, accountType);
-				return;
-			}
-		}
-		else {
-			const userResult = getUser(interaction.user.id);
-			if (!userResult?.epicAccountId) {
-				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
-				return;
-			}
-			account = { name: interaction.user.displayName, id: userResult.epicAccountId };
-		}
+		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
+		if (stats === null) return;
 
+		const { account } = stats;
 		const accountId = account.id;
 		const track = interaction.options.getString('mode', true) as RankedTrack.C5S4BR | RankedTrack.C5S4ZB | RankedTrack.C5S4Racing | RankedTrack.Reload1BR | RankedTrack.Reload1ZB;
 

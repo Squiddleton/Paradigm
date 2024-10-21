@@ -1,10 +1,8 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import type { AccountType, Stats } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType, chatInputApplicationCommandMention } from 'discord.js';
-import fortniteAPI from '../../clients/fortnite.js';
-import { DiscordIds, PlatformChoices } from '../../util/constants.js';
-import { createRankedImage, handleStatsError, linkEpicAccount } from '../../util/fortnite.js';
-import { getUser } from '../../util/users.js';
+import type { AccountType } from '@squiddleton/fortnite-api';
+import { ApplicationCommandOptionType } from 'discord.js';
+import { PlatformChoices } from '../../util/constants.js';
+import { createRankedImage, getStats, linkEpicAccount } from '../../util/fortnite.js';
 
 export default new SlashCommand({
 	name: 'ranked',
@@ -14,6 +12,11 @@ export default new SlashCommand({
 			name: 'player',
 			description: 'The player\'s username; defaults to your linked account, if any',
 			type: ApplicationCommandOptionType.String
+		},
+		{
+			name: 'user',
+			description: 'The player who linked their Epic account with the bot; defaults to yourself or the "player" option',
+			type: ApplicationCommandOptionType.User
 		},
 		{
 			name: 'season',
@@ -50,30 +53,8 @@ export default new SlashCommand({
 		const season = interaction.options.getString('season') ?? 'c5s4';
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
-		let stats: Stats<false>;
-		if (accountName !== null) {
-			try {
-				stats = await fortniteAPI.stats({ name: accountName, accountType });
-			}
-			catch (error) {
-				await handleStatsError(interaction, error, accountType);
-				return;
-			}
-		}
-		else {
-			const userResult = getUser(interaction.user.id);
-			if (!userResult?.epicAccountId) {
-				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
-				return;
-			}
-			try {
-				stats = await fortniteAPI.stats({ id: userResult.epicAccountId });
-			}
-			catch (error) {
-				await handleStatsError(interaction, error);
-				return;
-			}
-		}
+		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
+		if (stats === null) return;
 
 		const buffer = await createRankedImage(stats.account, true, 'br', season);
 		if (buffer === null) {
