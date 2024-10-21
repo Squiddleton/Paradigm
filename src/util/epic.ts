@@ -6,7 +6,7 @@ import { ChapterLengths } from './constants.js';
 
 export const trackedModes = new Map<string, TrackedUser>();
 
-const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && error.status === 500;
+const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && error.status >= 500 && error.status < 600;
 const isEpicInternalError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
 
 export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | string> => {
