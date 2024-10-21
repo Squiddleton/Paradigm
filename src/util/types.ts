@@ -24,7 +24,7 @@ export interface Config {
 
 export interface DisplayUserProperties {
 	id: Snowflake;
-	username: string;
+	name: string;
 	color: number;
 	avatar: string;
 	same: boolean;

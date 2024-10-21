@@ -953,7 +953,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 		const isSameUser = interaction.user.id === user.id;
 		const userData = {
 			id: userId,
-			username: user.username,
+			name: user.displayName,
 			color: user.accentColor ?? Colors.Purple,
 			avatar: user.displayAvatarURL(),
 			same: isSameUser
@@ -965,7 +965,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 		if (isSameUser) {
 			return {
 				id: userId,
-				username: interaction.member.displayName,
+				name: interaction.member.displayName,
 				color: interaction.member.displayColor,
 				avatar: interaction.member.displayAvatarURL(),
 				same: true
@@ -977,7 +977,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 
 		return {
 			id: userId,
-			username: mentionedMember.displayName,
+			name: mentionedMember.displayName,
 			color: mentionedMember.displayColor,
 			avatar: mentionedMember.displayAvatarURL(),
 			same: false
@@ -987,7 +987,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 	const user = await getUserProperties();
 	const userResult = getUser(user.id);
 	if (!userResult?.wishlistCosmeticIds.length) {
-		await interaction.editReply({ content: `${user.same ? 'Your' : formatPossessive(user.username)} wishlist is currently empty.` });
+		await interaction.editReply({ content: `${user.same ? 'Your' : formatPossessive(user.name)} wishlist is currently empty.` });
 		return;
 	}
 
@@ -1006,7 +1006,7 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 		.setColor(user.color)
 		.setDescription(`${underline(`Cosmetics (${cosmeticStrings.length}):`)}\n${cosmeticStrings.slice(0, inc).join('\n')}`)
 		.setThumbnail(user.avatar)
-		.setTitle(`${formatPossessive(user.username)} Wishlist`);
+		.setTitle(`${formatPossessive(user.name)} Wishlist`);
 
 	const willUseButtons = cosmeticStrings.length > inc;
 	const buttons = createPaginationButtons();

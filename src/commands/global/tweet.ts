@@ -34,7 +34,7 @@ export default new SlashCommand({
 
 		const embed = new EmbedBuilder()
 			.setAuthor({ name: 'Fortnite (@FortniteGame)', iconURL: 'https://pbs.twimg.com/profile_images/1599314555481587713/ti619evb_400x400.jpg' })
-			.setDescription(text?.slice(0, 4000) ?? `Grab the @${interaction.inCachedGuild() ? interaction.member.displayName : interaction.user.username} locker bundle for a limited time!`)
+			.setDescription(text?.slice(0, 4000) ?? `Grab the @${interaction.inCachedGuild() ? interaction.member.displayName : interaction.user.displayName} locker bundle for a limited time!`)
 			.setFields([
 				{ name: 'Retweets', value: '498', inline: true },
 				{ name: 'Likes', value: '12025', inline: true }

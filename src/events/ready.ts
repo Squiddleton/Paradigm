@@ -19,7 +19,7 @@ export default new ClientEvent({
 	async execute(client) {
 		await client.application.fetch();
 		DiscordClient.assertReadyClient(client);
-		const readyMessage = `${client.user.username} is ready!`;
+		const readyMessage = `${client.user.displayName} is ready!`;
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
 
