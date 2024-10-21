@@ -599,6 +599,8 @@ export const getStats = async (interaction: ChatInputCommandInteraction, account
  */
 export const handleStatsError = (interaction: CommandInteraction, e: unknown, accountType: AccountType = 'epic') => interaction[interaction.deferred || interaction.replied ? 'followUp' : 'reply'](getStatsErrorMessage(e, accountType));
 
+export const isUnknownRank = (progress: HabaneroTrackProgress) => progress.currentDivision === 0 && progress.promotionProgress === 0 && new Date(progress.lastUpdated).getTime() === 0;
+
 /**
  * Links a Discord user's account to an Epic Games account.
  *
@@ -738,7 +740,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		ctx.lineWidth = height / 36;
 
-		const isUnknown = track.currentDivision === 0 && track.promotionProgress === 0 && new Date(track.lastUpdated).getTime() === 0;
+		const isUnknown = isUnknownRank(track);
 		const divisionIconName = isUnknown
 			? 'unknown'
 			: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');

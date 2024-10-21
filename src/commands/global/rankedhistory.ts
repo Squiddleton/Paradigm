@@ -2,9 +2,8 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
 import { PlatformChoices, RankedEmojiIds, RankedTrack } from '../../util/constants.js';
-import { getStats, linkEpicAccount } from '../../util/fortnite.js';
+import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
 import { getTrackProgress } from '../../util/epic.js';
-import type { HabaneroTrackProgress } from '@squiddleton/epic';
 
 export default new SlashCommand({
 	name: 'ranked-history',
@@ -71,13 +70,11 @@ export default new SlashCommand({
 		const embed = new EmbedBuilder()
 			.setTitle(`Ranked History: ${stats.account.name}`)
 			.setFields(tracks.map(([name, trackId]) => {
-				const isUnknown = (progress: HabaneroTrackProgress) => progress.currentDivision === 0 && progress.promotionProgress === 0 && new Date(progress.lastUpdated).getTime() === 0;
-
 				const getEmoji = (trackguid: RankedTrack) => {
 					const track = progress.find(p => p.trackguid === trackguid);
 					if (track === undefined) throw new Error(`No track progress found for track guid ${trackguid}`);
 
-					const emojiId = isUnknown(track) ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
+					const emojiId = isUnknownRank(track) ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
 					const emoji = emojis.get(emojiId);
 					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
 
