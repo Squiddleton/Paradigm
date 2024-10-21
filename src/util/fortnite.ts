@@ -498,7 +498,7 @@ const getStatsErrorMessage = (e: unknown, accountType: AccountType) => {
  * @returns Options for replying to an interaction and, if found, the user's Epic Games account
  */
 export const getLevelsString = async (options: LevelCommandOptions): Promise<InteractionReplyOptions & { account?: EpicAccount }> => {
-	const { accountName, accountType } = options;
+	const { accountName, accountType, targetUser } = options;
 
 	/**
 	 * Returns a string including each Fortnite season and the user's respective level.
@@ -530,7 +530,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 		.join('\n')}`;
 
 	if (accountName === null) {
-		const userResult = getUser(options.targetUser.id);
+		const userResult = getUser(targetUser.id);
 		if (!userResult?.epicAccountId) {
 			return { content: `No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true };
 		}
@@ -829,7 +829,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
 		if (!userResult?.epicAccountId) {
-			if (options.content !== undefined) await interaction.editReply(`${options.targetUser.username} has not linked their Epic account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+			if (interaction.user.id !== options.targetUser.id) await interaction.editReply(`${options.targetUser.displayName} has not yet linked their Epic account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 		}
 		else {

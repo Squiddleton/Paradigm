@@ -15,6 +15,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String
 		},
 		{
+			name: 'user',
+			description: 'The player who linked their Epic account with the bot; defaults to yourself or the "player" option',
+			type: ApplicationCommandOptionType.User
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -30,18 +35,19 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
+		const user = interaction.options.getUser('user');
 
 		await interaction.deferReply();
 
 		try {
 			const { account, ...content } = await getLevelsString({
-				targetUser: interaction.user,
+				targetUser: user ?? interaction.user,
 				accountName,
 				accountType
 			});
 
 			await interaction.editReply(content);
-			if (account !== undefined && interaction.options.getBoolean('link')) {
+			if (account !== undefined && user === null && interaction.options.getBoolean('link')) {
 				await linkEpicAccount(interaction, account, true);
 			}
 		}

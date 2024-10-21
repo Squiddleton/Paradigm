@@ -14,6 +14,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String
 		},
 		{
+			name: 'user',
+			description: 'The player who linked their Epic account with the bot; defaults to yourself or the "player" option',
+			type: ApplicationCommandOptionType.User
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -52,7 +57,7 @@ export default new SlashCommand({
 		const input = (interaction.options.getString('input') ?? 'all') as Input;
 		const timeWindow = (interaction.options.getString('timewindow') ?? 'lifetime') as TimeWindow;
 		await sendStatsImages(interaction, {
-			targetUser: interaction.user,
+			targetUser: interaction.options.getUser('user') ?? interaction.user,
 			accountName,
 			accountType,
 			input,
