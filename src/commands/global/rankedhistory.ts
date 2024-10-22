@@ -20,6 +20,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
+			name: 'show-detail',
+			description: 'Whether to include progress to the next rank and Unreal player ranking; defaults to false',
+			type: ApplicationCommandOptionType.Boolean
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -37,6 +42,7 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const user = interaction.options.getUser('user');
+		const showDetail = interaction.options.getBoolean('show-detail') ?? false;
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		const stats = await getStats(interaction, accountName, accountType, user);
@@ -70,22 +76,25 @@ export default new SlashCommand({
 		const embed = new EmbedBuilder()
 			.setTitle(`Ranked History: ${stats.account.name}`)
 			.setFields(tracks.map(([name, trackId]) => {
-				const getEmoji = (trackguid: RankedTrack) => {
+				const formatProgress = (trackguid: RankedTrack) => {
 					const track = progress.find(p => p.trackguid === trackguid);
 					if (track === undefined) throw new Error(`No track progress found for track guid ${trackguid}`);
 
-					const emojiId = isUnknownRank(track) ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
+					const isUnknown = isUnknownRank(track);
+					const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
 					const emoji = emojis.get(emojiId);
 					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
 
-					return emoji;
+					return showDetail && !isUnknown
+						? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
+						: emoji;
 				};
 
 				return {
 					name,
 					value: Array.isArray(trackId)
-						? `${getEmoji(trackId[0])} BR ${getEmoji(trackId[1])} ZB`
-						: getEmoji(trackId).toString(),
+						? `${formatProgress(trackId[0])} BR ${formatProgress(trackId[1])} ZB`
+						: formatProgress(trackId).toString(),
 					inline: true
 				};
 			}));
