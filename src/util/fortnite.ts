@@ -532,7 +532,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 	if (accountName === null) {
 		const userResult = getUser(targetUser.id);
 		if (!userResult?.epicAccountId) {
-			return { content: `No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true };
+			return { content: `No player username was provided, and you have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true };
 		}
 
 		try {
@@ -572,7 +572,7 @@ export const getStats = async (interaction: ChatInputCommandInteraction, account
 		const userResult = getUser(user?.id ?? interaction.user.id);
 		if (!userResult?.epicAccountId) {
 			if (user === null) {
-				await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+				await interaction.editReply(`No player username was provided, and you have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 			}
 			else {
 				await interaction.editReply(`${user.displayName} has not yet linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
@@ -832,7 +832,7 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 		const userResult = getUser(options.targetUser.id);
 		if (!userResult?.epicAccountId) {
 			if (interaction.user.id !== options.targetUser.id) await interaction.editReply(`${options.targetUser.displayName} has not yet linked their Epic account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
-			else await interaction.editReply(`No player username was provided, and you have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
+			else await interaction.editReply(`No player username was provided, and you have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`);
 		}
 		else {
 			try {

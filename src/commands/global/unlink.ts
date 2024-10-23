@@ -10,7 +10,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const userResult = getUser(interaction.user.id);
 		if (!userResult?.epicAccountId) {
-			await interaction.reply({ content: `You have not linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
+			await interaction.reply({ content: `You have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
 		}
 		else {
 			userResult.epicAccountId = null;
