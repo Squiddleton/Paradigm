@@ -63,11 +63,11 @@ export default new SlashCommand({
 			['Chapter 5, Season 2', [RankedTrack.C5S2BR, RankedTrack.C5S2ZB]],
 			['Chapter 5, Season 3', [RankedTrack.C5S3BR, RankedTrack.C5S3ZB]],
 			['Chapter 5, Season 4', [RankedTrack.C5S4BR, RankedTrack.C5S4ZB]],
-			['Reload Season Zero', [RankedTrack.Reload1BR, RankedTrack.Reload1ZB]],
+			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],
-			['Neon Rush Racing', RankedTrack.NeonRushRacing],
-			['Inferno Island Racing', RankedTrack.InfernoIslandRacing],
-			['Rocket Racing Chapter 5, Season 4', RankedTrack.C5S4Racing]
+			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
+			['Rocket Racing Inferno Island', RankedTrack.InfernoIslandRacing],
+			['Rocket Racing October 2024', RankedTrack.Oct24Racing]
 		];
 
 		const app = await interaction.client.application.fetch();

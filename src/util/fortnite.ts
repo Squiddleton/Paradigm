@@ -636,13 +636,13 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let seasonName = 'Chapter 5 Season 4';
 	let brTrackguid = RankedTrack.C5S4BR;
 	let zbTrackguid = RankedTrack.C5S4ZB;
-	let racingTrackguid = RankedTrack.C5S4Racing;
+	let racingTrackguid = RankedTrack.Oct24Racing;
 	let backgroundPath = 'general.jpg';
 	switch (season) {
-		case 'reload1': {
-			seasonName = 'Reload';
-			brTrackguid = RankedTrack.Reload1BR;
-			zbTrackguid = RankedTrack.Reload1ZB;
+		case 'reloads0': {
+			seasonName = 'Reload Season Zero';
+			brTrackguid = RankedTrack.S0ReloadBR;
+			zbTrackguid = RankedTrack.S0ReloadZB;
 			backgroundPath = 'og.jpg';
 			break;
 		}

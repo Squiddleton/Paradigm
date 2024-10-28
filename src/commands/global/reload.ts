@@ -40,7 +40,7 @@ export default new SlashCommand({
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'br', 'reload1');
+		const buffer = await createRankedImage(stats.account, true, 'br', 'reloads0');
 		if (buffer === null) await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
 		else await interaction.editReply({ files: [buffer] });
 
