@@ -19,6 +19,15 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
+			name: 'season',
+			description: 'Which season to check ranked stats in; defaults to current',
+			type: ApplicationCommandOptionType.String,
+			choices: [
+				{ name: 'Fortnite: Remix', value: 'reloadremix' },
+				{ name: 'Season Zero', value: 'reloads0' }
+			]
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -36,11 +45,12 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
+		const season = interaction.options.getString('season') ?? 'reloadremix';
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'br', 'reloads0');
+		const buffer = await createRankedImage(stats.account, true, 'br', season);
 		if (buffer === null) await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
 		else await interaction.editReply({ files: [buffer] });
 

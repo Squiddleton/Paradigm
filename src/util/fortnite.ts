@@ -522,9 +522,10 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 				'3',
 				'4',
 				'Fortnite: OG',
-				'5'
+				'5',
+				'Fortnite: Remix'
 			][chapterIndex];
-			const seasonName = chapterName === 'Fortnite: OG' ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
+			const seasonName = chapterName.startsWith('Fortnite') ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
 			return `Chapter ${chapterName}, Season ${seasonName}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;
@@ -623,7 +624,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string) {
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season = 'remix') {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -633,12 +634,34 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		return track;
 	};
 
-	let seasonName = 'Chapter 5 Season 4';
-	let brTrackguid = RankedTrack.C5S4BR;
-	let zbTrackguid = RankedTrack.C5S4ZB;
+	let seasonName: string;
+	let brTrackguid: RankedTrack;
+	let zbTrackguid: RankedTrack;
 	let racingTrackguid = RankedTrack.Oct24Racing;
-	let backgroundPath = 'general.jpg';
+	let backgroundPath: string;
 	switch (season) {
+		case 'remix': {
+			seasonName = 'Fortnite: Remix';
+			brTrackguid = RankedTrack.RemixBR;
+			zbTrackguid = RankedTrack.RemixZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
+		case 'reloadremix': {
+			seasonName = 'Reload Remix';
+			brTrackguid = RankedTrack.RemixReloadBR;
+			zbTrackguid = RankedTrack.RemixReloadZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
+		case 'c5s4': {
+			seasonName = 'Chapter 5 Season 4';
+			brTrackguid = RankedTrack.C5S4BR;
+			zbTrackguid = RankedTrack.C5S4ZB;
+			racingTrackguid = RankedTrack.InfernoIslandRacing;
+			backgroundPath = 'general.jpg';
+			break;
+		}
 		case 'reloads0': {
 			seasonName = 'Reload Season Zero';
 			brTrackguid = RankedTrack.S0ReloadBR;
@@ -694,6 +717,10 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.S0PBR;
 			zbTrackguid = RankedTrack.S0PZB;
 			backgroundPath = 'c4s3.png';
+			break;
+		}
+		default: {
+			throw new Error(`No case found for season ${season}`);
 		}
 	}
 	const brTrack = getTrack(brTrackguid);
