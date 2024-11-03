@@ -635,22 +635,17 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	};
 
 	let seasonName: string;
-	let brTrackguid: RankedTrack;
-	let zbTrackguid: RankedTrack;
+	let brTrackguid = RankedTrack.RemixBR;
+	let zbTrackguid = RankedTrack.RemixZB;
 	let racingTrackguid = RankedTrack.Oct24Racing;
-	let backgroundPath: string;
+	let backgroundPath = 'general.jpg';
+
 	switch (season) {
+		// Battle Royale
 		case 'remix': {
 			seasonName = 'Fortnite: Remix';
 			brTrackguid = RankedTrack.RemixBR;
 			zbTrackguid = RankedTrack.RemixZB;
-			backgroundPath = 'og.jpg';
-			break;
-		}
-		case 'reloadremix': {
-			seasonName = 'Reload Remix';
-			brTrackguid = RankedTrack.RemixReloadBR;
-			zbTrackguid = RankedTrack.RemixReloadZB;
 			backgroundPath = 'og.jpg';
 			break;
 		}
@@ -660,13 +655,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			zbTrackguid = RankedTrack.C5S4ZB;
 			racingTrackguid = RankedTrack.InfernoIslandRacing;
 			backgroundPath = 'general.jpg';
-			break;
-		}
-		case 'reloads0': {
-			seasonName = 'Reload Season Zero';
-			brTrackguid = RankedTrack.S0ReloadBR;
-			zbTrackguid = RankedTrack.S0ReloadZB;
-			backgroundPath = 'og.jpg';
 			break;
 		}
 		case 'c5s3': {
@@ -717,6 +705,46 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.S0PBR;
 			zbTrackguid = RankedTrack.S0PZB;
 			backgroundPath = 'c4s3.png';
+			break;
+		}
+		// Reload
+		case 'reloadremix': {
+			seasonName = 'Reload Remix';
+			brTrackguid = RankedTrack.RemixReloadBR;
+			zbTrackguid = RankedTrack.RemixReloadZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
+		case 'reloads0': {
+			seasonName = 'Reload Season Zero';
+			brTrackguid = RankedTrack.S0ReloadBR;
+			zbTrackguid = RankedTrack.S0ReloadZB;
+			backgroundPath = 'og.jpg';
+			break;
+		}
+		// Rocket Racing
+		case RankedTrack.Oct24Racing: {
+			racingTrackguid = season;
+			seasonName = 'October 2024';
+			backgroundPath = 'rr-oct24.webp';
+			break;
+		}
+		case RankedTrack.InfernoIslandRacing: {
+			racingTrackguid = season;
+			seasonName = 'Inferno Island';
+			backgroundPath = 'rr-ii.jpg';
+			break;
+		}
+		case RankedTrack.NeonRushRacing: {
+			racingTrackguid = season;
+			seasonName = 'Neon Rush';
+			backgroundPath = 'rr-nn.webp';
+			break;
+		}
+		case RankedTrack.S0Racing: {
+			racingTrackguid = season;
+			seasonName = 'Season Zero';
+			backgroundPath = 'rr-s0.webp';
 			break;
 		}
 		default: {
