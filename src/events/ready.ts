@@ -69,13 +69,13 @@ export default new ClientEvent({
 							if (cachedProgress === undefined || newProgress === undefined) return;
 
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! Division ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.currentDivision < cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! Division ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! Division ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 						}
 					}
