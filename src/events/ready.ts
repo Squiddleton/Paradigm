@@ -1,7 +1,7 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
-import { type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
+import { chatInputApplicationCommandMention, type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -22,6 +22,10 @@ export default new ClientEvent({
 		const readyMessage = `${client.user.displayName} is ready!`;
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
+
+		const rankedChannel = client.channels.cache.get('1170469502136356874');
+		if (!rankedChannel?.isSendable()) return;
+		await rankedChannel.send(`${client.user.displayName} has restarted and is no longer tracking ranked progress updates. Please use ${chatInputApplicationCommandMention('track', '1183810237900275743')} to start ranked tracking again.`);
 
 		const measureInterval = (name: string, callback: (...params: unknown[]) => Promise<void>) => () => {
 			const debug = process.argv[2] === 'debug';
@@ -52,9 +56,6 @@ export default new ClientEvent({
 		}), { timezone: 'America/New_York' });
 
 		// Intervals
-
-		const rankedChannel = client.channels.cache.get('1170469502136356874');
-		if (!rankedChannel?.isSendable()) return;
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
 		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
 			for (const [epicAccountId, trackedUser] of trackedModes) {
