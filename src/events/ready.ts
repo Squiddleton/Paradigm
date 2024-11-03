@@ -25,7 +25,7 @@ export default new ClientEvent({
 
 		const rankedChannel = client.channels.cache.get('1170469502136356874');
 		if (!rankedChannel?.isSendable()) return;
-		await rankedChannel.send(`${client.user.displayName} has restarted and is no longer tracking ranked progress updates. Please use ${chatInputApplicationCommandMention('track', '1183810237900275743')} to start ranked tracking again.`);
+		if (trackedModes.size !== 0) await rankedChannel.send(`${client.user.displayName} has restarted and is no longer tracking ranked progress updates. Please use ${chatInputApplicationCommandMention('track', '1183810237900275743')} to start ranked tracking again.`);
 
 		const measureInterval = (name: string, callback: (...params: unknown[]) => Promise<void>) => () => {
 			const debug = process.argv[2] === 'debug';
