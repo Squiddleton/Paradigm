@@ -1,7 +1,7 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
-import { chatInputApplicationCommandMention, type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
+import { type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -22,10 +22,6 @@ export default new ClientEvent({
 		const readyMessage = `${client.user.displayName} is ready!`;
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
-
-		const rankedChannel = client.channels.cache.get('1170469502136356874');
-		if (!rankedChannel?.isSendable()) return;
-		if (trackedModes.size !== 0) await rankedChannel.send(`${client.user.displayName} has restarted and is no longer tracking ranked progress updates. Please use ${chatInputApplicationCommandMention('track', '1183810237900275743')} to start ranked tracking again.`);
 
 		const measureInterval = (name: string, callback: (...params: unknown[]) => Promise<void>) => () => {
 			const debug = process.argv[2] === 'debug';
@@ -69,6 +65,8 @@ export default new ClientEvent({
 							const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
 							if (cachedProgress === undefined || newProgress === undefined) return;
 
+							const rankedChannel = client.channels.cache.get('1170469502136356874');
+							if (!rankedChannel?.isSendable()) return;
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
 								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}

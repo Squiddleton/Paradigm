@@ -639,6 +639,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let zbTrackguid = RankedTrack.RemixZB;
 	let racingTrackguid = RankedTrack.Oct24Racing;
 	let backgroundPath = 'general.jpg';
+	let invertText = false;
 
 	switch (season) {
 		// Battle Royale
@@ -647,6 +648,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.RemixBR;
 			zbTrackguid = RankedTrack.RemixZB;
 			backgroundPath = 'og.jpg';
+			invertText = true;
 			break;
 		}
 		case 'c5s4': {
@@ -684,6 +686,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.OGBR;
 			zbTrackguid = RankedTrack.OGZB;
 			backgroundPath = 'og.jpg';
+			invertText = true;
 			break;
 		}
 		case 'c4s4': {
@@ -713,6 +716,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.RemixReloadBR;
 			zbTrackguid = RankedTrack.RemixReloadZB;
 			backgroundPath = 'og.jpg';
+			invertText = true;
 			break;
 		}
 		case 'reloads0': {
@@ -720,6 +724,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			brTrackguid = RankedTrack.S0ReloadBR;
 			zbTrackguid = RankedTrack.S0ReloadZB;
 			backgroundPath = 'og.jpg';
+			invertText = true;
 			break;
 		}
 		// Rocket Racing
@@ -770,7 +775,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	ctx.font = `${fontSize}px fortnite, jetbrains`;
 	ctx.textAlign = 'center';
-	ctx.fillStyle = backgroundPath === 'og.jpg' ? 'black' : 'white';
+	ctx.fillStyle = invertText ? 'black' : 'white';
 
 	ctx.fillText(`${seasonName === 'Reload' ? 'Ranked Reload' : `${seasonName} Ranked`}: ${account.name}`, width / 2, fontSize, width);
 
@@ -854,7 +859,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		else ctx.drawImage(divisionIcon, width * 0.15 + xOffset, height * 0.3, iconWidth, iconWidth);
 
 		ctx.font = `${fontSize * 0.5}px fortnite, jetbrains`;
-		ctx.fillStyle = backgroundPath === 'og.jpg' ? 'purple' : 'yellow';
+		ctx.fillStyle = invertText ? 'purple' : 'yellow';
 		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
 		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
 		ctx.fillText(text, xOffset + (width / 4), height * 0.9, width / 2);
