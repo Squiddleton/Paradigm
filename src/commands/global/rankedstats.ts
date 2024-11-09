@@ -81,8 +81,8 @@ export default new SlashCommand({
 				{ name: 'Kills', value: getStat('kills').toString(), inline: true },
 				{ name: 'Wins', value: getStat('top1').toString(), inline: true },
 				{ name: 'Matches Played', value: getStat('matchesplayed').toString(), inline: true },
-				{ name: 'Win Rate', value: `${(getStat('top1') / getStat('matchesplayed') * 100).toFixed(2)}%`, inline: true },
-				{ name: 'Average Kills per Match', value: (getStat('kills') / getStat('matchesplayed')).toFixed(2).toString(), inline: true }
+				{ name: 'Win Rate', value: `${(getStat('top1') / getStat('matchesplayed') * 100).toFixed(2) || 0}%`, inline: true },
+				{ name: 'Average Kills per Match', value: ((getStat('kills') / getStat('matchesplayed')).toFixed(2) || 0).toString(), inline: true }
 			]);
 
 		await interaction.editReply({ embeds: [embed] });
