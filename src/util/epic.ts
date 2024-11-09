@@ -32,6 +32,25 @@ export const getLevelStats = async (accountId: string): Promise<Partial<Record<s
 	return bulkStats[0].stats;
 };
 
+export const getRankedStats = async (accountId: string): Promise<EpicStats['stats'] | null> => {
+	let stats: EpicStats;
+	try {
+		stats = await epicClient.fortnite.getStats(accountId);
+	}
+	catch (error) {
+		try {
+			await epicClient.auth.authenticate(config.epicDeviceAuth);
+		}
+		catch (error) {
+			if (isEpicInternalError(error)) return null;
+			else if (!isEpicAuthError(error)) throw error;
+		}
+		stats = await epicClient.fortnite.getStats(accountId);
+		console.log('Reauthenticated to retrieve ranked stats.');
+	}
+	return stats.stats;
+};
+
 export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => {
 	let trackProgress: HabaneroTrackProgress[];
 	try {
@@ -46,7 +65,7 @@ export const getTrackProgress = async (accountId: string): Promise<HabaneroTrack
 			else if (!isEpicAuthError(error)) throw error;
 		}
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
-		console.log('Reauthenticated to retrieve ranked stats.');
+		console.log('Reauthenticated to retrieve ranked progress.');
 	}
 	return trackProgress;
 };
