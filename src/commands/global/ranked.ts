@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
 import { createRankedImage, getStats, linkEpicAccount } from '../../util/fortnite.js';
 
@@ -62,7 +62,13 @@ export default new SlashCommand({
 			await interaction.editReply('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
 			return;
 		}
-		await interaction.editReply({ files: [buffer] });
+
+		try {
+			await interaction.editReply({ files: [buffer] });
+		}
+		catch (error) {
+			if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+		}
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
 	}
