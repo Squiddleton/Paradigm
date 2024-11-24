@@ -45,12 +45,14 @@ export default new SlashCommand({
 				new EmbedBuilder()
 					.setTitle(playlist.name ?? 'Unnamed Playlist')
 					.setDescription(playlist.description?.replaceAll('\\n', '\n').replaceAll('\\r', '\r') ?? 'No description.')
-					.setImage(playlist.images.showcase ?? null)
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+					.setImage(playlist.images?.showcase ?? null)
 					.setFields([
 						{ name: 'Modes', value: removeDuplicates(playlists.filter(p => p.name === playlist.name).map(p => p.subName)).join('/') || 'N/A', inline: true },
 						{ name: 'Added Date', value: new Date(playlist.added).toLocaleDateString(), inline: true }
 					])
-					.setFooter({ text: playlist.id, iconURL: playlist.images.missionIcon ?? undefined })
+					// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+					.setFooter({ text: playlist.id, iconURL: playlist.images?.missionIcon ?? undefined })
 			]
 		});
 	}
