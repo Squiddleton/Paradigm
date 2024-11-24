@@ -1,4 +1,4 @@
-import { GlobalFonts, type Image, createCanvas, loadImage } from '@napi-rs/canvas';
+import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
@@ -7,12 +7,13 @@ import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption, STWProgress, STWTrackedAccount } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
+import config from '../config.js';
 
 let cachedBRCosmetics: BRCosmetic[] = [];
 let cachedCosmetics: AnyCosmetic[] = [];
@@ -591,6 +592,130 @@ export const getStats = async (interaction: ChatInputCommandInteraction, account
 	}
 };
 
+export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let profile: any;
+	try {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+		profile = await epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as any;
+	}
+	catch (error) {
+		await epicClient.auth.authenticate(config.epicDeviceAuth);
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+		profile = await epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as any;
+		console.log('Reauthenticated to retrieve STW progress.');
+	}
+
+	const achievementQuests = [
+		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', completion: 'completion_kill_husk_smasher', increment: 100, max: 20_000 },
+		{ templateId: 'Quest:achievement_playwithothers', name: 'Play with Others', completion: 'completion_quick_complete', increment: 50, max: 1_000 },
+		{ templateId: 'Quest:achievement_explorezones', name: 'Explore Zones', completion: 'completion_complete_exploration_1', increment: 50, max: 1_500 },
+		{ templateId: 'Quest:achievement_buildstructures', name: 'Build Structures', completion: 'completion_build_any_structure', increment: 10_000, max: 500_000 }
+	];
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+	const items = Object.values(profile.profileChanges[0].profile.items as ({ templateId: string; attributes: { quest_state: string } })[]).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
+
+	return items.map(item => {
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const quest = achievementQuests.find(quest => quest.templateId === item.templateId)!;
+		return {
+			accountId,
+			active: item.attributes.quest_state === 'Active',
+			template: item.templateId,
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			completion: Object.entries<string | number>(item.attributes).find(([k]) => k.startsWith('completion'))![1] as number,
+			questName: quest.name,
+			max: quest.max,
+			increment: quest.increment
+		};
+	});
+};
+
+export const trackSTWProgress = async (client: DiscordClient) => {
+	const accounts: STWTrackedAccount[] = [
+		{ id: 'fa646860d86c4def9716359b4d1a0ff8', name: 'Squid', progress: null }, // Squid
+		{ id: '7df93ec9c5864474ba1ab22e82a8ac64', name: 'Jake', progress: null }, // Jake
+		{ id: '1b57ac3f27af49e09c0d2c874e180ff4', name: 'Riley', progress: null }, // Riley
+		{ id: 'e3180e59cf4c4ad59985a9aa7c2623d2', name: 'Koba', progress: null } // Koba
+	];
+
+	for (const account of accounts) {
+		const getCompletion = () => getSTWProgress(account.id);
+		account.progress = await getCompletion();
+		for (const quest of account.progress) {
+			if (!quest.active) continue; // Skip since quest is complete
+
+			setInterval(async () => {
+				const allNewProgress = await getCompletion();
+				let foundNew = false;
+				for (const newProgress of allNewProgress) {
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
+					const oldProgress = account.progress?.find(p => p.template === newProgress.template)!;
+					if (newProgress.completion >= (oldProgress.completion + quest.increment)) {
+						foundNew = true;
+						const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
+
+						await rankedChannel.send(`New progress for ${account.name} for STW ${quest.questName} quest: ${newProgress.completion}/${quest.max}`);
+					}
+				}
+				if (foundNew) account.progress = allNewProgress;
+			}, 600_000);
+		}
+	}
+};
+
+export const createSTWProgressImage = async () => {
+	const w = 900;
+	const h = 600;
+	const canvas = createCanvas(w, h);
+	const ctx = canvas.getContext('2d');
+
+	const fontSize = 50;
+	ctx.font = `${fontSize}px fortnite, jetbrains`;
+	ctx.fillStyle = 'white';
+	ctx.textAlign = 'center';
+
+	const accounts = [
+		{ i: 'fa646860d86c4def9716359b4d1a0ff8', n: 'Squid', c: -1 }, // Squid
+		{ i: '1b57ac3f27af49e09c0d2c874e180ff4', n: 'Riley', c: -1 }, // Riley
+		{ i: '7df93ec9c5864474ba1ab22e82a8ac64', n: 'Jake', c: -1 }, // Jake
+		{ i: 'e3180e59cf4c4ad59985a9aa7c2623d2', n: 'Koba', c: -1 } // Koba
+	];
+
+	const quests = ['Kill Mist Monsters', 'Build Structures', 'Explore Zones', 'Play with Others'];
+
+	ctx.fillText('STW Progress', w / 2, fontSize * 1.2);
+
+	for (let i = 0; i < accounts.length; i++) {
+		const account = accounts[i];
+		const y = h * (i + 1.5) / 5;
+		ctx.fillText(account.n, w / 10, y);
+
+		const allProgress = await getSTWProgress(account.i);
+		for (let j = 0; j < quests.length; j++) {
+			const quest = quests[j];
+			const progress = allProgress.find(a => a.questName === quest);
+			if (progress === undefined) {
+				console.error(`No progress found for quest ${quest}:`, progress);
+				continue;
+			}
+			if (!progress.active) ctx.fillStyle = 'green';
+			ctx.fillText(progress.completion.toString(), w * (j + 1.5) / 5, y);
+			if (!progress.active) ctx.fillStyle = 'white';
+		}
+	}
+
+	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
+	for (let i = 0; i < quests.length; i++) {
+		const quest = quests[i];
+		ctx.fillText(quest, w * (i + 1.5) / 5, h / 5);
+	}
+
+	const buffer = await canvas.encode('jpeg');
+	return buffer;
+};
+
 /**
  * Replies to an interaction with an error message thrown from fetching a user's stats.
  *
@@ -769,8 +894,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	ctx.drawImage(background, 0, 0);
 
-	GlobalFonts.registerFromPath('./fonts/fortnite.otf', 'fortnite');
-	GlobalFonts.registerFromPath('./fonts/jetbrains-mono.ttf', 'jetbrains');
 	const fontSize = height / 8;
 
 	ctx.font = `${fontSize}px fortnite, jetbrains`;

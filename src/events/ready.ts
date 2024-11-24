@@ -8,10 +8,11 @@ import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { getTrackProgress, trackedModes } from '../util/epic.js';
-import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
+import { checkWishlists, createSTWProgressImage, fetchCosmetics, trackSTWProgress } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
-import { divisionNames } from '../util/constants.js';
+import { DiscordIds, divisionNames } from '../util/constants.js';
+import { GlobalFonts } from '@napi-rs/canvas';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -19,6 +20,8 @@ export default new ClientEvent({
 	async execute(client) {
 		await client.application.fetch();
 		DiscordClient.assertReadyClient(client);
+		GlobalFonts.registerFromPath('./fonts/fortnite.otf', 'fortnite');
+		GlobalFonts.registerFromPath('./fonts/jetbrains-mono.ttf', 'jetbrains');
 		const readyMessage = `${client.user.displayName} is ready!`;
 		await client.devChannel.send(readyMessage);
 		console.log(readyMessage);
@@ -52,6 +55,14 @@ export default new ClientEvent({
 		}), { timezone: 'America/New_York' });
 
 		// Intervals
+		await trackSTWProgress(client);
+
+		schedule('*/10 * * * *', measureInterval('STW progress embed update', async () => {
+			const buffer = await createSTWProgressImage();
+			const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
+			await rankedChannel.messages.edit(DiscordIds.MessageId.STWProgress, { attachments: [], files: [buffer] });
+		}));
+
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
 		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
 			for (const [epicAccountId, trackedUser] of trackedModes) {
@@ -65,8 +76,7 @@ export default new ClientEvent({
 							const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
 							if (cachedProgress === undefined || newProgress === undefined) return;
 
-							const rankedChannel = client.channels.cache.get('1170469502136356874');
-							if (!rankedChannel?.isSendable()) return;
+							const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
 								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}

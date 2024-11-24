@@ -206,6 +206,22 @@ export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
 
+export interface STWProgress {
+	accountId: string;
+	active: boolean;
+	template: string;
+	completion: number;
+	questName: string;
+	max: number;
+	increment: number;
+}
+
+export interface STWTrackedAccount {
+	id: string;
+	name: string;
+	progress: STWProgress[] | null;
+}
+
 export interface TrackedMode {
 	trackguid: RankedTrack;
 	displayName: string;
