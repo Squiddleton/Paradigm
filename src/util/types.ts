@@ -219,7 +219,7 @@ export interface STWProgress {
 export interface STWTrackedAccount {
 	id: string;
 	name: string;
-	progress: STWProgress[] | null;
+	progress: STWProgress[];
 }
 
 export interface TrackedMode {

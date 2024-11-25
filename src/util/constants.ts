@@ -21,7 +21,8 @@ export namespace DiscordIds {
 		Dev = '863882874519814154',
 		ShopPosts = '489836390759268353',
 		UserCommands = '742803449493717134',
-		RankedProgress = '1170469502136356874'
+		RankedProgress = '1170469502136356874',
+		STWTracking = '1310688486046564423'
 	}
 	export enum CommandId {
 		Link = '1032454252024565821',
@@ -34,7 +35,7 @@ export namespace DiscordIds {
 	}
 	export enum MessageId {
 		CommandList = '1064964139094650971',
-		STWProgress = '1310386604421943356'
+		STWProgress = '1310693896942125098'
 	}
 	export enum RoleId {
 		ItemShop = '568590143640961037'

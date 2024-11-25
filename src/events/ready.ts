@@ -8,11 +8,12 @@ import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { getTrackProgress, trackedModes } from '../util/epic.js';
-import { checkWishlists, createSTWProgressImage, fetchCosmetics, trackSTWProgress } from '../util/fortnite.js';
+import { checkWishlists, createSTWProgressImage, fetchCosmetics, getSTWProgress } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 import { DiscordIds, divisionNames } from '../util/constants.js';
 import { GlobalFonts } from '@napi-rs/canvas';
+import type { STWTrackedAccount } from '../util/types.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -55,12 +56,37 @@ export default new ClientEvent({
 		}), { timezone: 'America/New_York' });
 
 		// Intervals
-		await trackSTWProgress(client);
+		const STWTrackedAccounts: STWTrackedAccount[] = [
+			{ id: 'fa646860d86c4def9716359b4d1a0ff8', name: 'Squid', progress: await getSTWProgress('fa646860d86c4def9716359b4d1a0ff8') },
+			{ id: '7df93ec9c5864474ba1ab22e82a8ac64', name: 'Jake', progress: await getSTWProgress('7df93ec9c5864474ba1ab22e82a8ac64') },
+			{ id: '1b57ac3f27af49e09c0d2c874e180ff4', name: 'Riley', progress: await getSTWProgress('1b57ac3f27af49e09c0d2c874e180ff4') },
+			{ id: 'e3180e59cf4c4ad59985a9aa7c2623d2', name: 'Koba', progress: await getSTWProgress('e3180e59cf4c4ad59985a9aa7c2623d2') }
+		];
 
 		schedule('*/10 * * * *', measureInterval('STW progress embed update', async () => {
 			const buffer = await createSTWProgressImage();
-			const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
+			const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
 			await rankedChannel.messages.edit(DiscordIds.MessageId.STWProgress, { attachments: [], files: [buffer] });
+
+			for (const account of STWTrackedAccounts) {
+				const allNewProgress = await getSTWProgress(account.id);
+				let foundNew = false;
+				for (const newProgress of allNewProgress) {
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					const oldProgress = account.progress.find(p => p.template === newProgress.template)!;
+					if (!oldProgress.active) continue;
+
+					const oldIncs = Math.floor(oldProgress.completion / newProgress.increment);
+					const newIncs = Math.floor(newProgress.completion / newProgress.increment);
+					if (newIncs > oldIncs) {
+						foundNew = true;
+						const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
+
+						await rankedChannel.send(`New progress for ${account.name} for STW ${newProgress.questName} quest: ${newProgress.completion}/${newProgress.max}`);
+					}
+				}
+				if (foundNew) account.progress = allNewProgress;
+			}
 		}));
 
 		const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();

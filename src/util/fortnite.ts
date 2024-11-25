@@ -7,7 +7,7 @@ import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption, STWProgress, STWTrackedAccount } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption, STWProgress } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -630,39 +630,6 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 			increment: quest.increment
 		};
 	});
-};
-
-export const trackSTWProgress = async (client: DiscordClient) => {
-	const accounts: STWTrackedAccount[] = [
-		{ id: 'fa646860d86c4def9716359b4d1a0ff8', name: 'Squid', progress: null }, // Squid
-		{ id: '7df93ec9c5864474ba1ab22e82a8ac64', name: 'Jake', progress: null }, // Jake
-		{ id: '1b57ac3f27af49e09c0d2c874e180ff4', name: 'Riley', progress: null }, // Riley
-		{ id: 'e3180e59cf4c4ad59985a9aa7c2623d2', name: 'Koba', progress: null } // Koba
-	];
-
-	for (const account of accounts) {
-		const getCompletion = () => getSTWProgress(account.id);
-		account.progress = await getCompletion();
-		for (const quest of account.progress) {
-			if (!quest.active) continue; // Skip since quest is complete
-
-			setInterval(async () => {
-				const allNewProgress = await getCompletion();
-				let foundNew = false;
-				for (const newProgress of allNewProgress) {
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-non-null-asserted-optional-chain
-					const oldProgress = account.progress?.find(p => p.template === newProgress.template)!;
-					if (newProgress.completion >= (oldProgress.completion + quest.increment)) {
-						foundNew = true;
-						const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
-
-						await rankedChannel.send(`New progress for ${account.name} for STW ${quest.questName} quest: ${newProgress.completion}/${quest.max}`);
-					}
-				}
-				if (foundNew) account.progress = allNewProgress;
-			}, 600_000);
-		}
-	}
 };
 
 export const createSTWProgressImage = async () => {
