@@ -669,7 +669,12 @@ export const createSTWProgressImage = async () => {
 			}
 			if (!progress.active) ctx.fillStyle = 'green';
 			ctx.fillText(progress.completion.toString(), w * (j + 1.5) / 5, y);
-			if (!progress.active) ctx.fillStyle = 'white';
+
+			ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
+			ctx.fillText(`${Math.floor(progress.completion * 100 / progress.max)}%`, w * (j + 1.5) / 5, y + fontSize * 0.8);
+
+			ctx.font = `${fontSize}px fortnite, jetbrains`;
+			ctx.fillStyle = 'white';
 		}
 	}
 
