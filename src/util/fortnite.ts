@@ -617,7 +617,7 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 		const quest = achievementQuests.find(quest => quest.templateId === item.templateId);
 		if (quest === undefined) throw new Error(`No quest found with the template id ${item.templateId}`);
 		const completion = Object.entries<string | number>(item.attributes).find(([k]) => k.startsWith('completion'));
-		if (typeof completion !== 'number') throw new Error(`No completion found for the quest with the template id ${item.templateId}`);
+		if (!completion || typeof completion[1] !== 'number') throw new Error(`No completion found for the quest with the template id ${item.templateId}: ${completion}`);
 		return {
 			accountId,
 			active: item.attributes.quest_state === 'Active',
