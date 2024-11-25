@@ -7,7 +7,7 @@ import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption, STWProgress } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, FortniteWebsite, LevelCommandOptions, Links, StatsCommandOptions, StringOption, STWProgress, STWPublicProfile } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -593,16 +593,14 @@ export const getStats = async (interaction: ChatInputCommandInteraction, account
 };
 
 export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	let profile: any;
+	const getProfile = (): Promise<STWPublicProfile> => epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as Promise<STWPublicProfile>;
+	let profile: STWPublicProfile;
 	try {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-		profile = await epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as any;
+		profile = await getProfile();
 	}
 	catch (error) {
 		await epicClient.auth.authenticate(config.epicDeviceAuth);
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-		profile = await epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as any;
+		profile = await getProfile();
 		console.log('Reauthenticated to retrieve STW progress.');
 	}
 
@@ -613,18 +611,18 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 		{ templateId: 'Quest:achievement_buildstructures', name: 'Build Structures', completion: 'completion_build_any_structure', increment: 10_000, max: 500_000 }
 	];
 
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
 	const items = Object.values(profile.profileChanges[0].profile.items as ({ templateId: string; attributes: { quest_state: string } })[]).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
 
 	return items.map(item => {
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const quest = achievementQuests.find(quest => quest.templateId === item.templateId)!;
+		const quest = achievementQuests.find(quest => quest.templateId === item.templateId);
+		if (quest === undefined) throw new Error(`No quest found with the template id ${item.templateId}`);
+		const completion = Object.entries<string | number>(item.attributes).find(([k]) => k.startsWith('completion'));
+		if (typeof completion !== 'number') throw new Error(`No completion found for the quest with the template id ${item.templateId}`);
 		return {
 			accountId,
 			active: item.attributes.quest_state === 'Active',
 			template: item.templateId,
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			completion: Object.entries<string | number>(item.attributes).find(([k]) => k.startsWith('completion'))![1] as number,
+			completion: completion[1],
 			questName: quest.name,
 			max: quest.max,
 			increment: quest.increment

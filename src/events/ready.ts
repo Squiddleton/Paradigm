@@ -72,9 +72,8 @@ export default new ClientEvent({
 				const allNewProgress = await getSTWProgress(account.id);
 				let foundNew = false;
 				for (const newProgress of allNewProgress) {
-					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-					const oldProgress = account.progress.find(p => p.template === newProgress.template)!;
-					if (!oldProgress.active) continue;
+					const oldProgress = account.progress.find(p => p.template === newProgress.template);
+					if (!oldProgress?.active) continue;
 
 					const oldIncs = Math.floor(oldProgress.completion / newProgress.increment);
 					const newIncs = Math.floor(newProgress.completion / newProgress.increment);

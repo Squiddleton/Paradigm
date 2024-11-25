@@ -206,6 +206,19 @@ export type StringChoices = ApplicationCommandOptionChoiceData<string>[];
 
 export type StringOption = string | null;
 
+export interface STWPublicProfile {
+	profileChanges: {
+		profile: {
+			items: {
+				templateId: string;
+				attributes: {
+					quest_state: string;
+				};
+			}[];
+		};
+	}[];
+}
+
 export interface STWProgress {
 	accountId: string;
 	active: boolean;
