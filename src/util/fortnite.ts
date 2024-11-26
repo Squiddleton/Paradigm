@@ -605,10 +605,11 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 	}
 
 	const achievementQuests = [
-		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', completion: 'completion_kill_husk_smasher', increment: 100, max: 20_000 },
-		{ templateId: 'Quest:achievement_playwithothers', name: 'Play with Others', completion: 'completion_quick_complete', increment: 50, max: 1_000 },
-		{ templateId: 'Quest:achievement_explorezones', name: 'Explore Zones', completion: 'completion_complete_exploration_1', increment: 50, max: 1_500 },
-		{ templateId: 'Quest:achievement_buildstructures', name: 'Build Structures', completion: 'completion_build_any_structure', increment: 10_000, max: 500_000 }
+		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', increment: 100, max: 20_000 },
+		{ templateId: 'Quest:achievement_playwithothers', name: 'Play with Others', increment: 50, max: 1_000 },
+		{ templateId: 'Quest:achievement_explorezones', name: 'Explore Zones', increment: 50, max: 1_500 },
+		{ templateId: 'Quest:achievement_buildstructures', name: 'Build Structures', increment: 10_000, max: 500_000 },
+		{ templateId: 'Quest:achievement_savesurvivors', name: 'Save Survivors', increment: 100, max: 10_000 }
 	];
 
 	const items = Object.values(profile.profileChanges[0].profile.items as ({ templateId: string; attributes: { quest_state: string } })[]).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
@@ -631,7 +632,7 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 };
 
 export const createSTWProgressImage = async () => {
-	const w = 900;
+	const w = 1200;
 	const h = 600;
 	const canvas = createCanvas(w, h);
 	const ctx = canvas.getContext('2d');
@@ -648,14 +649,14 @@ export const createSTWProgressImage = async () => {
 		{ i: 'e3180e59cf4c4ad59985a9aa7c2623d2', n: 'Koba', c: -1 } // Koba
 	];
 
-	const quests = ['Kill Mist Monsters', 'Build Structures', 'Explore Zones', 'Play with Others'];
+	const quests = ['Kill Mist Monsters', 'Build Structures', 'Explore Zones', 'Play with Others', 'Save Survivors'];
 
 	ctx.fillText('STW Progress', w / 2, fontSize * 1.2);
 
 	for (let i = 0; i < accounts.length; i++) {
 		const account = accounts[i];
 		const y = h * (i + 1.5) / 5;
-		ctx.fillText(account.n, w / 10, y);
+		ctx.fillText(account.n, w / 15, y);
 
 		const allProgress = await getSTWProgress(account.i);
 		for (let j = 0; j < quests.length; j++) {
@@ -666,10 +667,10 @@ export const createSTWProgressImage = async () => {
 				continue;
 			}
 			if (!progress.active) ctx.fillStyle = 'green';
-			ctx.fillText(progress.completion.toString(), w * (j + 1.5) / 5, y);
+			ctx.fillText(progress.completion.toString(), w * (j + 1.5) / 6, y);
 
 			ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
-			ctx.fillText(`${Math.floor(progress.completion * 100 / progress.max)}%`, w * (j + 1.5) / 5, y + fontSize * 0.8);
+			ctx.fillText(`${Math.floor(progress.completion * 100 / progress.max)}%`, w * (j + 1.5) / 6, y + fontSize * 0.8);
 
 			ctx.font = `${fontSize}px fortnite, jetbrains`;
 			ctx.fillStyle = 'white';
@@ -679,7 +680,7 @@ export const createSTWProgressImage = async () => {
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
 	for (let i = 0; i < quests.length; i++) {
 		const quest = quests[i];
-		ctx.fillText(quest, w * (i + 1.5) / 5, h / 5);
+		ctx.fillText(quest, w * (i + 1.5) / 6, h / 5);
 	}
 
 	const buffer = await canvas.encode('jpeg');
