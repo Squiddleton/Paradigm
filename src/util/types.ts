@@ -213,6 +213,7 @@ export interface STWPublicProfile {
 				templateId: string;
 				attributes: {
 					quest_state: string;
+					last_state_change_time: string;
 				};
 			}[];
 		};
@@ -227,6 +228,7 @@ export interface STWProgress {
 	questName: string;
 	max: number;
 	increment: number;
+	updatedAt: string;
 }
 
 export interface STWTrackedAccount {

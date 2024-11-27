@@ -612,7 +612,7 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 		{ templateId: 'Quest:achievement_savesurvivors', name: 'Save Survivors', increment: 100, max: 10_000 }
 	];
 
-	const items = Object.values(profile.profileChanges[0].profile.items as ({ templateId: string; attributes: { quest_state: string } })[]).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
+	const items = Object.values(profile.profileChanges[0].profile.items).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
 
 	return items.map(item => {
 		const quest = achievementQuests.find(quest => quest.templateId === item.templateId);
@@ -626,18 +626,22 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 			completion: completion[1],
 			questName: quest.name,
 			max: quest.max,
-			increment: quest.increment
+			increment: quest.increment,
+			updatedAt: item.attributes.last_state_change_time
 		};
 	});
 };
 
 export const createSTWProgressImage = async () => {
-	const w = 1200;
-	const h = 600;
+	const w = 1800;
+	const h = 900;
 	const canvas = createCanvas(w, h);
 	const ctx = canvas.getContext('2d');
 
-	const fontSize = 50;
+	const image = await loadImage('https://preview.redd.it/tc6ghw1yaln71.png?width=640&crop=smart&auto=webp&s=91c394ba4100998ff112a8e73d67268d9448d421');
+	ctx.drawImage(image, 0, 0, w, h);
+
+	const fontSize = 75;
 	ctx.font = `${fontSize}px fortnite, jetbrains`;
 	ctx.fillStyle = 'white';
 	ctx.textAlign = 'center';
@@ -670,7 +674,14 @@ export const createSTWProgressImage = async () => {
 			ctx.fillText(progress.completion.toString(), w * (j + 1.5) / 6, y);
 
 			ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
-			ctx.fillText(`${Math.floor(progress.completion * 100 / progress.max)}%`, w * (j + 1.5) / 6, y + fontSize * 0.8);
+			if (progress.active) {
+				ctx.fillText(`${Math.floor(progress.completion * 100 / progress.max)}%`, w * (j + 1.5) / 6, y + fontSize * 0.8);
+			}
+			else {
+				const date = new Date(progress.updatedAt);
+				const month = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
+				ctx.fillText(`Done ${month} ${date.getDate()}, ${date.getFullYear()}`, w * (j + 1.5) / 6, y + fontSize * 0.8);
+			}
 
 			ctx.font = `${fontSize}px fortnite, jetbrains`;
 			ctx.fillStyle = 'white';
