@@ -23,6 +23,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'Chapter 6 Season 1', value: 'c6s1' },
 				{ name: 'Fortnite: Remix', value: 'remix' },
 				{ name: 'Chapter 5 Season 4', value: 'c5s4' },
 				{ name: 'Chapter 5 Season 3', value: 'c5s3' },

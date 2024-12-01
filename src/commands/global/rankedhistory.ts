@@ -64,6 +64,7 @@ export default new SlashCommand({
 			['Chapter 5, Season 3', [RankedTrack.C5S3BR, RankedTrack.C5S3ZB]],
 			['Chapter 5, Season 4', [RankedTrack.C5S4BR, RankedTrack.C5S4ZB]],
 			['Fortnite: Remix', [RankedTrack.RemixBR, RankedTrack.RemixZB]],
+			['Chapter 6, Season 1', [RankedTrack.C6S1BR, RankedTrack.C6S1ZB]],
 			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],

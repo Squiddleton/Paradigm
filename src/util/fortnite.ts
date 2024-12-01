@@ -524,7 +524,8 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 				'4',
 				'Fortnite: OG',
 				'5',
-				'Fortnite: Remix'
+				'Fortnite: Remix',
+				'6'
 			][chapterIndex];
 			const seasonName = chapterName.startsWith('Fortnite') ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
 			return `Chapter ${chapterName}, Season ${seasonName}: ${Math.floor((v ?? 0) / 100)}`;
@@ -742,14 +743,21 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	};
 
 	let seasonName: string;
-	let brTrackguid = RankedTrack.RemixBR;
-	let zbTrackguid = RankedTrack.RemixZB;
+	let brTrackguid = RankedTrack.C6S1BR;
+	let zbTrackguid = RankedTrack.C6S1ZB;
 	let racingTrackguid = RankedTrack.Oct24Racing;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
 	switch (season) {
 		// Battle Royale
+		case 'c6s1': {
+			seasonName = 'Chapter 6 Season 1';
+			brTrackguid = RankedTrack.C6S1BR;
+			zbTrackguid = RankedTrack.C6S1ZB;
+			backgroundPath = 'general.jpg';
+			break;
+		}
 		case 'remix': {
 			seasonName = 'Fortnite: Remix';
 			brTrackguid = RankedTrack.RemixBR;

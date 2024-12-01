@@ -15,8 +15,8 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String,
 			required: true,
 			choices: [
-				{ name: 'Battle Royale', value: RankedTrack.RemixBR },
-				{ name: 'Zero Build', value: RankedTrack.RemixZB },
+				{ name: 'Battle Royale', value: RankedTrack.C6S1BR },
+				{ name: 'Zero Build', value: RankedTrack.C6S1ZB },
 				{ name: 'Reload (BR)', value: RankedTrack.RemixReloadBR },
 				{ name: 'Reload (ZB)', value: RankedTrack.RemixReloadZB },
 				{ name: 'Rocket Racing', value: RankedTrack.Oct24Racing }
@@ -49,7 +49,7 @@ export default new SlashCommand({
 
 		const { account } = stats;
 		const accountId = account.id;
-		const track = interaction.options.getString('mode', true) as RankedTrack.RemixBR | RankedTrack.RemixZB | RankedTrack.RemixReloadBR | RankedTrack.RemixReloadZB | RankedTrack.Oct24Racing;
+		const track = interaction.options.getString('mode', true) as RankedTrack.C6S1BR | RankedTrack.C6S1ZB | RankedTrack.RemixReloadBR | RankedTrack.RemixReloadZB | RankedTrack.Oct24Racing;
 
 		if (!trackedModes.has(accountId)) trackedModes.set(accountId, { displayUsername: account.name, trackedModes: [] });
 		const trackedUser = trackedModes.get(accountId);
@@ -60,8 +60,8 @@ export default new SlashCommand({
 		}
 
 		const trackDisplayName = {
-			[RankedTrack.RemixBR]: 'Battle Royale',
-			[RankedTrack.RemixZB]: 'Zero Build',
+			[RankedTrack.C6S1BR]: 'Battle Royale',
+			[RankedTrack.C6S1ZB]: 'Zero Build',
 			[RankedTrack.Oct24Racing]: 'Rocket Racing',
 			[RankedTrack.RemixReloadBR]: 'Reload (Battle Royale)',
 			[RankedTrack.RemixReloadZB]: 'Reload (Zero Build)'
