@@ -52,13 +52,13 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const accountName = interaction.options.getString('player');
-		const season = interaction.options.getString('season') ?? 'remix';
+		const season = interaction.options.getString('season');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'br', season);
+		const buffer = await createRankedImage(stats.account, true, 'br', season ?? undefined);
 		if (buffer === null) {
 			await interaction.editReply('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
 			return;

@@ -732,7 +732,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season = 'remix') {
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season = 'c6s1') {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
