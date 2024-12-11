@@ -730,9 +730,9 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	}
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season = 'c6s1') {
+export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null | 'Unknown'>;
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season = 'c6s1') {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -746,6 +746,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let brTrackguid = RankedTrack.C6S1BR;
 	let zbTrackguid = RankedTrack.C6S1ZB;
 	let racingTrackguid = RankedTrack.Oct24Racing;
+	const ballisticTrackguid = RankedTrack.Ballistic;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
@@ -867,13 +868,17 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
+		case RankedTrack.Ballistic: {
+			seasonName = 'Chapter 6 Season 1';
+			backgroundPath = 'ballistic.jpg';
+			break;
+		}
 		default: {
 			throw new Error(`No case found for season ${season}`);
 		}
 	}
 	const brTrack = getTrack(brTrackguid);
 	const zbTrack = getTrack(zbTrackguid);
-	const racingTrack = getTrack(racingTrackguid);
 
 	if (!returnUnknown && brTrack.currentDivision === 0 && brTrack.promotionProgress === 0 && zbTrack.currentDivision === 0 && zbTrack.promotionProgress === 0) return 'Unknown';
 
@@ -895,6 +900,9 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
 	if (rankingType === 'rr') {
 		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
+	}
+	else if (rankingType === 'b') {
+		ctx.fillText('Ballistic', width * 0.5, height - (fontSize / 4), width / 2);
 	}
 	else {
 		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
@@ -979,7 +987,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	};
 
 	if (rankingType === 'rr') {
+		const racingTrack = getTrack(racingTrackguid);
 		await drawRankedImage(width * 0.25, racingTrack);
+	}
+	else if (rankingType === 'b') {
+		const ballisticTrack = getTrack(ballisticTrackguid);
+		await drawRankedImage(width * 0.25, ballisticTrack);
 	}
 	else {
 		await drawRankedImage(0, brTrack);
