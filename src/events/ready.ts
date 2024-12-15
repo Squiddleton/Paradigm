@@ -1,7 +1,7 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
-import { type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
+import { codeBlock, type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -102,14 +102,18 @@ export default new ClientEvent({
 							if (cachedProgress === undefined || newProgress === undefined) return;
 
 							const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
+
+							const change = ((newProgress.currentDivision + newProgress.promotionProgress) - (cachedProgress.currentDivision + cachedProgress.promotionProgress)) * 100;
+							const changeStr = codeBlock('diff', `${change >= 0 ? '+' : ''}${Math.round(change)}%`);
+
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.currentDivision < cachedProgress.currentDivision) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 							else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
-								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
 							}
 						}
 					}
