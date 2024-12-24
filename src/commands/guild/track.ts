@@ -19,7 +19,7 @@ export default new SlashCommand({
 				{ name: 'Zero Build', value: RankedTrack.C6S1ZB },
 				{ name: 'Reload (BR)', value: RankedTrack.RemixReloadBR },
 				{ name: 'Reload (ZB)', value: RankedTrack.RemixReloadZB },
-				{ name: 'Ballistic', value: RankedTrack.Ballistic },
+				{ name: 'Ballistic', value: RankedTrack.BallisticS0 },
 				{ name: 'Rocket Racing', value: RankedTrack.Oct24Racing }
 			]
 		},
@@ -50,7 +50,7 @@ export default new SlashCommand({
 
 		const { account } = stats;
 		const accountId = account.id;
-		const track = interaction.options.getString('mode', true) as RankedTrack.C6S1BR | RankedTrack.C6S1ZB | RankedTrack.RemixReloadBR | RankedTrack.RemixReloadZB | RankedTrack.Oct24Racing | RankedTrack.Ballistic;
+		const track = interaction.options.getString('mode', true) as RankedTrack.C6S1BR | RankedTrack.C6S1ZB | RankedTrack.RemixReloadBR | RankedTrack.RemixReloadZB | RankedTrack.Oct24Racing | RankedTrack.BallisticS0;
 
 		if (!trackedModes.has(accountId)) trackedModes.set(accountId, { displayUsername: account.name, trackedModes: [] });
 		const trackedUser = trackedModes.get(accountId);
@@ -66,7 +66,7 @@ export default new SlashCommand({
 			[RankedTrack.Oct24Racing]: 'Rocket Racing',
 			[RankedTrack.RemixReloadBR]: 'Reload (Battle Royale)',
 			[RankedTrack.RemixReloadZB]: 'Reload (Zero Build)',
-			[RankedTrack.Ballistic]: 'Ballistic'
+			[RankedTrack.BallisticS0]: 'Ballistic'
 		}[track];
 		const existingTrack = trackedUser.trackedModes.find(t => t.trackguid === track);
 

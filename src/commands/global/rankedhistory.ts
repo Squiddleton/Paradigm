@@ -70,7 +70,10 @@ export default new SlashCommand({
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],
 			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
 			['Rocket Racing Inferno Island', RankedTrack.InfernoIslandRacing],
-			['Rocket Racing October 2024', RankedTrack.Oct24Racing]
+			['Rocket Racing October 2024', RankedTrack.Oct24Racing],
+			['Rocket Racing December 2024', RankedTrack.Dec24Racing],
+			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
+			['Ballistic Season Zero', RankedTrack.BallisticS0]
 		];
 
 		const app = await interaction.client.application.fetch();

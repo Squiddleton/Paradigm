@@ -746,7 +746,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let brTrackguid = RankedTrack.C6S1BR;
 	let zbTrackguid = RankedTrack.C6S1ZB;
 	let racingTrackguid = RankedTrack.Oct24Racing;
-	const ballisticTrackguid = RankedTrack.Ballistic;
+	const ballisticTrackguid = RankedTrack.BallisticS0;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
@@ -868,7 +868,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
-		case RankedTrack.Ballistic: {
+		case RankedTrack.BallisticS0: {
 			seasonName = 'Chapter 6 Season 1';
 			backgroundPath = 'ballistic.jpg';
 			break;
