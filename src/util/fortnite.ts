@@ -606,7 +606,7 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> 
 	}
 
 	const achievementQuests = [
-		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', increment: 100, max: 20_000 },
+		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', increment: 1_000, max: 20_000 },
 		{ templateId: 'Quest:achievement_playwithothers', name: 'Play with Others', increment: 50, max: 1_000 },
 		{ templateId: 'Quest:achievement_explorezones', name: 'Explore Zones', increment: 50, max: 1_500 },
 		{ templateId: 'Quest:achievement_buildstructures', name: 'Build Structures', increment: 10_000, max: 500_000 },
