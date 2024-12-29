@@ -79,31 +79,39 @@ export default new SlashCommand({
 		const app = await interaction.client.application.fetch();
 		const emojis = await app.emojis.fetch();
 
+		const fields = tracks.map(([name, trackId]) => {
+			const formatProgress = (trackguid: RankedTrack) => {
+				const track = progress.find(p => p.trackguid === trackguid);
+				if (track === undefined) throw new Error(`No track progress found for track guid ${trackguid}`);
+
+				const isUnknown = isUnknownRank(track);
+				const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
+				const emoji = emojis.get(emojiId);
+				if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
+
+				return showDetail && !isUnknown
+					? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
+					: emoji.toString();
+			};
+
+			const value = Array.isArray(trackId)
+				? `${formatProgress(trackId[0])} BR ${formatProgress(trackId[1])} ZB`
+				: formatProgress(trackId);
+
+			const unknownEmoji = emojis.find(emoji => emoji.name === 'unknown')?.toString();
+
+			if ([unknownEmoji, `${unknownEmoji} BR ${unknownEmoji} ZB`].includes(value)) return null;
+
+			return {
+				name,
+				value,
+				inline: true
+			};
+		});
+
 		const embed = new EmbedBuilder()
 			.setTitle(`Ranked History: ${stats.account.name}`)
-			.setFields(tracks.map(([name, trackId]) => {
-				const formatProgress = (trackguid: RankedTrack) => {
-					const track = progress.find(p => p.trackguid === trackguid);
-					if (track === undefined) throw new Error(`No track progress found for track guid ${trackguid}`);
-
-					const isUnknown = isUnknownRank(track);
-					const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
-					const emoji = emojis.get(emojiId);
-					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
-
-					return showDetail && !isUnknown
-						? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
-						: emoji;
-				};
-
-				return {
-					name,
-					value: Array.isArray(trackId)
-						? `${formatProgress(trackId[0])} BR ${formatProgress(trackId[1])} ZB`
-						: formatProgress(trackId).toString(),
-					inline: true
-				};
-			}));
+			.setFields(fields.filter(field => field !== null));
 
 		await interaction.editReply({ embeds: [embed] });
 
