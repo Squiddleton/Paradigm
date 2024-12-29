@@ -1,5 +1,5 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
-import { type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
+import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underline, userMention } from 'discord.js';
@@ -593,18 +593,33 @@ export const getStats = async (interaction: ChatInputCommandInteraction, account
 	}
 };
 
-export const getSTWProgress = async (accountId: string): Promise<STWProgress[]> => {
+const privateAccounts = new Set();
+
+export const getSTWProgress = async (accountId: string): Promise<STWProgress[] | null> => {
 	const getProfile = (): Promise<STWPublicProfile> => epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as Promise<STWPublicProfile>;
 	let profile: STWPublicProfile;
 	try {
 		profile = await getProfile();
 	}
 	catch (error) {
-		await epicClient.auth.authenticate(config.epicDeviceAuth);
-		profile = await getProfile();
-		console.log('Reauthenticated to retrieve STW progress.');
+		try {
+			await epicClient.auth.authenticate(config.epicDeviceAuth);
+			profile = await getProfile();
+			console.log('Reauthenticated to retrieve STW progress.');
+		}
+		catch (error) {
+			if (error instanceof EpicAPIError && error.status === 403) {
+				privateAccounts.add(accountId);
+				console.log(`Account ${accountId} has set their stats to private`);
+			}
+			else {
+				console.error(`An unexpected error occurred while fetching STW progress for account ${accountId}`, error);
+			}
+			return null;
+		}
 	}
 
+	privateAccounts.delete(accountId);
 	const achievementQuests = [
 		{ templateId: 'Quest:achievement_killmistmonsters', name: 'Kill Mist Monsters', increment: 1_000, max: 20_000 },
 		{ templateId: 'Quest:achievement_playwithothers', name: 'Play with Others', increment: 50, max: 1_000 },
@@ -664,6 +679,8 @@ export const createSTWProgressImage = async () => {
 		ctx.fillText(account.n, w / 15, y);
 
 		const allProgress = await getSTWProgress(account.i);
+		if (allProgress === null) continue;
+
 		for (let j = 0; j < quests.length; j++) {
 			const quest = quests[j];
 			const progress = allProgress.find(a => a.questName === quest);

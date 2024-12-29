@@ -234,7 +234,7 @@ export interface STWProgress {
 export interface STWTrackedAccount {
 	id: string;
 	name: string;
-	progress: STWProgress[];
+	progress: STWProgress[] | null;
 }
 
 export interface TrackedMode {

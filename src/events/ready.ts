@@ -71,8 +71,10 @@ export default new ClientEvent({
 			for (const account of STWTrackedAccounts) {
 				const allNewProgress = await getSTWProgress(account.id);
 				let foundNew = false;
+				if (allNewProgress === null) continue;
+
 				for (const newProgress of allNewProgress) {
-					const oldProgress = account.progress.find(p => p.template === newProgress.template);
+					const oldProgress = account.progress?.find(p => p.template === newProgress.template);
 					if (!oldProgress?.active) continue;
 
 					const oldIncs = Math.floor(oldProgress.completion / newProgress.increment);
