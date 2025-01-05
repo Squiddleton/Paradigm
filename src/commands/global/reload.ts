@@ -2,7 +2,8 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
-import { createRankedImage, getStats, linkEpicAccount } from '../../util/fortnite.js';
+import { getStats, linkEpicAccount } from '../../util/fortnite.js';
+import { createRankedImage } from '../../util/epic.js';
 
 export default new SlashCommand({
 	name: 'reload',

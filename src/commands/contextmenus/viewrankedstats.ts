@@ -3,8 +3,9 @@ import type { Stats } from '@squiddleton/fortnite-api';
 import { ApplicationCommandType, chatInputApplicationCommandMention, MessageFlags } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { DiscordIds } from '../../util/constants.js';
-import { createRankedImage, handleStatsError } from '../../util/fortnite.js';
+import { handleStatsError } from '../../util/fortnite.js';
 import { getUser } from '../../util/users.js';
+import { createRankedImage } from '../../util/epic.js';
 
 export default new ContextMenu({
 	name: 'View Ranked Stats',

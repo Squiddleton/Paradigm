@@ -30,15 +30,6 @@ export interface DisplayUserProperties {
 	same: boolean;
 }
 
-export interface EpicAccount {
-	id: string;
-	displayName?: string;
-	passwordResetRequired?: boolean;
-	links?: AnyObject;
-	displayNameType?: string;
-	externalAuths: Record<string, AnyObject>;
-}
-
 export type Template<T> = T & {
 	_activeDate: DateString;
 	lastModified: DateString;
