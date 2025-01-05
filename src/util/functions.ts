@@ -390,5 +390,6 @@ export const viewMilestones = async (interaction: ChatInputCommandInteraction | 
 		}
 	}
 
-	await interaction.reply({ embeds: [embed], ephemeral: interaction.isContextMenuCommand() ? true : (interaction.options.getBoolean('ephemeral') ?? false) });
+	const ephemeral = interaction.isContextMenuCommand() ? true : (interaction.options.getBoolean('ephemeral') ?? false);
+	await interaction.reply({ embeds: [embed], flags: ephemeral ? MessageFlags.Ephemeral : undefined });
 };

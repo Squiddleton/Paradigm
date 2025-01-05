@@ -589,7 +589,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	}
 	else {
 		await setEpicAccount(userId, account.id);
-		await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, ephemeral });
+		await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, flags: ephemeral ? MessageFlags.Ephemeral : undefined });
 	}
 };
 
@@ -602,7 +602,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
  */
 export const sendStatsImages = async (interaction: CommandInteraction, options: StatsCommandOptions) => {
 	const isContextMenu = interaction.isContextMenuCommand();
-	await interaction.deferReply({ ephemeral: isContextMenu });
+	await interaction.deferReply({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined });
 
 	if (options.accountName === null) {
 		const userResult = getUser(options.targetUser.id);
@@ -616,8 +616,8 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 				await interaction.editReply({ content: options.content, files: [image] });
 				const buffer = await createRankedImage(account, isContextMenu, 'br');
 				if (buffer !== 'Unknown') {
-					if (buffer === null) await interaction.followUp({ ephemeral: isContextMenu, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
-					else await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+					if (buffer === null) await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
+					else await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, files: [buffer] });
 				}
 			}
 			catch (error) {
@@ -631,8 +631,8 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 			await interaction.editReply({ files: [image] });
 			const buffer = await createRankedImage(account, isContextMenu, 'br');
 			if (buffer !== 'Unknown') {
-				if (buffer === null) await interaction.followUp({ ephemeral: isContextMenu, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
-				else await interaction.followUp({ ephemeral: isContextMenu, files: [buffer] });
+				if (buffer === null) await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
+				else await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, files: [buffer] });
 			}
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
