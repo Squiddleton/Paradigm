@@ -1,6 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { LoadoutImageOptions } from '../../util/constants.js';
 import { createLoadoutAttachment, createStyleListeners } from '../../util/fortnite.js';
+import { MessageFlags } from 'discord.js';
 
 export default new SlashCommand({
 	name: 'loadout',
@@ -16,7 +17,7 @@ export default new SlashCommand({
 		const chosenBackground = interaction.options.getString('background');
 
 		if (!outfit && !backbling && !pickaxe && !glider && !wrap) {
-			await interaction.reply({ content: 'You must include at least one cosmetic.', ephemeral: true });
+			await interaction.reply({ content: 'You must include at least one cosmetic.', flags: MessageFlags.Ephemeral });
 			return;
 		}
 		await interaction.deferReply();

@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { normalize, removeDuplicates } from '@squiddleton/util';
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 
 export default new SlashCommand({
@@ -24,7 +24,7 @@ export default new SlashCommand({
 		}
 		catch (error) {
 			if (error instanceof FortniteAPIError && error.code === 503) {
-				await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', ephemeral: true });
+				await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', flags: MessageFlags.Ephemeral });
 				return;
 			}
 			throw error;

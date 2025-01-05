@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
@@ -43,7 +43,7 @@ export default new SlashCommand({
 						const channel = channelInteraction.channels.first();
 						if (channel === undefined) {
 							await guildModel.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });
-							await channelInteraction.reply({ content: 'That channel has been unset.', ephemeral: true });
+							await channelInteraction.reply({ content: 'That channel has been unset.', flags: MessageFlags.Ephemeral });
 							return;
 						}
 						else if (channel.isDMBased()) {
@@ -53,12 +53,12 @@ export default new SlashCommand({
 						DiscordClient.assertReadyClient(client);
 						const permissions = client.getPermissions(channel);
 						if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
-							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, ephemeral: true });
+							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, flags: MessageFlags.Ephemeral });
 							return;
 						}
 
 						await guildModel.findByIdAndUpdate(guildId, { [customId]: channel.id }, { upsert: true });
-						await channelInteraction.reply({ content: 'That channel has been set.', ephemeral: true });
+						await channelInteraction.reply({ content: 'That channel has been set.', flags: MessageFlags.Ephemeral });
 					})
 					.once('end', async () => {
 						try {
@@ -84,7 +84,7 @@ export default new SlashCommand({
 								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : channelMention(wishlistChannelId), inline: true }
 							)
 					],
-					ephemeral: true
+					flags: MessageFlags.Ephemeral
 				});
 			}
 		}

@@ -2,7 +2,7 @@ import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { EpicAPIError, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, quantify, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, PermissionFlagsBits, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, codeBlock, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RarityColors, Time } from './constants.js';
 import { getLevelStats, getTrackProgress } from './epic.js';
@@ -535,7 +535,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 	if (accountName === null) {
 		const userResult = getUser(targetUser.id);
 		if (!userResult?.epicAccountId) {
-			return { content: `No player username was provided, and you have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true };
+			return { content: `No player username was provided, and you have not yet linked your account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, flags: MessageFlags.Ephemeral };
 		}
 
 		try {
@@ -544,7 +544,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 			return { content: formatLevels(stats) };
 		}
 		catch (error) {
-			return { content: getStatsErrorMessage(error, accountType), ephemeral: true };
+			return { content: getStatsErrorMessage(error, accountType), flags: MessageFlags.Ephemeral };
 		}
 	}
 	else {
@@ -555,7 +555,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 			return { content: formatLevels(stats), account };
 		}
 		catch (error) {
-			return { content: getStatsErrorMessage(error, accountType), ephemeral: true };
+			return { content: getStatsErrorMessage(error, accountType), flags: MessageFlags.Ephemeral };
 		}
 	}
 };
@@ -739,7 +739,7 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	const userDocument = getUser(userId);
 
 	if (account.id === userDocument?.epicAccountId) {
-		await interaction.followUp({ content: 'You have already linked that Epic account with this bot.', ephemeral: true });
+		await interaction.followUp({ content: 'You have already linked that Epic account with this bot.', flags: MessageFlags.Ephemeral });
 	}
 	else {
 		await setEpicAccount(userId, account.id);

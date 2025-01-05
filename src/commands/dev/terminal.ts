@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType, codeBlock } from 'discord.js';
+import { ApplicationCommandOptionType, codeBlock, MessageFlags } from 'discord.js';
 
 export default new SlashCommand({
 	name: 'terminal',
@@ -15,7 +15,7 @@ export default new SlashCommand({
 	],
 	scope: 'Dev',
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		exec(interaction.options.getString('command', true), { encoding: 'utf8' }, async (error, stdout, stderr) => {
 			let content = stderr || stdout;
 			content = content === '' ? 'There was no output returned.' : codeBlock(content.slice(0, 1992));

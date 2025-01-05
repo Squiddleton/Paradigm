@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, MessageFlags, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
@@ -184,18 +184,18 @@ export default new SlashCommand({
 				const role2Amount = interaction.options.getInteger('bonusrole2amount');
 
 				if (areMismatchedBonusRoles(role1, role1Amount) || areMismatchedBonusRoles(role2, role2Amount)) {
-					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
+					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
 				const { giveaways } = await guildModel.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
 				const giveaway = giveaways.find(g => g.messageId === messageId);
 				if (giveaway === undefined) {
-					await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, ephemeral: true });
+					await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, flags: MessageFlags.Ephemeral });
 					return;
 				}
 				if (giveaway.completed) {
-					await interaction.reply({ content: 'That giveaway has already concluded.', ephemeral: true });
+					await interaction.reply({ content: 'That giveaway has already concluded.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -215,7 +215,7 @@ export default new SlashCommand({
 							giveaway.endTime = endTime;
 						}
 						else if ((giveawayTime !== null && units === null) || (giveawayTime === null && units !== null)) {
-							await interaction.reply({ content: 'The updated amount of time must have matching units.', ephemeral: true });
+							await interaction.reply({ content: 'The updated amount of time must have matching units.', flags: MessageFlags.Ephemeral });
 							return;
 						}
 						if (role1 !== null || role2 !== null) {
@@ -235,17 +235,17 @@ export default new SlashCommand({
 						);
 
 						await giveawayMessage.edit({ embeds: [createGiveawayEmbed(giveaway, interaction.guild)] });
-						await interaction.reply({ content: 'The giveaway has been updated.', ephemeral: true });
+						await interaction.reply({ content: 'The giveaway has been updated.', flags: MessageFlags.Ephemeral });
 					}
 					catch (error) {
 						const errorCodes: (string | number)[] = [RESTJSONErrorCodes.InvalidWebhookToken, RESTJSONErrorCodes.UnknownMessage];
 						if (!(error instanceof DiscordAPIError) || !errorCodes.includes(error.code)) throw error;
 
-						await interaction.reply({ content: 'That giveaway message has been deleted.', ephemeral: true });
+						await interaction.reply({ content: 'That giveaway message has been deleted.', flags: MessageFlags.Ephemeral });
 					}
 				}
 				catch (error) {
-					await interaction.reply({ content: 'This giveaway\'s channel has been deleted, or the bot cannot access it.', ephemeral: true });
+					await interaction.reply({ content: 'This giveaway\'s channel has been deleted, or the bot cannot access it.', flags: MessageFlags.Ephemeral });
 				}
 				break;
 			}
@@ -269,7 +269,7 @@ export default new SlashCommand({
 				const role2Amount = interaction.options.getInteger('bonusrole2amount');
 
 				if (areMismatchedBonusRoles(role1, role1Amount) || areMismatchedBonusRoles(role2, role2Amount)) {
-					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', ephemeral: true });
+					await interaction.reply({ content: 'Bonus roles must have a matching amount of bonus entries.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -279,7 +279,7 @@ export default new SlashCommand({
 
 				const permissions = client.getPermissions(channel);
 				if (!permissions.has([...AccessibleChannelPermissions, PermissionsBitField.Flags.EmbedLinks])) {
-					await interaction.reply({ content: 'The View Channel, Send Messages, and Embed Links permissions in the selected channel are required to use this command.', ephemeral: true });
+					await interaction.reply({ content: 'The View Channel, Send Messages, and Embed Links permissions in the selected channel are required to use this command.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -320,7 +320,7 @@ export default new SlashCommand({
 					{ upsert: true }
 				);
 
-				await interaction.reply({ content: 'Succesfully hosted the giveaway!', ephemeral: true });
+				await interaction.reply({ content: 'Succesfully hosted the giveaway!', flags: MessageFlags.Ephemeral });
 			}
 		}
 	}

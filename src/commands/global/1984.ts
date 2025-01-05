@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { EmbedBuilder, bold } from 'discord.js';
+import { EmbedBuilder, MessageFlags, bold } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { getBRCosmetics } from '../../util/fortnite.js';
 
@@ -10,7 +10,7 @@ export default new SlashCommand({
 	async execute(interaction) {
 		const cosmetics = getBRCosmetics();
 		if (cosmetics.length === 0) {
-			await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', ephemeral: true });
+			await interaction.reply({ content: 'Fortnite-API is currently booting up. Please try again in a few minutes.', flags: MessageFlags.Ephemeral });
 			return;
 		}
 

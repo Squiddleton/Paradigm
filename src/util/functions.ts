@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, MessageFlags, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -142,7 +142,7 @@ export const isKey = <T extends Record<string, unknown>>(str: string, obj: T): s
  */
 export const messageComponentCollectorFilter = (interaction: BaseInteraction) => (i: MessageComponentInteraction) => {
 	if (i.user.id === interaction.user.id) return true;
-	i.reply({ content: 'Only the command user can use this.', ephemeral: true });
+	i.reply({ content: 'Only the command user can use this.', flags: MessageFlags.Ephemeral });
 	return false;
 };
 
@@ -249,7 +249,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
  * @param interaction - The command interaction that initiated this function call
  */
 export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => {
-	await interaction.deferReply({ ephemeral: true });
+	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
 	const amount = interaction.isChatInputCommand() ? (interaction.options.getInteger('amount') ?? 1) : 1;
 
@@ -310,7 +310,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const giveaway = guildResult.giveaways.find(g => g.messageId === messageId);
 
 	if (giveaway === undefined) {
-		await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, ephemeral: true });
+		await interaction.reply({ content: `${ErrorMessage.UnknownGiveaway}.`, flags: MessageFlags.Ephemeral });
 		return;
 	}
 
@@ -334,7 +334,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const willUseButtons = entrants.length > inc;
 	const buttons = createPaginationButtons();
 
-	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [], embeds: [embed], fetchReply: true, ephemeral: true });
+	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [], embeds: [embed], fetchReply: true, flags: MessageFlags.Ephemeral });
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };

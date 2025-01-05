@@ -2,7 +2,7 @@ import { ClientEvent } from '@squiddleton/discordjs-util';
 import { EpicAPIError } from '@squiddleton/epic';
 import { type BRCosmetic, FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
+import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, MessageFlags, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -167,7 +167,7 @@ export default new ClientEvent({
 
 			const command = client.commands.get(interaction.commandName);
 			if (command === undefined) {
-				await interaction.reply({ content: 'I could not find a command matching that name!', ephemeral: true });
+				await interaction.reply({ content: 'I could not find a command matching that name!', flags: MessageFlags.Ephemeral });
 				return;
 			}
 
@@ -193,7 +193,7 @@ export default new ClientEvent({
 					console.log(`The Epic client's access token was unauthorized, but it successfully reauthenticated at ${date}.`);
 					const errorMessage: InteractionReplyOptions = {
 						content: 'An internal error occurred, but it has been resolved. Try the command again!',
-						ephemeral: true
+						flags: MessageFlags.Ephemeral
 					};
 					if (interaction.replied || interaction.deferred) await interaction.followUp(errorMessage);
 					else await interaction.reply(errorMessage);
@@ -220,7 +220,7 @@ export default new ClientEvent({
 					content: firstIsUnknownInteraction
 						? 'That command timed out internally; please try again.'
 						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.displayName} if this issue persists.`}`,
-					ephemeral: true
+					flags: MessageFlags.Ephemeral
 				};
 
 				try {
@@ -237,7 +237,7 @@ export default new ClientEvent({
 			const { guildId } = interaction;
 			const messageId = interaction.message.id;
 
-			await interaction.deferReply({ ephemeral: true });
+			await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 			if (interaction.member.joinedTimestamp !== null && interaction.member.joinedTimestamp + 6 * 86400000 > Date.now()) {
 				await interaction.editReply('You need to have been in the server for at least 6 days to enter.');
 				return;

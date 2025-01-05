@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { BRCosmetic } from '@squiddleton/fortnite-api';
 import { getRandomItem, normalize } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, Colors, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags, ModalBuilder, type ModalSubmitInteraction, RESTJSONErrorCodes, TextInputBuilder, TextInputStyle, bold } from 'discord.js';
 import { Time } from '../../util/constants.js';
 import { getBRCosmetics, getCosmeticColor, getCosmeticLargeIcon } from '../../util/fortnite.js';
 
@@ -88,7 +88,7 @@ export default new SlashCommand({
 		const filter = (i: ModalSubmitInteraction) => {
 			if (i.customId !== interaction.id) return false;
 			if (normalize(i.fields.getTextInputValue('outfit')) === normalizedName) return true;
-			i.reply({ content: 'Your guess is incorrect.', ephemeral: true });
+			i.reply({ content: 'Your guess is incorrect.', flags: MessageFlags.Ephemeral });
 			return false;
 		};
 

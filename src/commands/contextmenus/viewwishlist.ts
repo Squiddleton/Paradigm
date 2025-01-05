@@ -1,5 +1,5 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
-import { ApplicationCommandType } from 'discord.js';
+import { ApplicationCommandType, MessageFlags } from 'discord.js';
 import { viewWishlist } from '../../util/fortnite.js';
 
 export default new ContextMenu({
@@ -7,7 +7,7 @@ export default new ContextMenu({
 	type: ApplicationCommandType.User,
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply({ ephemeral: true });
+		await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 		await viewWishlist(interaction);
 	}
 });

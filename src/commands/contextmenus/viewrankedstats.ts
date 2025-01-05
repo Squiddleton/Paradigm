@@ -1,6 +1,6 @@
 import { ContextMenu } from '@squiddleton/discordjs-util';
 import type { Stats } from '@squiddleton/fortnite-api';
-import { ApplicationCommandType, chatInputApplicationCommandMention } from 'discord.js';
+import { ApplicationCommandType, chatInputApplicationCommandMention, MessageFlags } from 'discord.js';
 import fortniteAPI from '../../clients/fortnite.js';
 import { DiscordIds } from '../../util/constants.js';
 import { createRankedImage, handleStatsError } from '../../util/fortnite.js';
@@ -13,7 +13,7 @@ export default new ContextMenu({
 	async execute(interaction) {
 		const userResult = getUser(interaction.targetUser.id);
 		if (!userResult?.epicAccountId) {
-			await interaction.reply({ content: `The target user has not yet linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, ephemeral: true });
+			await interaction.reply({ content: `The target user has not yet linked their account with ${chatInputApplicationCommandMention('link', DiscordIds.CommandId.Link)}.`, flags: MessageFlags.Ephemeral });
 			return;
 		}
 

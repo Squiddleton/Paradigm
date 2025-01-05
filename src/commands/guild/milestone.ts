@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPossessive } from '@squiddleton/util';
-import { ApplicationCommandOptionType, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags, PermissionFlagsBits } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import memberModel from '../../models/members.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
@@ -87,7 +87,7 @@ export default new SlashCommand({
 				const name = interaction.options.getString('name', true);
 				const guildResult = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				if (guildResult.milestones.some(m => m.name === name)) {
-					await interaction.reply({ content: 'A milestone already exists with that name.', ephemeral: true });
+					await interaction.reply({ content: 'A milestone already exists with that name.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -107,7 +107,7 @@ export default new SlashCommand({
 					{ '_id': guildId, 'milestones.name': milestoneName },
 					{ $pull: { milestones: { name: milestoneName } } });
 				if (guildResult === null) {
-					await interaction.reply({ content: 'There is no milestone by that name.', ephemeral: true });
+					await interaction.reply({ content: 'There is no milestone by that name.', flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -131,7 +131,7 @@ export default new SlashCommand({
 				const { milestones } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				const milestone = milestones.find(m => m.name === milestoneName);
 				if (milestone === undefined) {
-					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, ephemeral: true });
+					await interaction.reply({ content: `The milestone \`${milestoneName}\` does not exist.`, flags: MessageFlags.Ephemeral });
 					return;
 				}
 
@@ -166,7 +166,7 @@ export default new SlashCommand({
 					}
 				}
 
-				await interaction.reply({ embeds: [embed], ephemeral: true });
+				await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 			}
 		}
 	}
