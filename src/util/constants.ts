@@ -197,7 +197,11 @@ export enum RankedTrack {
 	C6S1ZB = 'SP1D3R',
 	BallisticS0 = 'G4RL1C',
 	OGS0BR = 'M3M0RY',
-	OGS0ZB = 'DR3AM5'
+	OGS0ZB = 'DR3AM5',
+	OGS2BR = 'RU5T3D',
+	OGS2ZB = 'G0LD3N',
+	UnknownReloadBR = 'SUG4R',
+	UnknownReloadZB = 'SP1C3'
 }
 
 export const RarityColors: Partial<Record<string, number>> = {
