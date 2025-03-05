@@ -237,3 +237,16 @@ export interface TrackedUser {
 	displayUsername: string;
 	trackedModes: TrackedMode[];
 }
+
+export interface WorldInfo {
+	missionAlerts: {
+		availableMissionAlerts: {
+			missionAlertRewards: {
+				items: {
+					itemType: string;
+					quantity: number;
+				}[];
+			};
+		}[];
+	}[];
+}

@@ -1,7 +1,7 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
 import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
-import { codeBlock, type GuildTextBasedChannel, type Message, type Snowflake, userMention } from 'discord.js';
+import { codeBlock, type GuildTextBasedChannel, type Message, roleMention, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
@@ -11,9 +11,10 @@ import { createSTWProgressImage, getSTWProgress, getTrackProgress, trackedModes 
 import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
-import { DiscordIds, divisionNames } from '../util/constants.js';
+import { DiscordIds, divisionNames, EpicEndpoint } from '../util/constants.js';
 import { GlobalFonts } from '@napi-rs/canvas';
-import type { STWTrackedAccount } from '../util/types.js';
+import type { STWTrackedAccount, WorldInfo } from '../util/types.js';
+import epicClient from '../clients/epic.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -40,8 +41,26 @@ export default new ClientEvent({
 		};
 
 		// Specific times
-		schedule('30 0 0 * * *', measureInterval('Wishlist check', async () => {
+		schedule('30 0 0 * * *', measureInterval('Wishlist and VB check', async () => {
 			await checkWishlists(client);
+
+			const worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
+			let vbuckMissions = 0;
+			let totalVbucks = 0;
+			for (const alert of worldInfo.missionAlerts) {
+				for (const { missionAlertRewards } of alert.availableMissionAlerts) {
+					for (const item of missionAlertRewards.items) {
+						if (item.itemType.includes('mtx')) {
+							vbuckMissions++;
+							totalVbucks += item.quantity;
+						}
+					}
+				}
+			}
+			if (vbuckMissions > 0) {
+				const stwChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
+				stwChannel.send(`There ${vbuckMissions === 1 ? 'is' : 'are'} ${vbuckMissions} V-buck mission${vbuckMissions === 1 ? '' : 's'} today for a total of ${totalVbucks} V-bucks ${roleMention(DiscordIds.RoleId.STW)}.`);
+			}
 		}), { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', measureInterval('Daily chores', async () => {

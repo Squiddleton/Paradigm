@@ -38,7 +38,8 @@ export namespace DiscordIds {
 		STWProgress = '1310693896942125098'
 	}
 	export enum RoleId {
-		ItemShop = '568590143640961037'
+		ItemShop = '568590143640961037',
+		STW = '1308313483703615549'
 	}
 	export enum UserId {
 		Catalyst = '848452706791981056',
@@ -65,7 +66,8 @@ export enum EpicEndpoint {
 	MCP = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{accountId}/client/{operation}?profileId={profile}&rvn=-1',
 	Stats = 'https://statsproxy-public-service-live.ol.epicgames.com/statsproxy/api/statsv2/account/{accountId},',
 	Timeline = 'https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/calendar/v1/timeline',
-	Website = 'https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game?lang=en-US'
+	Website = 'https://fortnitecontent-website-prod07.ol.epicgames.com/content/api/pages/fortnite-game?lang=en-US',
+	WorldInfo = 'https://fngw-mcp-gc-livefn.ol.epicgames.com/fortnite/api/game/v2/world/info'
 }
 
 export enum ErrorMessage {
