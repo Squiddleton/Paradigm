@@ -59,7 +59,7 @@ export default new ClientEvent({
 			}
 			const stwChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
 			if (vbuckMissions > 0) {
-				await stwChannel.send(`There ${vbuckMissions === 1 ? 'is' : 'are'} ${vbuckMissions} V-buck mission${vbuckMissions === 1 ? '' : 's'} today for a total of ${totalVbucks} V-bucks ${roleMention(DiscordIds.RoleId.STW)}.`);
+				await stwChannel.send({ content: `There ${vbuckMissions === 1 ? 'is' : 'are'} ${vbuckMissions} V-buck mission${vbuckMissions === 1 ? '' : 's'} today for a total of ${totalVbucks} V-bucks ${roleMention(DiscordIds.RoleId.STW)}.`, allowedMentions: { parse: ['users', 'roles'] } });
 			}
 			else {
 				await stwChannel.send('There\'s nothing.');
