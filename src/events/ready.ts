@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import type { HabaneroTrackProgress } from '@squiddleton/epic';
+import { EpicAPIError, type HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
 import { codeBlock, type GuildTextBasedChannel, type Message, roleMention, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
@@ -15,6 +15,7 @@ import { DiscordIds, divisionNames, EpicEndpoint } from '../util/constants.js';
 import { GlobalFonts } from '@napi-rs/canvas';
 import type { STWTrackedAccount, WorldInfo } from '../util/types.js';
 import epicClient from '../clients/epic.js';
+import config from '../config.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -44,7 +45,19 @@ export default new ClientEvent({
 		schedule('30 0 0 * * *', measureInterval('Wishlist and VB check', async () => {
 			await checkWishlists(client);
 
-			const worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
+			let worldInfo: WorldInfo;
+			try {
+				worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
+			}
+			catch (error) {
+				if (error instanceof EpicAPIError && error.status === 401) {
+					await epicClient.auth.authenticate(config.epicDeviceAuth);
+					worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
+				}
+				else {
+					throw error;
+				}
+			}
 			let vbuckMissions = 0;
 			let totalVbucks = 0;
 			for (const alert of worldInfo.missionAlerts) {
@@ -58,12 +71,10 @@ export default new ClientEvent({
 				}
 			}
 			const stwChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
-			if (vbuckMissions > 0) {
+			if (vbuckMissions > 0)
 				await stwChannel.send({ content: `There ${vbuckMissions === 1 ? 'is' : 'are'} ${vbuckMissions} V-buck mission${vbuckMissions === 1 ? '' : 's'} today for a total of ${totalVbucks} V-bucks ${roleMention(DiscordIds.RoleId.STW)}.`, allowedMentions: { parse: ['users', 'roles'] } });
-			}
-			else {
+			else
 				await stwChannel.send('There\'s nothing.');
-			}
 		}), { timezone: 'Etc/UTC' });
 
 		schedule('0 0 * * *', measureInterval('Daily chores', async () => {
