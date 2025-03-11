@@ -65,16 +65,19 @@ export default new SlashCommand({
 			['Chapter 5, Season 4', [RankedTrack.C5S4BR, RankedTrack.C5S4ZB]],
 			['Fortnite: Remix', [RankedTrack.RemixBR, RankedTrack.RemixZB]],
 			['Chapter 6, Season 1', [RankedTrack.C6S1BR, RankedTrack.C6S1ZB]],
+			['Chapter 6, Season 2', [RankedTrack.C6S2BR, RankedTrack.C6S2ZB]],
 			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
-			['Reload Unknown', [RankedTrack.UnknownReloadBR, RankedTrack.UnknownReloadZB]],
+			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],
 			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
 			['Rocket Racing Inferno Island', RankedTrack.InfernoIslandRacing],
 			['Rocket Racing October 2024', RankedTrack.Oct24Racing],
 			['Rocket Racing December 2024', RankedTrack.Dec24Racing],
+			['Rocket Racing February 2025', RankedTrack.Feb25Racing],
 			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
-			['Ballistic Season Zero', RankedTrack.BallisticS0]
+			['Ballistic Season Zero', RankedTrack.BallisticS0],
+			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
 		];
 
 		const app = await interaction.client.application.fetch();
@@ -112,7 +115,7 @@ export default new SlashCommand({
 
 		const embed = new EmbedBuilder()
 			.setTitle(`Ranked History: ${stats.account.name}`)
-			.setFields(fields.filter(field => field !== null));
+			.setFields(fields.filter(field => field !== null).slice(0, 25));
 
 		await interaction.editReply({ embeds: [embed] });
 

@@ -239,7 +239,7 @@ export const createSTWProgressImage = async () => {
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season = 'c6s1') {
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season = 'c6s2') {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -250,15 +250,22 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	};
 
 	let seasonName: string;
-	let brTrackguid = RankedTrack.C6S1BR;
-	let zbTrackguid = RankedTrack.C6S1ZB;
-	let racingTrackguid = RankedTrack.Oct24Racing;
+	let brTrackguid = RankedTrack.C6S2BR;
+	let zbTrackguid = RankedTrack.C6S2ZB;
+	let racingTrackguid = RankedTrack.Feb25Racing;
 	const ballisticTrackguid = RankedTrack.BallisticS0;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
 	switch (season) {
 		// Battle Royale
+		case 'c6s2': {
+			seasonName = 'Chapter 6 Season 2';
+			brTrackguid = RankedTrack.C6S2BR;
+			zbTrackguid = RankedTrack.C6S2ZB;
+			backgroundPath = 'general.jpg';
+			break;
+		}
 		case 'c6s1': {
 			seasonName = 'Chapter 6 Season 1';
 			brTrackguid = RankedTrack.C6S1BR;
@@ -334,10 +341,10 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Reload
-		case 'reloadunknown': {
+		case 'reloads2': {
 			seasonName = 'Reload';
-			brTrackguid = RankedTrack.UnknownReloadBR;
-			zbTrackguid = RankedTrack.UnknownReloadZB;
+			brTrackguid = RankedTrack.S2ReloadBR;
+			zbTrackguid = RankedTrack.S2ReloadZB;
 			backgroundPath = 'og.jpg';
 			invertText = true;
 			break;

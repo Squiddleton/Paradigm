@@ -15,12 +15,12 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.String,
 			required: true,
 			choices: [
-				{ name: 'Battle Royale', value: RankedTrack.C6S1BR },
-				{ name: 'Zero Build', value: RankedTrack.C6S1ZB },
-				{ name: 'Reload (BR)', value: RankedTrack.UnknownReloadBR },
-				{ name: 'Reload (ZB)', value: RankedTrack.UnknownReloadZB },
+				{ name: 'Battle Royale', value: RankedTrack.C6S2BR },
+				{ name: 'Zero Build', value: RankedTrack.C6S2ZB },
+				{ name: 'Reload (BR)', value: RankedTrack.S2ReloadBR },
+				{ name: 'Reload (ZB)', value: RankedTrack.S2ReloadZB },
 				{ name: 'Ballistic', value: RankedTrack.BallisticS0 },
-				{ name: 'Rocket Racing', value: RankedTrack.Oct24Racing }
+				{ name: 'Rocket Racing', value: RankedTrack.Feb25Racing }
 			]
 		},
 		{
@@ -50,7 +50,7 @@ export default new SlashCommand({
 
 		const { account } = stats;
 		const accountId = account.id;
-		const track = interaction.options.getString('mode', true) as RankedTrack.C6S1BR | RankedTrack.C6S1ZB | RankedTrack.UnknownReloadBR | RankedTrack.UnknownReloadZB | RankedTrack.Oct24Racing | RankedTrack.BallisticS0;
+		const track = interaction.options.getString('mode', true) as RankedTrack.C6S2BR | RankedTrack.C6S2ZB | RankedTrack.S2ReloadBR | RankedTrack.S2ReloadZB | RankedTrack.Feb25Racing | RankedTrack.BallisticS0;
 
 		if (!trackedModes.has(accountId)) trackedModes.set(accountId, { displayUsername: account.name, trackedModes: [] });
 		const trackedUser = trackedModes.get(accountId);
@@ -61,11 +61,11 @@ export default new SlashCommand({
 		}
 
 		const trackDisplayName = {
-			[RankedTrack.C6S1BR]: 'Battle Royale',
-			[RankedTrack.C6S1ZB]: 'Zero Build',
-			[RankedTrack.Oct24Racing]: 'Rocket Racing',
-			[RankedTrack.UnknownReloadBR]: 'Reload (Battle Royale)',
-			[RankedTrack.UnknownReloadZB]: 'Reload (Zero Build)',
+			[RankedTrack.C6S2BR]: 'Battle Royale',
+			[RankedTrack.C6S2ZB]: 'Zero Build',
+			[RankedTrack.Feb25Racing]: 'Rocket Racing',
+			[RankedTrack.S2ReloadBR]: 'Reload (Battle Royale)',
+			[RankedTrack.S2ReloadZB]: 'Reload (Zero Build)',
 			[RankedTrack.BallisticS0]: 'Ballistic'
 		}[track];
 		const existingTrack = trackedUser.trackedModes.find(t => t.trackguid === track);
