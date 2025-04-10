@@ -253,7 +253,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let brTrackguid = RankedTrack.C6S2BR;
 	let zbTrackguid = RankedTrack.C6S2ZB;
 	let racingTrackguid = RankedTrack.Feb25Racing;
-	const ballisticTrackguid = RankedTrack.BallisticS0;
+	const ballisticTrackguid = RankedTrack.BallisticRAndDS1;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
@@ -390,8 +390,14 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
+		// Ballistic
 		case RankedTrack.BallisticS0: {
 			seasonName = 'Chapter 6 Season 1';
+			backgroundPath = 'ballistic.jpg';
+			break;
+		}
+		case RankedTrack.BallisticRAndDS1: {
+			seasonName = 'Ballistic R&D Season 1';
 			backgroundPath = 'ballistic.jpg';
 			break;
 		}

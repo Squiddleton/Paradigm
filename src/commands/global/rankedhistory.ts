@@ -76,7 +76,10 @@ export default new SlashCommand({
 			['Rocket Racing December 2024', RankedTrack.Dec24Racing],
 			['Rocket Racing February 2025', RankedTrack.Feb25Racing],
 			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
+			['Fortnite OG Season 2', [RankedTrack.OGS2BR, RankedTrack.OGS2ZB]],
+			['Fortnite OG Season 3', [RankedTrack.OGS3BR, RankedTrack.OGS3ZB]],
 			['Ballistic Season Zero', RankedTrack.BallisticS0],
+			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
 			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
 		];
 
