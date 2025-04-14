@@ -143,6 +143,11 @@ export default new ClientEvent({
 
 							if (newProgress.currentDivision > cachedProgress.currentDivision) {
 								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+								if (newProgress.currentDivision === (divisionNames.length - 1)) {
+									// Player has hit Unreal
+									trackedModes.delete(epicAccountId);
+									await rankedChannel.send('No longer tracking progress for this player and mode.');
+								}
 							}
 							else if (newProgress.currentDivision < cachedProgress.currentDivision) {
 								await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
