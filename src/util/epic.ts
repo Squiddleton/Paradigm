@@ -341,6 +341,14 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Reload
+		case 'reloads3': {
+			seasonName = 'Reload';
+			brTrackguid = RankedTrack.S3ReloadBR;
+			zbTrackguid = RankedTrack.S3ReloadZB;
+			backgroundPath = 'og.jpg';
+			invertText = true;
+			break;
+		}
 		case 'reloads2': {
 			seasonName = 'Reload';
 			brTrackguid = RankedTrack.S2ReloadBR;
