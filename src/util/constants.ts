@@ -240,9 +240,9 @@ export const RankingTypeDisplayNames: Record<RankingType, string> = {
 	[RankingType.BattleRoyale]: 'Battle Royale',
 	[RankingType.ZeroBuild]: 'Zero Build',
 	[RankingType.OGBuild]: 'OG (Build)',
-	[RankingType.OGNoBuild]: 'OG (No Build)',
+	[RankingType.OGNoBuild]: 'OG (Zero Build)',
 	[RankingType.ReloadBuild]: 'Reload (Build)',
-	[RankingType.ReloadNoBuild]: 'Reload (No Build)',
+	[RankingType.ReloadNoBuild]: 'Reload (Zero Build)',
 	[RankingType.Ballistic]: 'Ballistic',
 	[RankingType.RocketRacing]: 'Rocket Racing'
 };
