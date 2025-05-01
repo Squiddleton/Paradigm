@@ -253,7 +253,7 @@ export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = 
 	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild },
 	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadBuild], value: RankingType.ReloadBuild },
-	{ name: RankingTypeDisplayNames[RankingType.ZeroBuild], value: RankingType.ReloadNoBuild },
+	{ name: RankingTypeDisplayNames[RankingType.ReloadNoBuild], value: RankingType.ReloadNoBuild },
 	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
 	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing }
 ] satisfies { name: string; value: RankingType }[];
