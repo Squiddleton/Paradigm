@@ -1,8 +1,8 @@
-import { EpicAPIError, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
+import { EpicAPIError, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type ShortHabaneroTrack, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import type { FortniteWebsite, STWProgress, STWPublicProfile, TrackedUser } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
-import { AccessibleChannelPermissions, ChapterLengths, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack } from './constants.js';
+import { AccessibleChannelPermissions, ChapterLengths, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
 import { quantify } from '@squiddleton/util';
 import type { DiscordClient } from './classes.js';
 import guildModel from '../models/guilds.js';
@@ -237,9 +237,9 @@ export const createSTWProgressImage = async () => {
 	return buffer;
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season = 'c6s2') {
+export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null | 'Unknown'>;
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season: string | null = 'c6s2') {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -249,16 +249,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		return track;
 	};
 
+	const currentTracks = await getCurrentRankedTracks();
 	let seasonName: string;
-	let brTrackguid = RankedTrack.C6S2BR;
-	let zbTrackguid = RankedTrack.C6S2ZB;
-	let racingTrackguid = RankedTrack.Feb25Racing;
-	const ballisticTrackguid = RankedTrack.BallisticRAndDS1;
+	let brTrackguid = currentTracks[RankingType.BattleRoyale].trackguid as RankedTrack;
+	let zbTrackguid = currentTracks[RankingType.ZeroBuild].trackguid as RankedTrack;
+	let ballisticTrackguid = currentTracks[RankingType.Ballistic].trackguid as RankedTrack;
+	let racingTrackguid = currentTracks[RankingType.RocketRacing].trackguid as RankedTrack;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
 	switch (season) {
 		// Battle Royale
+		case null:
 		case 'c6s2': {
 			seasonName = 'Chapter 6 Season 2';
 			brTrackguid = RankedTrack.C6S2BR;
@@ -374,6 +376,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Rocket Racing
+		case RankedTrack.Feb25Racing: {
+			racingTrackguid = season;
+			seasonName = 'February 2025';
+			backgroundPath = 'rr-s0.webp';
+			break;
+		}
+		case RankedTrack.Dec24Racing: {
+			racingTrackguid = season;
+			seasonName = 'December 2024';
+			backgroundPath = 'rr-s0.webp';
+			break;
+		}
 		case RankedTrack.Oct24Racing: {
 			racingTrackguid = season;
 			seasonName = 'October 2024';
@@ -400,11 +414,13 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		}
 		// Ballistic
 		case RankedTrack.BallisticS0: {
+			ballisticTrackguid = season;
 			seasonName = 'Chapter 6 Season 1';
 			backgroundPath = 'ballistic.jpg';
 			break;
 		}
 		case RankedTrack.BallisticRAndDS1: {
+			ballisticTrackguid = season;
 			seasonName = 'Ballistic R&D Season 1';
 			backgroundPath = 'ballistic.jpg';
 			break;
@@ -445,9 +461,9 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		ctx.fillText('Zero Build', width * 0.75, height - (fontSize / 4), width / 2);
 	}
 
-	const drawRankedImage = async (xOffset: number, track: HabaneroTrackProgress) => {
+	const drawRankedImage = async (xOffset: number, progress: HabaneroTrackProgress) => {
 		const start = 1.5 * Math.PI;
-		const end = (2 * Math.PI * track.promotionProgress) - (0.5 * Math.PI);
+		const end = (2 * Math.PI * progress.promotionProgress) - (0.5 * Math.PI);
 
 		const vertexX = xOffset + (width / 4);
 		const vertexY = height / 2;
@@ -457,12 +473,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		ctx.lineWidth = height / 36;
 
-		const isUnknown = isUnknownRank(track);
+		const isUnknown = isUnknownRank(progress);
 		const divisionIconName = isUnknown
 			? 'unknown'
-			: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
+			: divisionNames[progress.currentDivision].toLowerCase().replace(' ', '');
 
-		if (track.currentPlayerRanking === null) {
+		if (progress.currentPlayerRanking === null) {
 			ctx.beginPath();
 			ctx.arc(vertexX, vertexY, radius * 0.85, 0, 2 * Math.PI);
 			ctx.fillStyle = 'midnightblue';
@@ -517,18 +533,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 		ctx.font = `${fontSize * 0.5}px fortnite, jetbrains`;
 		ctx.fillStyle = invertText ? 'purple' : 'yellow';
-		const divisionName = isUnknown ? 'Unknown' : divisionNames[track.currentDivision];
-		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${track.currentPlayerRanking === null ? `${Math.floor(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`;
+		const divisionName = isUnknown ? 'Unknown' : divisionNames[progress.currentDivision];
+		const text = divisionName === 'Unknown' ? divisionName : `${divisionName} ${progress.currentPlayerRanking === null ? `${Math.floor(progress.promotionProgress * 100)}%` : `#${progress.currentPlayerRanking}`}`;
 		ctx.fillText(text, xOffset + (width / 4), height * 0.9, width / 2);
 	};
 
 	if (rankingType === 'rr') {
-		const racingTrack = getTrack(racingTrackguid);
-		await drawRankedImage(width * 0.25, racingTrack);
+		const progress = getTrack(racingTrackguid);
+		await drawRankedImage(width * 0.25, progress);
 	}
 	else if (rankingType === 'b') {
-		const ballisticTrack = getTrack(ballisticTrackguid);
-		await drawRankedImage(width * 0.25, ballisticTrack);
+		const progress = getTrack(ballisticTrackguid);
+		await drawRankedImage(width * 0.25, progress);
 	}
 	else {
 		await drawRankedImage(0, brTrack);
@@ -579,6 +595,53 @@ export const getRankedStats = async (accountId: string): Promise<EpicStats['stat
 		console.log('Reauthenticated to retrieve ranked stats.');
 	}
 	return stats.stats;
+};
+
+export const getRankedTracks = async (): Promise<ShortHabaneroTrack[] | null> => {
+	let tracks: ShortHabaneroTrack[];
+	try {
+		tracks = await epicClient.fortnite.getTracks();
+	}
+	catch (error) {
+		try {
+			await epicClient.auth.authenticate(config.epicDeviceAuth);
+		}
+		catch (error) {
+			if (isEpicInternalError(error)) return null;
+			else if (!isEpicAuthError(error)) throw error;
+		}
+		tracks = await epicClient.fortnite.getTracks();
+		console.log('Reauthenticated to retrieve ranked tracks.');
+	}
+	return tracks;
+};
+
+export const getCurrentRankedTrack = async (rankingType: RankingType): Promise<ShortHabaneroTrack> => {
+	const tracks = await getRankedTracks();
+	if (tracks === null)
+		throw new Error('Cannot fetch ranked tracks.');
+
+	const now = Date.now();
+	const track = tracks.find(t => t.rankingType === rankingType && new Date(t.beginTime).getTime() < now && new Date(t.endTime).getTime() > now);
+	if (track === undefined)
+		throw new Error(`No current ranked track found for type ${rankingType}.`);
+
+	return track;
+};
+
+export const getCurrentRankedTracks = async (): Promise<Record<RankingType, ShortHabaneroTrack>> => {
+	const tracks = await getRankedTracks();
+	if (tracks === null)
+		throw new Error('Cannot fetch ranked tracks.');
+
+	const ret: Record<string, ShortHabaneroTrack> = {};
+	const now = Date.now();
+	for (const t of tracks) {
+		if (new Date(t.beginTime).getTime() < now && new Date(t.endTime).getTime() > now)
+			ret[t.rankingType] = t;
+	}
+
+	return ret;
 };
 
 export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => {

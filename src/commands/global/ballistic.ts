@@ -20,6 +20,15 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
+			name: 'season',
+			description: 'Which season to check ranked stats in; defaults to current',
+			type: ApplicationCommandOptionType.String,
+			choices: [
+				{ name: 'R&D Season 1', value: RankedTrack.BallisticRAndDS1 },
+				{ name: 'Season Zero', value: RankedTrack.BallisticS0 }
+			]
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -36,12 +45,13 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		const accountName = interaction.options.getString('player');
+		const season = interaction.options.getString('season') as RankedTrack | null;
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'b', RankedTrack.BallisticRAndDS1);
+		const buffer = await createRankedImage(stats.account, true, 'b', season);
 		if (buffer === null) await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
 		else await interaction.editReply({ files: [buffer] });
 

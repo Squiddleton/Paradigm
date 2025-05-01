@@ -1,5 +1,5 @@
 import { getEnumKeys } from '@squiddleton/util';
-import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from 'discord.js';
+import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionChoiceData, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from 'discord.js';
 import type { StringChoices } from './types.js';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
@@ -14,7 +14,16 @@ export enum BackgroundURL {
 
 export const BackgroundChoices: StringChoices = getEnumKeys(BackgroundURL).map(b => ({ name: b, value: b }));
 
-export const ChapterLengths = [10, 8, 4, 4, 1, 4, 1, 1];
+export const ChapterLengths = [
+	10, // Chapter 1
+	8, // Chapter 2
+	4, // Chapter 3
+	4, // Chapter 4
+	1, // OG
+	4, // Chapter 5
+	1, // Remix
+	2 // Chapter 6
+];
 
 export namespace DiscordIds {
 	export enum ChannelId {
@@ -215,6 +224,39 @@ export enum RankedTrack {
 	S3ReloadBR = 'QU3ST',
 	S3ReloadZB = 'L3GND'
 }
+
+export enum RankingType {
+	BattleRoyale = 'ranked-br',
+	ZeroBuild = 'ranked-zb',
+	OGBuild = 'ranked-figment-build',
+	OGNoBuild = 'ranked-figment-nobuild',
+	ReloadBuild = 'ranked_blastberry_build',
+	ReloadNoBuild = 'ranked_blastberry_nobuild',
+	Ballistic = 'ranked-feral',
+	RocketRacing = 'delmar-competitive'
+}
+
+export const RankingTypeDisplayNames: Record<RankingType, string> = {
+	[RankingType.BattleRoyale]: 'Battle Royale',
+	[RankingType.ZeroBuild]: 'Zero Build',
+	[RankingType.OGBuild]: 'OG (Build)',
+	[RankingType.OGNoBuild]: 'OG (No Build)',
+	[RankingType.ReloadBuild]: 'Reload (Build)',
+	[RankingType.ReloadNoBuild]: 'Reload (No Build)',
+	[RankingType.Ballistic]: 'Ballistic',
+	[RankingType.RocketRacing]: 'Rocket Racing'
+};
+
+export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = [
+	{ name: RankingTypeDisplayNames[RankingType.BattleRoyale], value: RankingType.BattleRoyale },
+	{ name: RankingTypeDisplayNames[RankingType.ZeroBuild], value: RankingType.ZeroBuild },
+	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild },
+	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild },
+	{ name: RankingTypeDisplayNames[RankingType.ReloadBuild], value: RankingType.ReloadBuild },
+	{ name: RankingTypeDisplayNames[RankingType.ZeroBuild], value: RankingType.ReloadNoBuild },
+	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
+	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing }
+] satisfies { name: string; value: RankingType }[];
 
 export const RarityColors: Partial<Record<string, number>> = {
 	'Common': 0xbebdb7,
