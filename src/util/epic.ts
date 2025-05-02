@@ -261,18 +261,22 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	switch (season) {
 		// Battle Royale
 		case null:
+		case 'gb': {
+			seasonName = 'Galactic Battle';
+			brTrackguid = RankedTrack.GalacticBattleBR;
+			zbTrackguid = RankedTrack.GalacticBattleZB;
+			break;
+		}
 		case 'c6s2': {
 			seasonName = 'Chapter 6 Season 2';
 			brTrackguid = RankedTrack.C6S2BR;
 			zbTrackguid = RankedTrack.C6S2ZB;
-			backgroundPath = 'general.jpg';
 			break;
 		}
 		case 'c6s1': {
 			seasonName = 'Chapter 6 Season 1';
 			brTrackguid = RankedTrack.C6S1BR;
 			zbTrackguid = RankedTrack.C6S1ZB;
-			backgroundPath = 'general.jpg';
 			break;
 		}
 		case 'remix': {

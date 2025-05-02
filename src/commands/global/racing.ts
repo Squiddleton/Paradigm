@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'May 2025', value: RankedTrack.May25Racing },
 				{ name: 'Februrary 2025', value: RankedTrack.Feb25Racing },
 				{ name: 'December 2024', value: RankedTrack.Dec24Racing },
 				{ name: 'October 2024', value: RankedTrack.Oct24Racing },
@@ -50,7 +51,7 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
-		const season = interaction.options.getString('season') ?? RankedTrack.Oct24Racing;
+		const season = interaction.options.getString('season') ?? RankedTrack.May25Racing;
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;

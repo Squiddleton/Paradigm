@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'Galactic Battle', value: 'gb' },
 				{ name: 'Chapter 6 Season 2', value: 'c6s2' },
 				{ name: 'Chapter 6 Season 1', value: 'c6s1' },
 				{ name: 'Fortnite: Remix', value: 'remix' },
@@ -60,7 +61,7 @@ export default new SlashCommand({
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'br', season ?? undefined);
+		const buffer = await createRankedImage(stats.account, true, 'br', season);
 		if (buffer === null) {
 			await interaction.editReply('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
 			return;
