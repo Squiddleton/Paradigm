@@ -40,7 +40,8 @@ export default new SlashCommand({
 		await interaction.deferReply();
 
 		try {
-			const { account, ...content } = await getLevelsString({
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { account, flags, ...content } = await getLevelsString({
 				targetUser: user ?? interaction.user,
 				accountName,
 				accountType
