@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, time } from 'discord.js';
 import { PlatformChoices, type RankedTrack, type RankingType, RankingTypeChoices, RankingTypeDisplayNames } from '../../util/constants.js';
 import { getCurrentRankedTrack, trackedModes } from '../../util/epic.js';
 import { getStats } from '../../util/fortnite.js';
@@ -55,13 +55,14 @@ export default new SlashCommand({
 
 		const trackDisplayName = RankingTypeDisplayNames[rankingType];
 
-		const { trackguid } = await getCurrentRankedTrack(rankingType) as { trackguid: RankedTrack };
+		const track = await getCurrentRankedTrack(rankingType);
+		const trackguid = track.trackguid as RankedTrack;
 
 		const existingTrack = trackedUser.trackedModes.find(t => t.trackguid === trackguid);
 
 		if (existingTrack === undefined) {
 			trackedUser.trackedModes.push({ trackguid, displayName: trackDisplayName });
-			await interaction.reply(`Started tracking progress for ${account.name} in ${trackDisplayName}!`);
+			await interaction.reply(`Started tracking progress for ${account.name} in ${trackDisplayName}!\nSeason: ${time(new Date(track.beginTime))} = ${time(new Date(track.endTime))}`);
 		}
 		else {
 			trackedUser.trackedModes.splice(trackedUser.trackedModes.indexOf(existingTrack), 1);
