@@ -121,7 +121,8 @@ export default new SlashCommand({
 
 		const embed = new EmbedBuilder()
 			.setTitle(`Ranked History: ${stats.account.name}`)
-			.setFields(fields.filter(field => field !== null).slice(0, 25));
+			.setFields(fields.filter(field => field !== null).slice(0, 25))
+			.setFooter({ text: `Epic Account ID: ${stats.account.id}` });
 
 		await interaction.editReply({ embeds: [embed] });
 
