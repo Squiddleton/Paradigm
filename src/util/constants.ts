@@ -236,7 +236,9 @@ export enum RankingType {
 	ReloadBuild = 'ranked_blastberry_build',
 	ReloadNoBuild = 'ranked_blastberry_nobuild',
 	Ballistic = 'ranked-feral',
-	RocketRacing = 'delmar-competitive'
+	RocketRacing = 'delmar-competitive',
+	GetawayBuild = 'ranked-bling',
+	GetawayNoBuild = 'ranked-bling-nobuild'
 }
 
 export const RankingTypeDisplayNames: Record<RankingType, string> = {
@@ -247,7 +249,9 @@ export const RankingTypeDisplayNames: Record<RankingType, string> = {
 	[RankingType.ReloadBuild]: 'Reload (Build)',
 	[RankingType.ReloadNoBuild]: 'Reload (Zero Build)',
 	[RankingType.Ballistic]: 'Ballistic',
-	[RankingType.RocketRacing]: 'Rocket Racing'
+	[RankingType.RocketRacing]: 'Rocket Racing',
+	[RankingType.GetawayBuild]: 'Getaway (Build)',
+	[RankingType.GetawayNoBuild]: 'Getaway (No Build)'
 };
 
 export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = [
@@ -258,7 +262,9 @@ export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = 
 	{ name: RankingTypeDisplayNames[RankingType.ReloadBuild], value: RankingType.ReloadBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadNoBuild], value: RankingType.ReloadNoBuild },
 	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
-	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing }
+	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing },
+	{ name: RankingTypeDisplayNames[RankingType.GetawayBuild], value: RankingType.GetawayBuild },
+	{ name: RankingTypeDisplayNames[RankingType.GetawayNoBuild], value: RankingType.GetawayNoBuild }
 ] satisfies { name: string; value: RankingType }[];
 
 export const RarityColors: Partial<Record<string, number>> = {

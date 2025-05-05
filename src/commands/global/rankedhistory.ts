@@ -1,9 +1,10 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType, EmbedBuilder } from 'discord.js';
-import { PlatformChoices, RankedEmojiIds, RankedTrack } from '../../util/constants.js';
+import { ApplicationCommandOptionType, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
+import { divisionNames, PlatformChoices, RankedEmojiIds, RankedTrack, RankingTypeChoices } from '../../util/constants.js';
 import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
 import { getTrackProgress } from '../../util/epic.js';
+import { formatPossessive } from '@squiddleton/util';
 
 export default new SlashCommand({
 	name: 'ranked-history',
@@ -18,11 +19,6 @@ export default new SlashCommand({
 			name: 'user',
 			description: 'The player who linked their Epic account with the bot; defaults to yourself or the "player" option',
 			type: ApplicationCommandOptionType.User
-		},
-		{
-			name: 'show-detail',
-			description: 'Whether to include progress to the next rank and Unreal player ranking; defaults to false',
-			type: ApplicationCommandOptionType.Boolean
 		},
 		{
 			name: 'platform',
@@ -42,7 +38,6 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const user = interaction.options.getUser('user');
-		const showDetail = interaction.options.getBoolean('show-detail') ?? false;
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
 
 		const stats = await getStats(interaction, accountName, accountType, user);
@@ -54,7 +49,12 @@ export default new SlashCommand({
 			return;
 		}
 
-		const tracks: [string, RankedTrack | [RankedTrack, RankedTrack]][] = [
+		const app = await interaction.client.application.fetch();
+		const emojis = await app.emojis.fetch();
+		const components: JSONEncodable<APIMessageTopLevelComponent>[] = [];
+		const imageNames: string[] = [];
+
+		const tracks: [string, string | [string, string]][] = [
 			['Season Zero Pre-Reset', [RankedTrack.S0PBR, RankedTrack.S0PZB]],
 			['Season Zero', [RankedTrack.S0BR, RankedTrack.S0ZB]],
 			['Chapter 4, Season 4', [RankedTrack.C4S4BR, RankedTrack.C4S4ZB]],
@@ -86,45 +86,57 @@ export default new SlashCommand({
 			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
 		];
 
-		const app = await interaction.client.application.fetch();
-		const emojis = await app.emojis.fetch();
+		components.push(
+			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History`),
+			new SeparatorBuilder()
+		);
 
-		const fields = tracks.map(([name, trackId]) => {
-			const formatProgress = (trackguid: RankedTrack) => {
-				const track = progress.find(p => p.trackguid === trackguid);
-				if (track === undefined) throw new Error(`No track progress found for track guid ${trackguid}`);
+		for (const { name, value } of RankingTypeChoices) {
+			const trackProgresses = progress.filter(p => p.rankingType === value);
+			if (trackProgresses.length === 0 || trackProgresses.every(p => p.currentDivision === 0 && p.promotionProgress === 0))
+				continue;
 
-				const isUnknown = isUnknownRank(track);
-				const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
-				const emoji = emojis.get(emojiId);
-				if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
+			let currentDivisionImage = 'unknown';
 
-				return showDetail && !isUnknown
-					? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
-					: emoji.toString();
-			};
+			trackProgresses.sort((a, b) => tracks.findIndex(t => t[1].includes(a.trackguid)) - tracks.findIndex(t => t[1].includes(b.trackguid)));
 
-			const value = Array.isArray(trackId)
-				? `${formatProgress(trackId[0])} BR ${formatProgress(trackId[1])} ZB`
-				: formatProgress(trackId);
+			const section = new SectionBuilder();
+			const text = new TextDisplayBuilder()
+				.setContent(`## ${name}\n` + trackProgresses.map((track, i) => {
+					const isUnknown = isUnknownRank(track);
+					const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
+					const emoji = emojis.get(emojiId);
+					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
 
-			const unknownEmoji = emojis.find(emoji => emoji.name === 'unknown')?.toString();
+					if (i === trackProgresses.length - 1) { // Last progress is of most recent ranked session
+						currentDivisionImage = isUnknown
+							? 'unknown'
+							: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
+					}
+					else if (track.currentDivision === 0) {
+						return null;
+					}
 
-			if ([unknownEmoji, `${unknownEmoji} BR ${unknownEmoji} ZB`].includes(value)) return null;
+					const seasonName = tracks.find(t => t[1] === track.trackguid || t[1].includes(track.trackguid));
 
-			return {
-				name,
-				value,
-				inline: true
-			};
-		});
+					return `${seasonName?.[0] ?? 'Unknown Season'}: ${(!isUnknown
+						? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
+						: emoji.toString())}`;
+				}).filter(content => content !== null).join('\n'));
 
-		const embed = new EmbedBuilder()
-			.setTitle(`Ranked History: ${stats.account.name}`)
-			.setFields(fields.filter(field => field !== null).slice(0, 25))
-			.setFooter({ text: `Epic Account ID: ${stats.account.id}` });
+			if (!imageNames.includes(currentDivisionImage))
+				imageNames.push(currentDivisionImage);
 
-		await interaction.editReply({ embeds: [embed] });
+			section
+				.addTextDisplayComponents(text)
+				.setThumbnailAccessory(thumbnail => thumbnail.setURL(`attachment://${currentDivisionImage}.png`));
+
+			components.push(section, new SeparatorBuilder());
+		}
+
+		components.push(new TextDisplayBuilder().setContent(`Epic Account ID: ${stats.account.id}`));
+
+		await interaction.editReply({ components, files: imageNames.map(image => `./assets/ranked/${image}.png`), flags: [MessageFlags.IsComponentsV2] });
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
 	}
