@@ -231,12 +231,12 @@ export enum RankedTrack {
 export enum RankingType {
 	BattleRoyale = 'ranked-br',
 	ZeroBuild = 'ranked-zb',
-	OGBuild = 'ranked-figment-build',
-	OGNoBuild = 'ranked-figment-nobuild',
 	ReloadBuild = 'ranked_blastberry_build',
 	ReloadNoBuild = 'ranked_blastberry_nobuild',
-	Ballistic = 'ranked-feral',
 	RocketRacing = 'delmar-competitive',
+	OGBuild = 'ranked-figment-build',
+	OGNoBuild = 'ranked-figment-nobuild',
+	Ballistic = 'ranked-feral',
 	GetawayBuild = 'ranked-bling',
 	GetawayNoBuild = 'ranked-bling-nobuild'
 }
@@ -244,12 +244,12 @@ export enum RankingType {
 export const RankingTypeDisplayNames: Record<RankingType, string> = {
 	[RankingType.BattleRoyale]: 'Battle Royale',
 	[RankingType.ZeroBuild]: 'Zero Build',
-	[RankingType.OGBuild]: 'OG (Build)',
-	[RankingType.OGNoBuild]: 'OG (Zero Build)',
 	[RankingType.ReloadBuild]: 'Reload (Build)',
 	[RankingType.ReloadNoBuild]: 'Reload (Zero Build)',
-	[RankingType.Ballistic]: 'Ballistic',
 	[RankingType.RocketRacing]: 'Rocket Racing',
+	[RankingType.OGBuild]: 'OG (Build)',
+	[RankingType.OGNoBuild]: 'OG (Zero Build)',
+	[RankingType.Ballistic]: 'Ballistic',
 	[RankingType.GetawayBuild]: 'Getaway (Build)',
 	[RankingType.GetawayNoBuild]: 'Getaway (No Build)'
 };
@@ -257,12 +257,12 @@ export const RankingTypeDisplayNames: Record<RankingType, string> = {
 export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = [
 	{ name: RankingTypeDisplayNames[RankingType.BattleRoyale], value: RankingType.BattleRoyale },
 	{ name: RankingTypeDisplayNames[RankingType.ZeroBuild], value: RankingType.ZeroBuild },
-	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild },
-	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadBuild], value: RankingType.ReloadBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadNoBuild], value: RankingType.ReloadNoBuild },
-	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
 	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing },
+	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild },
+	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild },
+	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
 	{ name: RankingTypeDisplayNames[RankingType.GetawayBuild], value: RankingType.GetawayBuild },
 	{ name: RankingTypeDisplayNames[RankingType.GetawayNoBuild], value: RankingType.GetawayNoBuild }
 ] satisfies { name: string; value: RankingType }[];
