@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
+import { ApplicationCommandOptionType, Colors, ContainerBuilder, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
 import { divisionNames, PlatformChoices, RankedEmojiIds, RankedTrack, RankingTypeChoices } from '../../util/constants.js';
 import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
 import { getTrackProgress } from '../../util/epic.js';
@@ -87,7 +87,7 @@ export default new SlashCommand({
 		];
 
 		components.push(
-			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History`),
+			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History\nEpic Account ID: ${stats.account.id}`),
 			new SeparatorBuilder()
 		);
 
@@ -127,14 +127,27 @@ export default new SlashCommand({
 			if (!imageNames.includes(currentDivisionImage))
 				imageNames.push(currentDivisionImage);
 
+			const colors = [
+				{ div: 'bronze', color: Colors.Orange },
+				{ div: 'silver', color: Colors.DarkerGrey },
+				{ div: 'gold', color: Colors.Gold },
+				{ div: 'platinum', color: Colors.LightGrey },
+				{ div: 'diamond', color: Colors.Blurple },
+				{ div: 'elite', color: Colors.DarkButNotBlack },
+				{ div: 'champion', color: Colors.Red },
+				{ div: 'unreal', color: Colors.Purple }
+			];
+
 			section
 				.addTextDisplayComponents(text)
 				.setThumbnailAccessory(thumbnail => thumbnail.setURL(`attachment://${currentDivisionImage}.png`));
 
-			components.push(section, new SeparatorBuilder());
-		}
+			const container = new ContainerBuilder()
+				.addSectionComponents(section)
+				.setAccentColor(colors.find(arr => currentDivisionImage.includes(arr.div))?.color ?? Colors.Blue);
 
-		components.push(new TextDisplayBuilder().setContent(`Epic Account ID: ${stats.account.id}`));
+			components.push(container);
+		}
 
 		await interaction.editReply({ components, files: imageNames.map(image => `./assets/ranked/${image}.png`), flags: [MessageFlags.IsComponentsV2] });
 
