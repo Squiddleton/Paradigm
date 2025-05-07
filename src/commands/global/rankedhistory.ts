@@ -21,6 +21,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
+			name: 'hide',
+			description: 'Whether to hide the command reply so only you can see it; default to false',
+			type: ApplicationCommandOptionType.Boolean
+		},
+		{
 			name: 'platform',
 			description: 'The player\'s platform; defaults to Epic',
 			type: ApplicationCommandOptionType.String,
@@ -34,7 +39,7 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply();
+		await interaction.deferReply({ flags: interaction.options.getBoolean('hide') ? MessageFlags.Ephemeral : undefined });
 
 		const accountName = interaction.options.getString('player');
 		const user = interaction.options.getUser('user');
@@ -149,7 +154,7 @@ export default new SlashCommand({
 			components.push(container);
 		}
 
-		await interaction.editReply({ components, files: imageNames.map(image => `./assets/ranked/${image}.png`), flags: [MessageFlags.IsComponentsV2] });
+		await interaction.editReply({ components, files: imageNames.map(image => `./assets/ranked/${image}.png`), flags: MessageFlags.IsComponentsV2 });
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
 	}
