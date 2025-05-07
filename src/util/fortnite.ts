@@ -481,7 +481,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 		.entries(levels)
 		.sort()
 		.map(([k, v]) => {
-			const match = k.match(/\d+/);
+			const match = /\d+/.exec(k);
 			if (match === null) return 'null';
 			const overallSeason = parseInt(match[0]);
 			const index = ChapterLengths.findIndex((length, i) => overallSeason <= ChapterLengths.slice(0, i + 1).reduce(sum));

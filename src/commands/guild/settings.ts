@@ -34,12 +34,21 @@ export default new SlashCommand({
 					.setMinValues(0);
 
 				const wishlistRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(wishlistMenu);
-				const message = await interaction.reply({ components: [wishlistRow], content: 'Select the channels for the following automatic messages.', fetchReply: true });
+				const response = await interaction.reply({ components: [wishlistRow], content: 'Select the channels for the following automatic messages.', withResponse: true });
+				const message = response.resource?.message;
+				if (!message) {
+					await interaction.followUp({ content: 'Unable to listen for selected channels at this time. Please try this command again later.', flags: MessageFlags.Ephemeral });
+					return;
+				}
 
 				const collector = message.createMessageComponentCollector({ componentType: ComponentType.ChannelSelect, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 				collector
 					.on('collect', async channelInteraction => {
 						const { customId } = channelInteraction;
+						if (!channelInteraction.inCachedGuild()) {
+							await channelInteraction.reply({ content: ErrorMessage.OutOfGuild, flags: MessageFlags.Ephemeral });
+							return;
+						}
 						const channel = channelInteraction.channels.first();
 						if (channel === undefined) {
 							await guildModel.findByIdAndUpdate(guildId, { [customId]: null }, { upsert: true });

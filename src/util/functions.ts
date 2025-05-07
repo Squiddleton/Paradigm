@@ -334,7 +334,10 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
 	const willUseButtons = entrants.length > inc;
 	const buttons = createPaginationButtons();
 
-	const message = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [], embeds: [embed], fetchReply: true, flags: MessageFlags.Ephemeral });
+	const response = await interaction.reply({ components: willUseButtons ? [new ActionRowBuilder<ButtonBuilder>({ components: buttons })] : [], embeds: [embed], withResponse: true, flags: MessageFlags.Ephemeral });
+	const message = response.resource?.message;
+	if (!message)
+		throw new Error('Unable to fetch response from reviewing giveaway.');
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Entrants', entrants, inc);
 };

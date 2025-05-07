@@ -120,8 +120,11 @@ export default new SlashCommand({
 					buttonInteraction = await message.awaitMessageComponent({ componentType: ComponentType.Button, filter: messageComponentCollectorFilter(interaction), time: Time.CollectorDefault });
 				}
 				catch (error) {
-					await interaction.editReply({ components: [], content: 'Ran out of time; the command has been cancelled.' });
-					return;
+					if (error instanceof Error && 'code' in error && error.code === 'InteractionCollectorError' && error.message.endsWith('time')) {
+						await interaction.editReply({ components: [], content: 'Ran out of time; the command has been cancelled.' });
+						return;
+					}
+					throw error;
 				}
 
 				switch (buttonInteraction.customId) {

@@ -122,7 +122,8 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[] |
 	try {
 		profile = await getProfile();
 	}
-	catch (error) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	catch (error1) {
 		try {
 			await epicClient.auth.authenticate(config.epicDeviceAuth);
 			profile = await getProfile();
@@ -587,7 +588,8 @@ export const getRankedStats = async (accountId: string): Promise<EpicStats['stat
 	try {
 		stats = await epicClient.fortnite.getStats(accountId);
 	}
-	catch (error) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	catch (error1) {
 		try {
 			await epicClient.auth.authenticate(config.epicDeviceAuth);
 		}
@@ -606,7 +608,8 @@ export const getRankedTracks = async (): Promise<ShortHabaneroTrack[] | null> =>
 	try {
 		tracks = await epicClient.fortnite.getTracks();
 	}
-	catch (error) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	catch (error1) {
 		try {
 			await epicClient.auth.authenticate(config.epicDeviceAuth);
 		}
@@ -653,7 +656,8 @@ export const getTrackProgress = async (accountId: string): Promise<HabaneroTrack
 	try {
 		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
 	}
-	catch (error) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	catch (error1) {
 		try {
 			await epicClient.auth.authenticate(config.epicDeviceAuth);
 		}

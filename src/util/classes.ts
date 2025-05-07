@@ -15,7 +15,7 @@ export class DiscordClient<Ready extends boolean = boolean> extends UtilClient<R
 		DiscordClient.assertReadyClient(this);
 		const channel = validateChannel(this, channelId);
 		if (channel.type === ChannelType.DM) throw new Error(`The channel "${channelId}" is actually the DM channel for recipient "${channel.recipientId}"`);
-		if (channel.type === ChannelType.GroupDM) throw new Error(`The channel "${channelId}" is actually the group DM channel for recipients "${channel.recipients.join(', ')}"`);
+		if (channel.type === ChannelType.GroupDM) throw new Error(`The channel "${channelId}" is actually the group DM channel for recipients "${channel.recipients.map(r => r.username).join(', ')}"`);
 		if (checkPermissions && !this.getPermissions(channel).has(AccessibleChannelPermissions)) throw new Error(ErrorMessage.MissingPermissions.replace('{channelId}', channelId));
 		return channel;
 	}

@@ -245,7 +245,10 @@ export default new SlashCommand({
 					}
 				}
 				catch (error) {
-					await interaction.reply({ content: 'This giveaway\'s channel has been deleted, or the bot cannot access it.', flags: MessageFlags.Ephemeral });
+					if (error instanceof Error)
+						await interaction.reply({ content: 'This giveaway\'s channel has been deleted, or the bot cannot access it.', flags: MessageFlags.Ephemeral });
+					else
+						throw error;
 				}
 				break;
 			}
