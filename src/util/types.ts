@@ -147,6 +147,7 @@ export interface IGuild {
 	_id: Snowflake;
 	giveaways: IGiveaway[];
 	milestones: IMilestone[];
+	shopChannelId: Snowflake | null;
 	shopSectionsChannelId: Snowflake | null;
 	wishlistChannelId: Snowflake | null;
 }

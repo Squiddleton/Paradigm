@@ -8,7 +8,7 @@ import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
 import { createSTWProgressImage, getSTWProgress, getTrackProgress, trackedModes } from '../util/epic.js';
-import { checkWishlists, fetchCosmetics } from '../util/fortnite.js';
+import { checkWishlists, fetchCosmetics, postShopImages } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 import { DiscordIds, divisionNames, EpicEndpoint } from '../util/constants.js';
@@ -42,7 +42,8 @@ export default new ClientEvent({
 		};
 
 		// Specific times
-		schedule('30 0 0 * * *', measureInterval('Wishlist and VB check', async () => {
+		schedule('30 0 0 * * *', measureInterval('Daily reset', async () => {
+			await postShopImages(client);
 			await checkWishlists(client);
 
 			let worldInfo: WorldInfo;

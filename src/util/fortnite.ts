@@ -1,6 +1,6 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type EpicAccount, FortniteAPIError, type Stats } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type EpicAccount, FortniteAPIError, type ShopEntry, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
@@ -148,6 +148,113 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 			}
 		}
 	}
+};
+
+/**
+ * Creates an image of the current Fortnite item shop.
+ * @returns A buffer image displaying every relevant cosmetic in the current item shop.
+ */
+export const createShopImage = async () => {
+	const side = 256;
+	const entriesPerRow = 8;
+	const gap = 20;
+	const headerHeight = side / 2;
+
+	const shop = await fortniteAPI.shop();
+	const entries = shop.entries.filter(e => 'newDisplayAsset' in e && e.newDisplayAsset.renderImages?.length && (e.brItems !== undefined || e.cars !== undefined));
+	entries.sort((a, b) => {
+		const regex = /\d*\.\d+/;
+		if (a.layout.rank !== b.layout.rank) return b.layout.rank - a.layout.rank;
+		if (a.layoutId !== b.layoutId) {
+			const aLayout = regex.exec(a.layoutId)?.[0];
+			const bLayout = regex.exec(b.layoutId)?.[0];
+			if (aLayout === undefined || bLayout === undefined)
+				return 0;
+			const aInt = parseInt(aLayout);
+			const bInt = parseInt(bLayout);
+			if (aInt === bInt) return Number.parseFloat(bLayout) - Number.parseFloat(aLayout);
+			return aInt - bInt;
+		}
+		return b.sortPriority - a.sortPriority;
+	});
+
+	const entryCount = entries.length;
+	const totalWidth = entriesPerRow * (side + gap) + gap;
+	const totalRows = Math.ceil(entryCount / entriesPerRow);
+	const totalHeight = totalRows * (side + gap) + gap + headerHeight;
+
+	const itemToCanvas = async (item: ShopEntry) => {
+		const canvas = createCanvas(side, side);
+		const ctx = canvas.getContext('2d');
+
+		// Background gradient
+		const gradient = ctx.createLinearGradient(side / 2, 0, side / 2, side);
+		gradient.addColorStop(0, '#' + item.colors.color1.slice(0, -2));
+		if (item.colors.color2) {
+			gradient.addColorStop(0.5, '#' + item.colors.color3.slice(0, -2));
+			gradient.addColorStop(1, '#' + item.colors.color2.slice(0, -2));
+		}
+		else {
+			gradient.addColorStop(1, '#' + item.colors.color3.slice(0, -2));
+		}
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, side, side);
+
+		// Item image
+		const imageURL = item.newDisplayAsset.renderImages?.[0].image;
+		if (imageURL !== undefined) {
+			const image = await loadImage(imageURL);
+			ctx.drawImage(image, 0, 0, side, side);
+		}
+
+		// Price V-Buck icon
+		const vb = await loadImage('https://fortnite-api.com/images/vbuck.png');
+		ctx.drawImage(vb, side * 0.09, side * 0.865, side / 10, side / 10);
+
+		// Text background
+		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+		ctx.fillRect(0, side * 3 / 4, side, side / 4);
+
+		// Price
+		ctx.font = `${side / 10}px fortnite`;
+		ctx.fillStyle = 'white';
+		ctx.textAlign = 'left';
+		ctx.fillText(`${item.regularPrice}`, side * 0.2, side * 0.95, side / 2);
+
+		ctx.textAlign = 'center';
+
+		// Name
+		const bundle = item.bundle as Bundle | undefined;
+		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.85, side);
+
+		// Out date
+		ctx.fillText(`Exits ${new Date(item.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 3 / 4, side * 0.95);
+
+		return canvas;
+	};
+
+	const canvas = createCanvas(totalWidth, totalHeight);
+	const ctx = canvas.getContext('2d');
+
+	ctx.font = `${side / 5}px fortnite`;
+	ctx.fillStyle = 'white';
+	ctx.textAlign = 'center';
+
+	ctx.fillText(`Fortnite Item Shop: ${new Date(shop.date).toLocaleDateString('en-us', { month: 'long', day: 'numeric', year: 'numeric' })}`, totalWidth / 2, side / 4);
+	ctx.fillText('discord.gg/fortnitebr', totalWidth / 3, side / 2);
+	ctx.fillText('squiddleton.dev/paradigm/invite', totalWidth * 2 / 3, side / 2);
+	for (let i = 0; i < entries.length; i++) {
+		const item = entries[i];
+		const row = Math.floor(i / entriesPerRow);
+		const dy = gap + row * (gap + side) + headerHeight;
+		const col = i % entriesPerRow;
+		const dx = gap + col * (gap + side);
+
+		const itemCanvas = await itemToCanvas(item);
+		ctx.drawImage(itemCanvas, dx, dy, side, side);
+	}
+
+	return canvas.encode('png');
 };
 
 /**
@@ -590,6 +697,31 @@ export const linkEpicAccount = async (interaction: ChatInputCommandInteraction, 
 	else {
 		await setEpicAccount(userId, account.id);
 		await interaction.followUp({ content: `Your account has been linked with \`${account.name}\`.`, flags: ephemeral ? MessageFlags.Ephemeral : undefined });
+	}
+};
+
+/**
+ * Posts images of the item shop to all servers with a channel subscribed for them.
+ * @param client - A ready Discord client
+ */
+export const postShopImages = async (client: DiscordClient<true>) => {
+	const guildDocuments = await guildModel.find({ shopChannelId: { $ne: null } });
+	if (guildDocuments.length === 0)
+		return;
+
+	const shopImage = await createShopImage();
+
+	for (const guildDocument of guildDocuments) {
+		if (guildDocument.shopChannelId === null)
+			continue;
+
+		try {
+			const channel = client.getVisibleChannel(guildDocument.shopChannelId);
+			await channel.send({ files: [shopImage] });
+		}
+		catch (e) {
+			console.error('An error has occured while posting shop image', e, guildDocument);
+		}
 	}
 };
 

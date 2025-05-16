@@ -27,14 +27,20 @@ export default new SlashCommand({
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
+				const shopMenu = new ChannelSelectMenuBuilder()
+					.setChannelTypes(TextBasedChannelTypes)
+					.setCustomId('shopChannelId')
+					.setPlaceholder('Item Shop')
+					.setMinValues(0);
 				const wishlistMenu = new ChannelSelectMenuBuilder()
 					.setChannelTypes(TextBasedChannelTypes)
 					.setCustomId('wishlistChannelId')
 					.setPlaceholder('Wishlist Notifications')
 					.setMinValues(0);
 
+				const shopRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(shopMenu);
 				const wishlistRow = new ActionRowBuilder<ChannelSelectMenuBuilder>().setComponents(wishlistMenu);
-				const response = await interaction.reply({ components: [wishlistRow], content: 'Select the channels for the following automatic messages.', withResponse: true });
+				const response = await interaction.reply({ components: [shopRow, wishlistRow], content: 'Select the channels for the following automatic messages.', withResponse: true });
 				const message = response.resource?.message;
 				if (!message) {
 					await interaction.followUp({ content: 'Unable to listen for selected channels at this time. Please try this command again later.', flags: MessageFlags.Ephemeral });

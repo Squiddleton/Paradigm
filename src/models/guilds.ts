@@ -79,6 +79,10 @@ const guildSchema = new Schema<IGuild>({
 		required: true,
 		default: []
 	},
+	shopChannelId: {
+		type: String,
+		default: null
+	},
 	shopSectionsChannelId: {
 		type: String,
 		default: null
