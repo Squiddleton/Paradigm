@@ -207,13 +207,13 @@ export const createShopImage = async () => {
 			ctx.drawImage(image, 0, 0, side, side);
 		}
 
-		// Price V-Buck icon
-		const vb = await loadImage('https://fortnite-api.com/images/vbuck.png');
-		ctx.drawImage(vb, side * 0.09, side * 0.865, side / 10, side / 10);
-
 		// Text background
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
 		ctx.fillRect(0, side * 3 / 4, side, side / 4);
+
+		// Price V-Buck icon
+		const vb = await loadImage('https://fortnite-api.com/images/vbuck.png');
+		ctx.drawImage(vb, side * 0.09, side * 0.865, side / 10, side / 10);
 
 		// Price
 		ctx.font = `${side / 10}px fortnite`;
@@ -236,13 +236,19 @@ export const createShopImage = async () => {
 	const canvas = createCanvas(totalWidth, totalHeight);
 	const ctx = canvas.getContext('2d');
 
+	const gradient = ctx.createLinearGradient(totalWidth / 2, 0, totalWidth / 2, totalHeight);
+	gradient.addColorStop(0, 'midnightblue');
+	gradient.addColorStop(1, 'rgb(11, 155, 210)');
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, totalWidth, totalHeight);
+
 	ctx.font = `${side / 5}px fortnite`;
 	ctx.fillStyle = 'white';
 	ctx.textAlign = 'center';
-
 	ctx.fillText(`Fortnite Item Shop: ${new Date(shop.date).toLocaleDateString('en-us', { month: 'long', day: 'numeric', year: 'numeric' })}`, totalWidth / 2, side / 4);
 	ctx.fillText('discord.gg/fortnitebr', totalWidth / 3, side / 2);
 	ctx.fillText('squiddleton.dev/paradigm/invite', totalWidth * 2 / 3, side / 2);
+
 	for (let i = 0; i < entries.length; i++) {
 		const item = entries[i];
 		const row = Math.floor(i / entriesPerRow);
