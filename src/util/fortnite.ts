@@ -239,6 +239,30 @@ export const createShopImage = async () => {
 		const bundle = item.bundle as Bundle | undefined;
 		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.84, side - (margin * 2));
 
+		// Banner
+		if ('banner' in item) {
+			const textBoxOffset = margin;
+
+			ctx.textAlign = 'left';
+			ctx.font = `${side / 15}px fortnite`;
+			const textYOffset = side / 13 + margin + textBoxOffset;
+			const textXOffset = textYOffset - side / 20;
+			const bonusYOffset = side * 0.55;
+			const text = item.banner.value.toUpperCase();
+
+			const textPadding = side / 20;
+			const textWidth = Math.min(ctx.measureText(text).width, side - textPadding - textBoxOffset * 2);
+
+			ctx.fillStyle = 'yellow';
+			ctx.beginPath();
+			const rectWidth = Math.min(textWidth + textPadding, side - (margin * 2) - textBoxOffset * 2);
+			ctx.roundRect(margin + textBoxOffset, margin + textBoxOffset + bonusYOffset, rectWidth, side / 10, [side / 20]);
+			ctx.fill();
+
+			ctx.fillStyle = 'black';
+			ctx.fillText(item.banner.value.toUpperCase(), textXOffset, textYOffset + bonusYOffset, side - ((margin + textPadding) * 2));
+		}
+
 		return canvas;
 	};
 
