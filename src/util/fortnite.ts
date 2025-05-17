@@ -238,7 +238,7 @@ export const createShopImage = async () => {
 		// Name
 		ctx.font = `${side / 8}px fortnite`;
 		const bundle = item.bundle as Bundle | undefined;
-		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.84, side * 0.97 - (margin * 2));
+		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? item.layout.name), side / 2, side * 0.84, side * 0.97 - (margin * 2));
 
 		// Banner
 		if ('banner' in item) {
