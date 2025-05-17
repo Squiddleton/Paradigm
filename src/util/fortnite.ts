@@ -173,7 +173,7 @@ export const createShopImage = async () => {
 			const aInt = parseInt(aLayout);
 			const bInt = parseInt(bLayout);
 			if (aInt === bInt) return Number.parseFloat(bLayout) - Number.parseFloat(aLayout);
-			return aInt - bInt;
+			return bInt - aInt;
 		}
 		return b.sortPriority - a.sortPriority;
 	});
@@ -186,30 +186,38 @@ export const createShopImage = async () => {
 	const itemToCanvas = async (item: ShopEntry) => {
 		const canvas = createCanvas(side, side);
 		const ctx = canvas.getContext('2d');
+		const margin = side / 50;
+
+		const getFillStyle = (color: string) => `#${color.slice(0, -2)}`;
+
+		// Outline
+		ctx.fillStyle = getFillStyle(item.colors.textBackgroundColor);
+		ctx.fillRect(0, 0, side, side);
 
 		// Background gradient
 		const gradient = ctx.createLinearGradient(side / 2, 0, side / 2, side);
-		gradient.addColorStop(0, '#' + item.colors.color1.slice(0, -2));
+		gradient.addColorStop(0, getFillStyle(item.colors.color1));
 		if (item.colors.color2) {
-			gradient.addColorStop(0.5, '#' + item.colors.color3.slice(0, -2));
-			gradient.addColorStop(1, '#' + item.colors.color2.slice(0, -2));
+			gradient.addColorStop(0.5, getFillStyle(item.colors.color3));
+			gradient.addColorStop(1, getFillStyle(item.colors.color2));
 		}
 		else {
-			gradient.addColorStop(1, '#' + item.colors.color3.slice(0, -2));
+			gradient.addColorStop(1, getFillStyle(item.colors.color3));
 		}
 		ctx.fillStyle = gradient;
-		ctx.fillRect(0, 0, side, side);
+		ctx.fillRect(margin, margin, side - (margin * 2), side - (margin * 2));
 
 		// Item image
 		const imageURL = item.newDisplayAsset.renderImages?.[0].image;
 		if (imageURL !== undefined) {
 			const image = await loadImage(imageURL);
-			ctx.drawImage(image, 0, 0, side, side);
+			ctx.drawImage(image, margin, margin, side - (margin * 2), side - (margin * 2));
 		}
 
 		// Text background
+		const textBackgroundHeight = side / 4;
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-		ctx.fillRect(0, side * 3 / 4, side, side / 4);
+		ctx.fillRect(margin, side - textBackgroundHeight - margin, side - (margin * 2), textBackgroundHeight);
 
 		// Price V-Buck icon
 		const vb = await loadImage('https://fortnite-api.com/images/vbuck.png');
@@ -225,10 +233,10 @@ export const createShopImage = async () => {
 
 		// Name
 		const bundle = item.bundle as Bundle | undefined;
-		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.85, side);
+		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.83, side - (margin * 2));
 
 		// Out date
-		ctx.fillText(`Exits ${new Date(item.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 3 / 4, side * 0.95);
+		ctx.fillText(`Exits ${new Date(item.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
 
 		return canvas;
 	};
