@@ -1,6 +1,6 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import { formatPossessive } from '@squiddleton/util';
-import { ApplicationCommandOptionType, EmbedBuilder, MessageFlags, PermissionFlagsBits } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationIntegrationType, EmbedBuilder, MessageFlags, PermissionFlagsBits } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import memberModel from '../../models/members.js';
 import { ErrorMessage, Rarities, RarityOrdering } from '../../util/constants.js';
@@ -78,8 +78,9 @@ export default new SlashCommand({
 	],
 	scope: 'Guild',
 	permissions: PermissionFlagsBits.ManageGuild,
+	integrationTypes: [ApplicationIntegrationType.GuildInstall],
 	async execute(interaction) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfCachedGuild);
 
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {

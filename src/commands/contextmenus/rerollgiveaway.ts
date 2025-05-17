@@ -9,7 +9,7 @@ export default new ContextMenu({
 	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
 	async execute(interaction) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+		if (!interaction.inGuild()) throw new Error(ErrorMessage.OutOfGuild);
 		await rerollGiveaway(interaction);
 	}
 });

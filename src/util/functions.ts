@@ -2,7 +2,7 @@ import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squidd
 import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, MessageFlags, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
-import type { IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
+import type { CachedSlashOrMessageContextMenu, IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
 import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 
@@ -302,8 +302,7 @@ export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => 
  *
  * @param interaction - The command interaction that initiated this function call
  */
-export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => {
-	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+export const reviewGiveaway = async (interaction: CachedSlashOrMessageContextMenu) => {
 	const inc = 20;
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
 	const guildResult = await guildModel.findByIdAndUpdate(interaction.guildId, {}, { new: true, upsert: true });
@@ -347,9 +346,7 @@ export const reviewGiveaway = async (interaction: SlashOrMessageContextMenu) => 
  *
  * @param interaction - The command interaction that initiated this function call
  */
-export const viewMilestones = async (interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction) => {
-	if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
-
+export const viewMilestones = async (interaction: ChatInputCommandInteraction<'cached'> | UserContextMenuCommandInteraction<'cached'>) => {
 	const { guildId } = interaction;
 	const member = (interaction.isChatInputCommand() ? interaction.options.getMember('member') : interaction.targetMember) ?? interaction.member;
 	const { displayName } = member;

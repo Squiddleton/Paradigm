@@ -128,7 +128,7 @@ export default new ClientEvent({
 						break;
 					}
 					case 'milestone': {
-						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfGuild);
+						if (!inCachedGuild) throw new Error(ErrorMessage.OutOfCachedGuild);
 						const { guildId } = interaction;
 						const guildResult = await guildModel.findById(guildId);
 						if (guildResult === null) {

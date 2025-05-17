@@ -1,6 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ApplicationCommandOptionType } from 'discord.js';
+import { ApplicationCommandOptionType, ApplicationIntegrationType } from 'discord.js';
 import { viewMilestones } from '../../util/functions.js';
+import { ErrorMessage } from '../../util/constants.js';
 
 export default new SlashCommand({
 	name: 'milestones',
@@ -18,7 +19,10 @@ export default new SlashCommand({
 		}
 	],
 	scope: 'Guild',
+	integrationTypes: [ApplicationIntegrationType.GuildInstall],
 	async execute(interaction) {
+		if (!interaction.inCachedGuild())
+			throw new Error(ErrorMessage.OutOfCachedGuild);
 		await viewMilestones(interaction);
 	}
 });

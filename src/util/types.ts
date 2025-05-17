@@ -186,7 +186,9 @@ export type Dimensions = Record<CosmeticDisplayType, [number, number, number, nu
 
 export type PaginationButtons = [ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder, ButtonBuilder];
 
-export type SlashOrMessageContextMenu = ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
+export type SlashOrMessageContextMenu = ChatInputCommandInteraction<'raw' | 'cached'> | MessageContextMenuCommandInteraction<'raw' | 'cached'>;
+
+export type CachedSlashOrMessageContextMenu = ChatInputCommandInteraction<'cached'> | MessageContextMenuCommandInteraction<'cached'>;
 
 export interface StatsCommandOptions extends LevelCommandOptions {
 	content?: string;

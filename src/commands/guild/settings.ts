@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationIntegrationType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
@@ -22,8 +22,9 @@ export default new SlashCommand({
 	],
 	permissions: PermissionFlagsBits.ManageGuild,
 	scope: 'Guild',
+	integrationTypes: [ApplicationIntegrationType.GuildInstall],
 	async execute(interaction, client) {
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfCachedGuild);
 		const { guildId } = interaction;
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
@@ -52,7 +53,7 @@ export default new SlashCommand({
 					.on('collect', async channelInteraction => {
 						const { customId } = channelInteraction;
 						if (!channelInteraction.inCachedGuild()) {
-							await channelInteraction.reply({ content: ErrorMessage.OutOfGuild, flags: MessageFlags.Ephemeral });
+							await channelInteraction.reply({ content: ErrorMessage.OutOfCachedGuild, flags: MessageFlags.Ephemeral });
 							return;
 						}
 						const channel = channelInteraction.channels.first();

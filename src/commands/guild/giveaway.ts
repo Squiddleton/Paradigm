@@ -1,5 +1,5 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
-import { ActionRowBuilder, ApplicationCommandOptionType, ButtonBuilder, ButtonStyle, DiscordAPIError, MessageFlags, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
+import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationIntegrationType, ButtonBuilder, ButtonStyle, DiscordAPIError, MessageFlags, PermissionFlagsBits, PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
 import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, UnitChoices, UnitsToMS } from '../../util/constants.js';
@@ -167,9 +167,13 @@ export default new SlashCommand({
 	],
 	scope: 'Guild',
 	permissions: PermissionFlagsBits.ManageGuild,
+	integrationTypes: [ApplicationIntegrationType.GuildInstall],
 	async execute(interaction, client) {
 		DiscordClient.assertReadyClient(client);
-		if (!interaction.inCachedGuild()) throw new Error(ErrorMessage.OutOfGuild);
+		if (!interaction.inCachedGuild()) {
+			await interaction.reply({ content: 'This command can only be used if the bot has been added to the server. Please contact a server moderator to add the bot as a member.' });
+			throw new Error(ErrorMessage.OutOfCachedGuild);
+		}
 
 		switch (interaction.options.getSubcommand()) {
 			case 'edit': {
