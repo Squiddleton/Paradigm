@@ -159,6 +159,7 @@ export const createShopImage = async () => {
 	const entriesPerRow = 8;
 	const gap = 20;
 	const headerHeight = side / 2;
+	const footerHeight = side * 0.75;
 
 	const shop = await fortniteAPI.shop();
 	const entries = shop.entries.filter(e => 'newDisplayAsset' in e && e.newDisplayAsset.renderImages?.length && (e.brItems !== undefined || e.cars !== undefined));
@@ -181,7 +182,7 @@ export const createShopImage = async () => {
 	const entryCount = entries.length;
 	const totalWidth = entriesPerRow * (side + gap) + gap;
 	const totalRows = Math.ceil(entryCount / entriesPerRow);
-	const totalHeight = totalRows * (side + gap) + gap + headerHeight;
+	const totalHeight = headerHeight + totalRows * (side + gap) + gap + footerHeight;
 
 	const itemToCanvas = async (item: ShopEntry) => {
 		const canvas = createCanvas(side, side);
@@ -271,7 +272,8 @@ export const createShopImage = async () => {
 
 	const gradient = ctx.createLinearGradient(totalWidth / 2, 0, totalWidth / 2, totalHeight);
 	gradient.addColorStop(0, 'midnightblue');
-	gradient.addColorStop(1, 'rgb(11, 155, 210)');
+	gradient.addColorStop(0.5, 'rgb(11, 155, 210)');
+	gradient.addColorStop(1, 'midnightblue');
 	ctx.fillStyle = gradient;
 	ctx.fillRect(0, 0, totalWidth, totalHeight);
 
@@ -281,6 +283,8 @@ export const createShopImage = async () => {
 	ctx.fillText(`Fortnite Item Shop: ${new Date(shop.date).toLocaleDateString('en-us', { month: 'long', day: 'numeric', year: 'numeric' })}`, totalWidth / 2, side / 4);
 	ctx.fillText('discord.gg/fortnitebr', totalWidth / 3, side / 2);
 	ctx.fillText('squiddleton.dev/paradigm/invite', totalWidth * 2 / 3, side / 2);
+	ctx.fillText('Want a notification when an item appears in the item shop? Add the app The Paradigm, and use "/wishlist add"!', totalWidth / 2, totalHeight - (footerHeight * 0.75));
+	ctx.fillText('Want automatic item shop posts in your own server? Add the bot and use "/settings edit"!', totalWidth / 2, totalHeight - (footerHeight * 0.25));
 
 	for (let i = 0; i < entries.length; i++) {
 		const item = entries[i];
