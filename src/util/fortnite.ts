@@ -231,12 +231,13 @@ export const createShopImage = async () => {
 
 		ctx.textAlign = 'center';
 
-		// Name
-		const bundle = item.bundle as Bundle | undefined;
-		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.83, side - (margin * 2));
-
 		// Out date
 		ctx.fillText(`Exits ${new Date(item.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
+
+		// Name
+		ctx.font = `${side / 8}px fortnite`;
+		const bundle = item.bundle as Bundle | undefined;
+		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? 'Unknown Name'), side / 2, side * 0.84, side - (margin * 2));
 
 		return canvas;
 	};
