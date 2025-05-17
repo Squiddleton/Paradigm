@@ -88,7 +88,7 @@ export default new SlashCommand({
 				break;
 			}
 			case 'view': {
-				const { giveaways, milestones, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
+				const { giveaways, milestones, shopChannelId, wishlistChannelId } = await guildModel.findByIdAndUpdate(guildId, {}, { new: true, upsert: true });
 				await interaction.reply({
 					embeds: [
 						new EmbedBuilder()
@@ -97,6 +97,7 @@ export default new SlashCommand({
 							.setFields(
 								{ name: 'Total Giveaways', value: giveaways.length.toString(), inline: true },
 								{ name: 'Total Milestones', value: milestones.length.toString(), inline: true },
+								{ name: 'Item Shop Posts', value: shopChannelId === null ? 'No Channel Set' : channelMention(shopChannelId), inline: true },
 								{ name: 'Wishlist Notifications', value: wishlistChannelId === null ? 'No Channel Set' : channelMention(wishlistChannelId), inline: true }
 							)
 					],
