@@ -248,7 +248,7 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
  *
  * @param interaction - The command interaction that initiated this function call
  */
-export const rerollGiveaway = async (interaction: SlashOrMessageContextMenu) => {
+export const rerollGiveaway = async (interaction: CachedSlashOrMessageContextMenu) => {
 	await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 	const messageId = interaction.isChatInputCommand() ? interaction.options.getString('message', true) : interaction.targetId;
 	const amount = interaction.isChatInputCommand() ? (interaction.options.getInteger('amount') ?? 1) : 1;
