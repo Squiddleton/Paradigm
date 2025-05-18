@@ -157,7 +157,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  */
 export const createShopImage = async (side = 256) => {
 	const entriesPerRow = 8;
-	const gap = side / 10;
+	const gap = side * 0.05;
 	const headerHeight = side * 0.5;
 	const footerHeight = side * 0.75;
 
@@ -191,7 +191,7 @@ export const createShopImage = async (side = 256) => {
 	const totalRows = Math.ceil(entryCount / entriesPerRow);
 	const totalHeight = headerHeight + totalRows * (side + gap) + gap + footerHeight;
 
-	const itemToCanvas = async (entry: ShopEntry) => {
+	const entryToCanvas = async (entry: ShopEntry) => {
 		const canvas = createCanvas(side, side);
 		const ctx = canvas.getContext('2d');
 
@@ -245,6 +245,7 @@ export const createShopImage = async (side = 256) => {
 		ctx.fillText(`Exits ${outDate.toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
 
 		// Name
+		ctx.fillStyle = 'white';
 		ctx.font = `${side / 8}px fortnite`;
 		const bundle = entry.bundle as Bundle | undefined;
 		ctx.fillText(bundle !== undefined ? bundle.name : (entry.brItems?.[0].name ?? entry.layout.name), side / 2, side * 0.84, side * 0.97);
@@ -310,7 +311,7 @@ export const createShopImage = async (side = 256) => {
 		const col = i % entriesPerRow;
 		const dx = gap + col * (gap + side);
 
-		const itemCanvas = await itemToCanvas(item);
+		const itemCanvas = await entryToCanvas(item);
 		ctx.drawImage(itemCanvas, dx, dy, side, side);
 	}
 
