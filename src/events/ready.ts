@@ -1,5 +1,5 @@
 import { ClientEvent } from '@squiddleton/discordjs-util';
-import { EpicAPIError, type HabaneroTrackProgress } from '@squiddleton/epic';
+import type { HabaneroTrackProgress } from '@squiddleton/epic';
 import { getRandomItem } from '@squiddleton/util';
 import { codeBlock, type GuildTextBasedChannel, type Message, roleMention, type Snowflake, userMention } from 'discord.js';
 import { schedule } from 'node-cron';
@@ -7,15 +7,13 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
-import { createSTWProgressImage, getSTWProgress, getTrackProgress, trackedModes } from '../util/epic.js';
+import { callEpicFunction, createSTWProgressImage, getSTWProgress, getTrackProgress, trackedModes } from '../util/epic.js';
 import { checkWishlists, fetchCosmetics, postShopImages } from '../util/fortnite.js';
 import { createGiveawayEmbed } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 import { DiscordIds, divisionNames, EpicEndpoint } from '../util/constants.js';
 import { GlobalFonts } from '@napi-rs/canvas';
 import type { STWTrackedAccount, WorldInfo } from '../util/types.js';
-import epicClient from '../clients/epic.js';
-import config from '../config.js';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -46,19 +44,8 @@ export default new ClientEvent({
 			await postShopImages(client);
 			await checkWishlists(client);
 
-			let worldInfo: WorldInfo;
-			try {
-				worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
-			}
-			catch (error) {
-				if (error instanceof EpicAPIError && error.status === 401) {
-					await epicClient.auth.authenticate(config.epicDeviceAuth);
-					worldInfo = await epicClient.auth.get<WorldInfo>(EpicEndpoint.WorldInfo);
-				}
-				else {
-					throw error;
-				}
-			}
+			const worldInfo = await callEpicFunction(client => client.auth.get<WorldInfo>(EpicEndpoint.WorldInfo));
+
 			let vbuckMissions = 0;
 			let totalVbucks = 0;
 			for (const alert of worldInfo.missionAlerts) {

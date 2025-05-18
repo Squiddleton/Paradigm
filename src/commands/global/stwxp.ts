@@ -3,8 +3,7 @@ import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, EmbedBuilder, time } from 'discord.js';
 import { PlatformChoices } from '../../util/constants.js';
 import { getStats } from '../../util/fortnite.js';
-import epicClient from '../../clients/epic.js';
-import config from '../../config.js';
+import { callEpicFunction } from '../../util/epic.js';
 
 export default new SlashCommand({
 	name: 'stwxp',
@@ -37,15 +36,7 @@ export default new SlashCommand({
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		let profile: unknown;
-		const getProfile = () => epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', stats.account.id);
-		try {
-			profile = await getProfile();
-		}
-		catch {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-			profile = await getProfile();
-		}
+		const profile = callEpicFunction(client => client.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', stats.account.id));
 
 		// @ts-expect-error Checked as of 12/5/24
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument

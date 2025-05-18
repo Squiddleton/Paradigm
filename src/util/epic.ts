@@ -1,4 +1,4 @@
-import { EpicAPIError, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type ShortHabaneroTrack, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
+import { EpicAPIError, type EpicClient, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type ShortHabaneroTrack, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
 import type { FortniteWebsite, STWProgress, STWPublicProfile, TrackedUser } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
@@ -15,6 +15,21 @@ export const trackedModes = new Map<string, TrackedUser>();
 
 export const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && error.status >= 500 && error.status < 600;
 export const isEpicInternalError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
+
+export const callEpicFunction = async <T>(callback: (client: EpicClient) => T): Promise<T> => {
+	let ret: T;
+	try {
+		ret = await callback(epicClient);
+	}
+	catch (error) {
+		if (isEpicInternalError(error)) throw new Error('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
+		else if (!isEpicAuthError(error)) throw error;
+
+		await epicClient.auth.authenticate(config.epicDeviceAuth);
+		ret = await callback(epicClient);
+	}
+	return ret;
+};
 
 /**
  * Returns the names of the shop tabs in a client event state.
@@ -43,7 +58,7 @@ export const fetchShopNames = async (state: TimelineChannelData<TimelineClientEv
 /**
  * Returns the current client event states from Epic Games' timeline API
  */
-export const fetchStates = () => epicClient.fortnite.getTimeline().then(timeline => timeline.channels['client-events'].states);
+export const fetchStates = () => callEpicFunction(client => client.fortnite.getTimeline().then(timeline => timeline.channels['client-events'].states));
 
 /**
  * Posts leaked shop sections across all subscribed channels.
@@ -117,29 +132,8 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 const privateAccounts = new Set();
 
 export const getSTWProgress = async (accountId: string): Promise<STWProgress[] | null> => {
-	const getProfile = (): Promise<STWPublicProfile> => epicClient.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as Promise<STWPublicProfile>;
-	let profile: STWPublicProfile;
-	try {
-		profile = await getProfile();
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	catch (error1) {
-		try {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-			profile = await getProfile();
-			console.log('Reauthenticated to retrieve STW progress.');
-		}
-		catch (error) {
-			if (error instanceof EpicAPIError && error.status === 403) {
-				privateAccounts.add(accountId);
-				console.log(`Account ${accountId} has set their stats to private`);
-			}
-			else {
-				console.error(`An unexpected error occurred while fetching STW progress for account ${accountId}`, error);
-			}
-			return null;
-		}
-	}
+	const getProfile = (client: EpicClient): Promise<STWPublicProfile> => client.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as Promise<STWPublicProfile>;
+	const profile = await callEpicFunction(getProfile);
 
 	privateAccounts.delete(accountId);
 	const achievementQuests = [
@@ -563,64 +557,20 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | string> => {
 	const seasons = ChapterLengths.reduce((p, c) => p + c, 0);
 	const stats = getBattlePassLevels(seasons).filter(s => s !== 's12_social_bp_level').slice(-20);
-	let bulkStats: EpicStats[];
-	try {
-		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
-		if (bulkStats.length == 0) console.log(bulkStats, stats, accountId);
-	}
-	catch {
-		try {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-		}
-		catch (error) {
-			if (isEpicInternalError(error)) return 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.';
-			else if (!isEpicAuthError(error)) throw error;
-		}
-		bulkStats = await epicClient.fortnite.getBulkStats({ accountIds: [accountId], stats });
-		console.log('Reauthenticated to retrieve level stats.');
-	}
+	const getBulkStats = (client: EpicClient) => client.fortnite.getBulkStats({ accountIds: [accountId], stats });
+	const bulkStats = await callEpicFunction(getBulkStats);
+
 	if (bulkStats.length === 0) return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
 	return bulkStats[0].stats;
 };
 
 export const getRankedStats = async (accountId: string): Promise<EpicStats['stats'] | null> => {
-	let stats: EpicStats;
-	try {
-		stats = await epicClient.fortnite.getStats(accountId);
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	catch (error1) {
-		try {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-		}
-		catch (error) {
-			if (isEpicInternalError(error)) return null;
-			else if (!isEpicAuthError(error)) throw error;
-		}
-		stats = await epicClient.fortnite.getStats(accountId);
-		console.log('Reauthenticated to retrieve ranked stats.');
-	}
+	const stats = await callEpicFunction(client => client.fortnite.getStats(accountId));
 	return stats.stats;
 };
 
 export const getRankedTracks = async (): Promise<ShortHabaneroTrack[] | null> => {
-	let tracks: ShortHabaneroTrack[];
-	try {
-		tracks = await epicClient.fortnite.getTracks();
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	catch (error1) {
-		try {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-		}
-		catch (error) {
-			if (isEpicInternalError(error)) return null;
-			else if (!isEpicAuthError(error)) throw error;
-		}
-		tracks = await epicClient.fortnite.getTracks();
-		console.log('Reauthenticated to retrieve ranked tracks.');
-	}
-	return tracks;
+	return callEpicFunction(client => client.fortnite.getTracks());
 };
 
 export const getCurrentRankedTrack = async (rankingType: RankingType): Promise<ShortHabaneroTrack> => {
@@ -652,23 +602,7 @@ export const getCurrentRankedTracks = async (): Promise<Record<RankingType, Shor
 };
 
 export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => {
-	let trackProgress: HabaneroTrackProgress[];
-	try {
-		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
-	}
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	catch (error1) {
-		try {
-			await epicClient.auth.authenticate(config.epicDeviceAuth);
-		}
-		catch (error) {
-			if (isEpicInternalError(error)) return null;
-			else if (!isEpicAuthError(error)) throw error;
-		}
-		trackProgress = await epicClient.fortnite.getTrackProgress({ accountId });
-		console.log('Reauthenticated to retrieve ranked progress.');
-	}
-	return trackProgress;
+	return callEpicFunction(client => client.fortnite.getTrackProgress({ accountId }));
 };
 
 /**
@@ -676,7 +610,7 @@ export const getTrackProgress = async (accountId: string): Promise<HabaneroTrack
  *
  * @returns The output of the request
  */
-export const claimLoginReward = () => epicClient.fortnite.postMCPOperation('ClaimLoginReward', 'campaign');
+export const claimLoginReward = () => callEpicFunction(client => client.fortnite.postMCPOperation('ClaimLoginReward', 'campaign'));
 
 /**
  * Changes the authenticated user's Save the World homebase name.
@@ -686,4 +620,4 @@ export const claimLoginReward = () => epicClient.fortnite.postMCPOperation('Clai
  * @param homebaseName - The new homebase name
  * @returns The output of the request
  */
-export const setHomebaseName = (homebaseName: string) => epicClient.fortnite.postMCPOperation('SetHomebaseName', 'common_public', { homebaseName });
+export const setHomebaseName = (homebaseName: string) => callEpicFunction(client => client.fortnite.postMCPOperation('SetHomebaseName', 'common_public', { homebaseName }));
