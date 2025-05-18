@@ -152,13 +152,13 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
 
 /**
  * Creates an image of the current Fortnite item shop.
+ * @param side - The length and width of each shop entry in pixels
  * @returns A buffer image displaying every relevant cosmetic in the current item shop.
  */
-export const createShopImage = async () => {
-	const side = 256;
+export const createShopImage = async (side = 256) => {
 	const entriesPerRow = 8;
-	const gap = 20;
-	const headerHeight = side / 2;
+	const gap = side / 10;
+	const headerHeight = side * 0.5;
 	const footerHeight = side * 0.75;
 
 	const shop = await fortniteAPI.shop();
