@@ -162,6 +162,7 @@ export const createShopImage = async (side = 256) => {
 	const footerHeight = side * 0.75;
 
 	const shop = await fortniteAPI.shop();
+	const shopDate = new Date(shop.date);
 	const entries = shop.entries.filter(e => 'newDisplayAsset' in e && e.newDisplayAsset.renderImages?.length && (e.brItems !== undefined || e.cars !== undefined));
 	entries.sort((a, b) => {
 		const regex = /\d*\.\d+/;
@@ -234,7 +235,14 @@ export const createShopImage = async (side = 256) => {
 		ctx.textAlign = 'center';
 
 		// Out date
-		ctx.fillText(`Exits ${new Date(entry.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
+		const outDate = new Date(entry.outDate);
+
+		const tomorrow = new Date(shopDate);
+		tomorrow.setDate(tomorrow.getDate() + 1);
+		if (outDate.getDate() === tomorrow.getDate() && outDate.getMonth() === tomorrow.getMonth() && outDate.getFullYear() === tomorrow.getFullYear())
+			ctx.fillStyle = 'orange';
+
+		ctx.fillText(`Exits ${outDate.toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
 
 		// Name
 		ctx.font = `${side / 8}px fortnite`;
@@ -289,7 +297,7 @@ export const createShopImage = async (side = 256) => {
 	ctx.font = `${side / 5}px fortnite`;
 	ctx.fillStyle = 'white';
 	ctx.textAlign = 'center';
-	ctx.fillText(`Fortnite Item Shop: ${new Date(shop.date).toLocaleDateString('en-us', { month: 'long', day: 'numeric', year: 'numeric' })}`, totalWidth / 2, side / 4);
+	ctx.fillText(`Fortnite Item Shop: ${shopDate.toLocaleDateString('en-us', { month: 'long', day: 'numeric', year: 'numeric' })}`, totalWidth / 2, side / 4);
 	ctx.fillText('discord.gg/fortnitebr', totalWidth / 3, side / 2);
 	ctx.fillText('squiddleton.dev/paradigm/invite', totalWidth * 2 / 3, side / 2);
 	ctx.fillText('Want a notification when an item appears in the item shop? Add the app The Paradigm, and use "/wishlist add"!', totalWidth / 2, totalHeight - (footerHeight * 0.75));
