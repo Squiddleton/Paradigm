@@ -193,7 +193,6 @@ export const createShopImage = async () => {
 	const itemToCanvas = async (entry: ShopEntry) => {
 		const canvas = createCanvas(side, side);
 		const ctx = canvas.getContext('2d');
-		const margin = side / 50;
 
 		const getFillStyle = (color: string) => `#${color.slice(0, -2)}`;
 
@@ -244,28 +243,30 @@ export const createShopImage = async () => {
 
 		// Banner
 		if ('banner' in entry) {
-			const textBoxOffset = side / 50;
-
 			ctx.textAlign = 'left';
 			ctx.font = `${side / 10}px fortnite`;
-			const textYOffset = side / 12 + textBoxOffset;
-			const textXOffset = textYOffset - side / 20;
-			const bonusYOffset = side * 0.575;
-			const text = entry.banner.value.toUpperCase();
 
-			const textPadding = side / 17;
-			const textWidth = Math.min(ctx.measureText(text).width, side - textPadding - textBoxOffset * 2);
+			const bannerBackgroundXOffset = side * 0.02;
+			const bannerBackgroundYOffset = side * 0.6;
+			const textYOffset = bannerBackgroundYOffset * 1.14;
+			const text = entry.banner.value;
+
+			const borderRadius = side * 0.05;
+			const maxTextWidth = side - 2 * (borderRadius + bannerBackgroundXOffset);
+			const textWidth = Math.min(ctx.measureText(text).width, maxTextWidth);
+			const bannerBackgroundWidth = textWidth + (borderRadius * 2);
+			const bannerBackgroundHeight = side * 0.1;
 
 			ctx.fillStyle = 'yellow';
 			ctx.beginPath();
-			const rectWidth = Math.min(textWidth + textPadding, side - textBoxOffset * 2);
-			ctx.roundRect(textBoxOffset, textBoxOffset + bonusYOffset, rectWidth, side / 10, [side / 20]);
+			ctx.roundRect(bannerBackgroundXOffset, bannerBackgroundYOffset, bannerBackgroundWidth, bannerBackgroundHeight, [borderRadius]);
 			ctx.fill();
 
 			ctx.fillStyle = 'black';
-			ctx.fillText(entry.banner.value.toUpperCase(), textXOffset, textYOffset + bonusYOffset + side / 500, side - (textPadding * 2));
+			ctx.fillText(text, bannerBackgroundXOffset + borderRadius, textYOffset, maxTextWidth);
 		}
 
+		const margin = side * 0.02;
 		const canvasWithMargin = createCanvas(canvas.width, canvas.height);
 		const ctxWithMargin = canvasWithMargin.getContext('2d');
 		ctxWithMargin.fillStyle = getFillStyle(entry.colors.textBackgroundColor);
