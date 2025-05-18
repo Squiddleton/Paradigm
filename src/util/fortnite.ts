@@ -167,12 +167,18 @@ export const createShopImage = async () => {
 		const regex = /\d*\.\d+/;
 		if (a.layout.rank !== b.layout.rank) return b.layout.rank - a.layout.rank;
 		if (a.layoutId !== b.layoutId) {
-			const aLayout = regex.exec(a.layoutId)?.[0];
-			const bLayout = regex.exec(b.layoutId)?.[0];
+			let aLayout = regex.exec(a.layoutId)?.[0];
+			let bLayout = regex.exec(b.layoutId)?.[0];
 			if (aLayout === undefined || bLayout === undefined)
 				return 0;
+
+			if (aLayout.startsWith('.'))
+				aLayout = `0${aLayout}`;
+			if (bLayout.startsWith('.'))
+				bLayout = `0${bLayout}`;
 			const aInt = parseInt(aLayout);
 			const bInt = parseInt(bLayout);
+
 			if (aInt === bInt) return Number.parseFloat(bLayout) - Number.parseFloat(aLayout);
 			return bInt - aInt;
 		}
@@ -184,41 +190,37 @@ export const createShopImage = async () => {
 	const totalRows = Math.ceil(entryCount / entriesPerRow);
 	const totalHeight = headerHeight + totalRows * (side + gap) + gap + footerHeight;
 
-	const itemToCanvas = async (item: ShopEntry) => {
+	const itemToCanvas = async (entry: ShopEntry) => {
 		const canvas = createCanvas(side, side);
 		const ctx = canvas.getContext('2d');
 		const margin = side / 50;
 
 		const getFillStyle = (color: string) => `#${color.slice(0, -2)}`;
 
-		// Outline
-		ctx.fillStyle = getFillStyle(item.colors.textBackgroundColor);
-		ctx.fillRect(0, 0, side, side);
-
 		// Background gradient
 		const gradient = ctx.createLinearGradient(side / 2, 0, side / 2, side);
-		gradient.addColorStop(0, getFillStyle(item.colors.color1));
-		if (item.colors.color2) {
-			gradient.addColorStop(0.5, getFillStyle(item.colors.color3));
-			gradient.addColorStop(1, getFillStyle(item.colors.color2));
+		gradient.addColorStop(0, getFillStyle(entry.colors.color1));
+		if (entry.colors.color2) {
+			gradient.addColorStop(0.5, getFillStyle(entry.colors.color3));
+			gradient.addColorStop(1, getFillStyle(entry.colors.color2));
 		}
 		else {
-			gradient.addColorStop(1, getFillStyle(item.colors.color3));
+			gradient.addColorStop(1, getFillStyle(entry.colors.color3));
 		}
 		ctx.fillStyle = gradient;
-		ctx.fillRect(margin, margin, side - (margin * 2), side - (margin * 2));
+		ctx.fillRect(0, 0, side, side);
 
 		// Item image
-		const imageURL = item.newDisplayAsset.renderImages?.[0].image;
+		const imageURL = entry.newDisplayAsset.renderImages?.[0].image;
 		if (imageURL !== undefined) {
 			const image = await loadImage(imageURL);
-			ctx.drawImage(image, margin, margin, side - (margin * 2), side - (margin * 2));
+			ctx.drawImage(image, 0, 0, side, side);
 		}
 
 		// Text background
-		const textBackgroundHeight = side / 4;
+		const textBackgroundHeight = side * 0.275;
 		ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-		ctx.fillRect(margin, side - textBackgroundHeight - margin, side - (margin * 2), textBackgroundHeight);
+		ctx.fillRect(0, side - textBackgroundHeight, side, textBackgroundHeight);
 
 		// Price V-Buck icon
 		const vb = await loadImage('https://fortnite-api.com/images/vbuck.png');
@@ -228,43 +230,49 @@ export const createShopImage = async () => {
 		ctx.font = `${side / 10}px fortnite`;
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'left';
-		ctx.fillText(`${item.regularPrice}`, side * 0.2, side * 0.95, side / 2);
+		ctx.fillText(`${entry.regularPrice}`, side * 0.2, side * 0.95, side / 2);
 
 		ctx.textAlign = 'center';
 
 		// Out date
-		ctx.fillText(`Exits ${new Date(item.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
+		ctx.fillText(`Exits ${new Date(entry.outDate).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
 
 		// Name
 		ctx.font = `${side / 8}px fortnite`;
-		const bundle = item.bundle as Bundle | undefined;
-		ctx.fillText(bundle !== undefined ? bundle.name : (item.brItems?.[0].name ?? item.layout.name), side / 2, side * 0.84, side * 0.97 - (margin * 2));
+		const bundle = entry.bundle as Bundle | undefined;
+		ctx.fillText(bundle !== undefined ? bundle.name : (entry.brItems?.[0].name ?? entry.layout.name), side / 2, side * 0.84, side * 0.97);
 
 		// Banner
-		if ('banner' in item) {
-			const textBoxOffset = margin;
+		if ('banner' in entry) {
+			const textBoxOffset = side / 50;
 
 			ctx.textAlign = 'left';
-			ctx.font = `${side / 15}px fortnite`;
-			const textYOffset = side / 13 + margin + textBoxOffset;
+			ctx.font = `${side / 10}px fortnite`;
+			const textYOffset = side / 12 + textBoxOffset;
 			const textXOffset = textYOffset - side / 20;
-			const bonusYOffset = side * 0.55;
-			const text = item.banner.value.toUpperCase();
+			const bonusYOffset = side * 0.575;
+			const text = entry.banner.value.toUpperCase();
 
-			const textPadding = side / 20;
+			const textPadding = side / 17;
 			const textWidth = Math.min(ctx.measureText(text).width, side - textPadding - textBoxOffset * 2);
 
 			ctx.fillStyle = 'yellow';
 			ctx.beginPath();
-			const rectWidth = Math.min(textWidth + textPadding, side - (margin * 2) - textBoxOffset * 2);
-			ctx.roundRect(margin + textBoxOffset, margin + textBoxOffset + bonusYOffset, rectWidth, side / 10, [side / 20]);
+			const rectWidth = Math.min(textWidth + textPadding, side - textBoxOffset * 2);
+			ctx.roundRect(textBoxOffset, textBoxOffset + bonusYOffset, rectWidth, side / 10, [side / 20]);
 			ctx.fill();
 
 			ctx.fillStyle = 'black';
-			ctx.fillText(item.banner.value.toUpperCase(), textXOffset, textYOffset + bonusYOffset, side - ((margin + textPadding) * 2));
+			ctx.fillText(entry.banner.value.toUpperCase(), textXOffset, textYOffset + bonusYOffset + side / 500, side - (textPadding * 2));
 		}
 
-		return canvas;
+		const canvasWithMargin = createCanvas(canvas.width, canvas.height);
+		const ctxWithMargin = canvasWithMargin.getContext('2d');
+		ctxWithMargin.fillStyle = getFillStyle(entry.colors.textBackgroundColor);
+		ctxWithMargin.fillRect(0, 0, side, side);
+		ctxWithMargin.drawImage(canvas, margin, margin, canvas.width - margin * 2, canvas.height - margin * 2);
+
+		return canvasWithMargin;
 	};
 
 	const canvas = createCanvas(totalWidth, totalHeight);
