@@ -375,6 +375,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Rocket Racing
+		case RankedTrack.May25Racing: {
+			racingTrackguid = season;
+			seasonName = 'May 2025';
+			backgroundPath = 'rr-s0.webp';
+			break;
+		}
 		case RankedTrack.Feb25Racing: {
 			racingTrackguid = season;
 			seasonName = 'February 2025';
