@@ -195,7 +195,7 @@ export const createShopImage = async (side = 256) => {
 		const canvas = createCanvas(side, side);
 		const ctx = canvas.getContext('2d');
 
-		const getFillStyle = (color: string) => `#${color.slice(0, -2)}`;
+		const getFillStyle = (color: string | undefined) => color ? `#${color.slice(0, -2)}` : 'black';
 
 		// Background gradient
 		const gradient = ctx.createLinearGradient(side / 2, 0, side / 2, side);
