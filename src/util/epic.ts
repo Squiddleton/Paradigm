@@ -234,7 +234,7 @@ export const createSTWProgressImage = async () => {
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season: string | null = 'c6s2') {
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season: string | null = null) {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -343,7 +343,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		}
 		// Reload
 		case 'reloads3': {
-			seasonName = 'Reload';
+			seasonName = 'Reload Season 3';
 			brTrackguid = RankedTrack.S3ReloadBR;
 			zbTrackguid = RankedTrack.S3ReloadZB;
 			backgroundPath = 'og.jpg';
@@ -351,7 +351,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		case 'reloads2': {
-			seasonName = 'Reload';
+			seasonName = 'Reload Season 2';
 			brTrackguid = RankedTrack.S2ReloadBR;
 			zbTrackguid = RankedTrack.S2ReloadZB;
 			backgroundPath = 'og.jpg';
@@ -377,25 +377,25 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		// Rocket Racing
 		case RankedTrack.May25Racing: {
 			racingTrackguid = season;
-			seasonName = 'May 2025';
+			seasonName = 'Rocket Racing May 2025';
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
 		case RankedTrack.Feb25Racing: {
 			racingTrackguid = season;
-			seasonName = 'February 2025';
+			seasonName = 'Rocket Racing February 2025';
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
 		case RankedTrack.Dec24Racing: {
 			racingTrackguid = season;
-			seasonName = 'December 2024';
+			seasonName = 'Rocket Racing December 2024';
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
 		case RankedTrack.Oct24Racing: {
 			racingTrackguid = season;
-			seasonName = 'October 2024';
+			seasonName = 'Rocket Racing October 2024';
 			backgroundPath = 'rr-oct24.webp';
 			break;
 		}
@@ -413,14 +413,14 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		}
 		case RankedTrack.S0Racing: {
 			racingTrackguid = season;
-			seasonName = 'Season Zero';
+			seasonName = 'Rocket Racing Season Zero';
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
 		// Ballistic
 		case RankedTrack.BallisticS0: {
 			ballisticTrackguid = season;
-			seasonName = 'Chapter 6 Season 1';
+			seasonName = 'Ballistic Season Zero';
 			backgroundPath = 'ballistic.jpg';
 			break;
 		}
@@ -452,7 +452,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.textAlign = 'center';
 	ctx.fillStyle = invertText ? 'black' : 'white';
 
-	ctx.fillText(`${seasonName === 'Reload' ? 'Ranked Reload' : `${seasonName} Ranked`}: ${account.name}`, width / 2, fontSize, width);
+	ctx.fillText(`${seasonName}: ${account.name}`, width / 2, fontSize, width * 0.95);
 
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
 	if (rankingType === 'rr') {
