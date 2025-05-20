@@ -13,16 +13,16 @@ import { isUnknownRank } from './fortnite.js';
 
 export const trackedModes = new Map<string, TrackedUser>();
 
-export const isEpicAuthError = (error: unknown) => error instanceof EpicAPIError && error.status >= 500 && error.status < 600;
-export const isEpicInternalError = (error: unknown) => error instanceof EpicAPIError && [400, 401].includes(error.status);
-
 export const callEpicFunction = async <T>(callback: (client: EpicClient) => T): Promise<T> => {
 	let ret: T;
 	try {
 		ret = await callback(epicClient);
 	}
 	catch (error) {
-		if (isEpicInternalError(error)) throw new Error('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
+		const isEpicAuthError = (e: unknown) => e instanceof EpicAPIError && [400, 401].includes(e.status);
+		const isEpicInternalError = (e: unknown) => e instanceof EpicAPIError && e.status >= 500 && e.status < 600;
+
+		if (isEpicInternalError(error)) throw new Error(`The Epic Games API is currently unavailable at ${new Date()}.`);
 		else if (!isEpicAuthError(error)) throw error;
 
 		await epicClient.auth.authenticate(config.epicDeviceAuth);
