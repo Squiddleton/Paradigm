@@ -1,12 +1,12 @@
 import { EpicAPIError, type EpicClient, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type ShortHabaneroTrack, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import type { FortniteWebsite, STWProgress, STWPublicProfile, TrackedUser } from './types.js';
+import type { FortniteWebsite, STWProgress, STWPublicProfile, STWTrackedAccount, TrackedUser, WorldInfo } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
-import { AccessibleChannelPermissions, ChapterLengths, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
+import { AccessibleChannelPermissions, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
 import { quantify } from '@squiddleton/util';
 import type { DiscordClient } from './classes.js';
 import guildModel from '../models/guilds.js';
-import { codeBlock, EmbedBuilder, PermissionFlagsBits } from 'discord.js';
+import { codeBlock, EmbedBuilder, PermissionFlagsBits, roleMention } from 'discord.js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import type { EpicAccount } from '@squiddleton/fortnite-api';
 import { isUnknownRank } from './fortnite.js';
@@ -129,6 +129,28 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 	return true;
 };
 
+export const postVBuckMissions = async (client: DiscordClient<true>) => {
+	const worldInfo = await callEpicFunction(client => client.auth.get<WorldInfo>(EpicEndpoint.WorldInfo));
+
+	let vbuckMissions = 0;
+	let totalVbucks = 0;
+	for (const alert of worldInfo.missionAlerts) {
+		for (const { missionAlertRewards } of alert.availableMissionAlerts) {
+			for (const item of missionAlertRewards.items) {
+				if (item.itemType.includes('mtx')) {
+					vbuckMissions++;
+					totalVbucks += item.quantity;
+				}
+			}
+		}
+	}
+	const stwChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
+	if (vbuckMissions > 0)
+		await stwChannel.send({ content: `There ${vbuckMissions === 1 ? 'is' : 'are'} ${vbuckMissions} V-buck mission${vbuckMissions === 1 ? '' : 's'} today for a total of ${totalVbucks} V-bucks ${roleMention(DiscordIds.RoleId.STW)}.`, allowedMentions: { parse: ['users', 'roles'] } });
+	else
+		await stwChannel.send('There\'s nothing.');
+};
+
 const privateAccounts = new Set();
 
 export const getSTWProgress = async (accountId: string): Promise<STWProgress[] | null> => {
@@ -230,6 +252,46 @@ export const createSTWProgressImage = async () => {
 
 	const buffer = await canvas.encode('jpeg');
 	return buffer;
+};
+
+const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
+export const checkRankedTracking = async (client: DiscordClient<true>) => {
+	for (const [epicAccountId, trackedUser] of trackedModes) {
+		const cachedProgresses = allCachedProgresses.get(epicAccountId);
+		const newProgresses = await getTrackProgress(epicAccountId);
+
+		if (newProgresses !== null) {
+			if (cachedProgresses !== undefined) {
+				for (const trackedMode of trackedUser.trackedModes) {
+					const cachedProgress = cachedProgresses.find(track => track.trackguid === trackedMode.trackguid);
+					const newProgress = newProgresses.find(track => track.trackguid === trackedMode.trackguid);
+					if (cachedProgress === undefined || newProgress === undefined) return;
+
+					const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.RankedProgress);
+
+					const change = ((newProgress.currentDivision + newProgress.promotionProgress) - (cachedProgress.currentDivision + cachedProgress.promotionProgress)) * 100;
+					const changeStr = codeBlock('diff', `${change >= 0 ? '+' : ''}${Math.round(change)}%`);
+
+					if (newProgress.currentDivision > cachedProgress.currentDivision) {
+						await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank up! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+						if (newProgress.currentDivision === (divisionNames.length - 1)) {
+							// Player has hit Unreal
+							trackedModes.delete(epicAccountId);
+							await rankedChannel.send('No longer tracking progress for this player and mode.');
+						}
+					}
+					else if (newProgress.currentDivision < cachedProgress.currentDivision) {
+						await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} rank down! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} + ${Math.round(cachedProgress.promotionProgress * 100)}% => ${divisionNames[newProgress.currentDivision]} + ${Math.round(newProgress.promotionProgress * 100)}%`);
+					}
+					else if (newProgress.promotionProgress !== cachedProgress.promotionProgress) {
+						await rankedChannel.send(`${trackedUser.displayUsername} ${trackedMode.displayName} progress update! ${changeStr} ${divisionNames[cachedProgress.currentDivision]} ${Math.round(cachedProgress.promotionProgress * 100)}% => ${Math.round(newProgress.promotionProgress * 100)}%`);
+					}
+				}
+			}
+
+			allCachedProgresses.set(epicAccountId, newProgresses);
+		}
+	}
 };
 
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null>;
@@ -607,8 +669,40 @@ export const getCurrentRankedTracks = async (): Promise<Record<RankingType, Shor
 	return ret;
 };
 
-export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => {
-	return callEpicFunction(client => client.fortnite.getTrackProgress({ accountId }));
+export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => callEpicFunction(client => client.fortnite.getTrackProgress({ accountId }));
+
+export const checkSTWAchievementProgress = async (client: DiscordClient<true>) => {
+	const STWTrackedAccounts: STWTrackedAccount[] = [
+		{ id: 'fa646860d86c4def9716359b4d1a0ff8', name: 'Squid', progress: await getSTWProgress('fa646860d86c4def9716359b4d1a0ff8') },
+		{ id: '7df93ec9c5864474ba1ab22e82a8ac64', name: 'Jake', progress: await getSTWProgress('7df93ec9c5864474ba1ab22e82a8ac64') },
+		{ id: '1b57ac3f27af49e09c0d2c874e180ff4', name: 'Riley', progress: await getSTWProgress('1b57ac3f27af49e09c0d2c874e180ff4') },
+		{ id: 'e3180e59cf4c4ad59985a9aa7c2623d2', name: 'Koba', progress: await getSTWProgress('e3180e59cf4c4ad59985a9aa7c2623d2') }
+	];
+
+	const buffer = await createSTWProgressImage();
+	const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
+	await rankedChannel.messages.edit(DiscordIds.MessageId.STWProgress, { attachments: [], files: [buffer] });
+
+	for (const account of STWTrackedAccounts) {
+		const allNewProgress = await getSTWProgress(account.id);
+		let foundNew = false;
+		if (allNewProgress === null) continue;
+
+		for (const newProgress of allNewProgress) {
+			const oldProgress = account.progress?.find(p => p.template === newProgress.template);
+			if (!oldProgress?.active) continue;
+
+			const oldIncs = Math.floor(oldProgress.completion / newProgress.increment);
+			const newIncs = Math.floor(newProgress.completion / newProgress.increment);
+			if (newIncs > oldIncs) {
+				foundNew = true;
+				const rankedChannel = client.getVisibleChannel(DiscordIds.ChannelId.STWTracking);
+
+				await rankedChannel.send(`New progress for ${account.name} for STW ${newProgress.questName} quest: ${newProgress.completion}/${newProgress.max}`);
+			}
+		}
+		if (foundNew) account.progress = allNewProgress;
+	}
 };
 
 /**

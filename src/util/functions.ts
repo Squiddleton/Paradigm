@@ -1,5 +1,5 @@
 import { formatPlural, formatPossessive, getRandomItem, quantify } from '@squiddleton/util';
-import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type Message, type MessageComponentInteraction, MessageFlags, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, type BaseInteraction, ButtonBuilder, ButtonStyle, ChannelType, type ChatInputCommandInteraction, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type Guild, type GuildTextBasedChannel, type Message, type MessageComponentInteraction, MessageFlags, RESTJSONErrorCodes, type Role, type Snowflake, type UserContextMenuCommandInteraction, channelMention, hyperlink, time, underline, userMention } from 'discord.js';
 import { DiscordClient } from './classes.js';
 import { ErrorMessage, RarityOrdering, Time } from './constants.js';
 import type { CachedSlashOrMessageContextMenu, IGiveaway, PaginationButtons, SlashOrMessageContextMenu } from './types.js';
@@ -241,6 +241,74 @@ export const paginate = (interaction: CommandInteraction, message: Message, embe
 				}
 			}
 		});
+};
+
+export const closeCompletedGiveaways = async (client: DiscordClient<true>) => {
+	const now = Date.now() / 1000;
+	const guildResults = await guildModel.find({ giveaways: { $elemMatch: { completed: false, endTime: { $lte: now } } } });
+
+	for (const guildResult of guildResults) {
+		const guildId = guildResult._id;
+
+		for (const giveaway of guildResult.giveaways.filter(g => !g.completed && g.endTime <= now)) {
+			const deleteGiveaway = () => guildModel.findByIdAndUpdate(guildId, { $pull: { giveaways: giveaway } });
+
+			try {
+				let giveawayChannel: GuildTextBasedChannel;
+				try {
+					giveawayChannel = client.getVisibleChannel(giveaway.channelId);
+				}
+				catch {
+					console.log('The channel for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
+					await deleteGiveaway();
+					continue;
+				}
+
+				let message: Message;
+				try {
+					message = await giveawayChannel.messages.fetch(giveaway.messageId);
+				}
+				catch {
+					console.log('The message for the following giveaway no longer exists, and the giveaway will be deleted:', giveaway);
+					await deleteGiveaway();
+					continue;
+				}
+
+				const winnerIds: Snowflake[] = [];
+				const entrantsInGuild = await giveawayChannel.guild.members.fetch({ user: giveaway.entrants });
+				const entrantIds = entrantsInGuild.map(m => m.id);
+
+				for (let i = 0; i < giveaway.winnerNumber && i < entrantIds.length; i++) {
+					const winnerId = getRandomItem(entrantIds);
+					if (!winnerIds.includes(winnerId)) winnerIds.push(winnerId);
+				}
+
+				giveaway.completed = true;
+				giveaway.winners = winnerIds;
+
+				await guildModel.updateOne(
+					{
+						'_id': guildId,
+						'giveaways.messageId': giveaway.messageId
+					},
+					{ $set: { 'giveaways.$': giveaway } }
+				);
+
+				try {
+					await message.edit({ components: [], embeds: [createGiveawayEmbed(giveaway, giveawayChannel.guild, true)] });
+
+					if (winnerIds.length === 0) await message.reply('This giveaway has concluded!  Unfortunately, no one entered . . .');
+					else await message.reply(`This giveaway has concluded!  Congratulations to the following winners:\n${winnerIds.map((w, i) => `${i + 1}. ${userMention(w)} (${w})`).join('\n')}\nIf you won, please ensure that you have enabled DMs within the server in order to receive your prize.`);
+				}
+				catch (error) {
+					console.error(error);
+				}
+			}
+			catch (error) {
+				console.error('An error has occurred with the following giveaway', giveaway, error);
+			}
+		}
+	}
 };
 
 /**
