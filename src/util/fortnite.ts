@@ -4,7 +4,7 @@ import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type 
 import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, Time } from './constants.js';
+import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, Time } from './constants.js';
 import { createRankedImage, getLevelStats } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
@@ -776,8 +776,14 @@ export const postShopImages = async (client: DiscordClient<true>) => {
 		if (guildDocument.shopChannelId === null)
 			continue;
 
+		const channel = client.channels.cache.get(guildDocument.shopChannelId);
+		if (channel === undefined || channel.isDMBased() || !channel.isSendable() || !client.getPermissions(channel).has(AccessibleChannelPermissionsWithImages)) {
+			guildDocument.shopChannelId = null;
+			await guildDocument.save();
+			continue;
+		}
+
 		try {
-			const channel = client.getVisibleChannel(guildDocument.shopChannelId);
 			await channel.send({ files: [shopImage] });
 		}
 		catch (e) {

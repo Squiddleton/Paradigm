@@ -2,7 +2,7 @@ import { SlashCommand } from '@squiddleton/discordjs-util';
 import { ActionRowBuilder, ApplicationCommandOptionType, ApplicationIntegrationType, ChannelSelectMenuBuilder, ComponentType, DiscordAPIError, EmbedBuilder, MessageFlags, PermissionFlagsBits, RESTJSONErrorCodes, channelMention } from 'discord.js';
 import guildModel from '../../models/guilds.js';
 import { DiscordClient } from '../../util/classes.js';
-import { AccessibleChannelPermissions, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
+import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, ErrorMessage, TextBasedChannelTypes, Time } from '../../util/constants.js';
 import { messageComponentCollectorFilter } from '../../util/functions.js';
 
 export default new SlashCommand({
@@ -69,7 +69,11 @@ export default new SlashCommand({
 						DiscordClient.assertReadyClient(client);
 						const permissions = client.getPermissions(channel);
 						if (customId === 'wishlistChannelId' && !permissions.has(AccessibleChannelPermissions)) {
-							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to set it.`, flags: MessageFlags.Ephemeral });
+							await channelInteraction.reply({ content: `I need the View Channel and Send Messages permissions in ${channel} to send wishlist notifications in it.`, flags: MessageFlags.Ephemeral });
+							return;
+						}
+						else if (customId === 'shopChannelId' && !permissions.has(AccessibleChannelPermissionsWithImages)) {
+							await channelInteraction.reply({ content: `I need the View Channel, Send Messages, and Attach Files permissions in ${channel} to send shop images in it.`, flags: MessageFlags.Ephemeral });
 							return;
 						}
 

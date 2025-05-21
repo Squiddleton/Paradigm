@@ -4,6 +4,8 @@ import type { StringChoices } from './types.js';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
 
+export const AccessibleChannelPermissionsWithImages = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.AttachFiles];
+
 export enum BackgroundURL {
 	Gold = './assets/backgrounds/gold.jpg',
 	Orange = './assets/backgrounds/orange.jpg',
