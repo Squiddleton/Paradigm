@@ -237,9 +237,8 @@ export const createShopImage = async (side = 256) => {
 		// Out date
 		const outDate = new Date(entry.outDate);
 
-		const tomorrow = new Date(shopDate);
-		tomorrow.setDate(tomorrow.getDate() + 1);
-		if (outDate.getDate() === tomorrow.getDate() && outDate.getMonth() === tomorrow.getMonth() && outDate.getFullYear() === tomorrow.getFullYear())
+		const today = new Date(shopDate);
+		if (outDate.getDate() === today.getDate() && outDate.getMonth() === today.getMonth() && outDate.getFullYear() === today.getFullYear())
 			ctx.fillStyle = 'orange';
 
 		ctx.fillText(`Exits ${outDate.toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}`, side * 0.7, side * 0.95, side / 2);
