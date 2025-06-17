@@ -23,7 +23,7 @@ export default new SlashCommand({
 				},
 				{
 					name: 'High',
-					value: 512
+					value: 384
 				}
 			]
 		}
