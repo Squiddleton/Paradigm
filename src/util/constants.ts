@@ -24,7 +24,7 @@ export const ChapterLengths = [
 	1, // OG
 	4, // Chapter 5
 	1, // Remix
-	3 // Chapter 6
+	4 // Chapter 6
 ];
 
 export namespace DiscordIds {
@@ -228,7 +228,11 @@ export enum RankedTrack {
 	S3ReloadZB = 'L3GND',
 	GalacticBattleBR = 'Pr1c3s',
 	GalacticBattleZB = 'C4m1s4',
-	May25Racing = 'rrg9wp'
+	May25Racing = 'rrg9wp',
+	June25Racing = '0r4ng3',
+	C6S3BR = 'c0off3',
+	C6S3ZB = 'b3atle',
+	BallisticRAndDS2 = '8UFF3D'
 }
 
 export enum RankingType {

@@ -315,9 +315,28 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
+	if (season === null) {
+		switch (rankingType) {
+			case 'b': {
+				season = ballisticTrackguid;
+				break;
+			}
+			case 'rr': {
+				season = racingTrackguid;
+				break;
+			}
+		}
+	}
+
 	switch (season) {
 		// Battle Royale
 		case null:
+		case 'c6s3': {
+			seasonName = 'Chapter 6 Season 3';
+			brTrackguid = RankedTrack.C6S3BR;
+			zbTrackguid = RankedTrack.C6S3ZB;
+			break;
+		}
 		case 'gb': {
 			seasonName = 'Galactic Battle';
 			brTrackguid = RankedTrack.GalacticBattleBR;
@@ -480,15 +499,21 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Ballistic
-		case RankedTrack.BallisticS0: {
+		case RankedTrack.BallisticRAndDS2: {
 			ballisticTrackguid = season;
-			seasonName = 'Ballistic Season Zero';
+			seasonName = 'Ballistic R&D Season 2';
 			backgroundPath = 'ballistic.jpg';
 			break;
 		}
 		case RankedTrack.BallisticRAndDS1: {
 			ballisticTrackguid = season;
 			seasonName = 'Ballistic R&D Season 1';
+			backgroundPath = 'ballistic.jpg';
+			break;
+		}
+		case RankedTrack.BallisticS0: {
+			ballisticTrackguid = season;
+			seasonName = 'Ballistic Season Zero';
 			backgroundPath = 'ballistic.jpg';
 			break;
 		}

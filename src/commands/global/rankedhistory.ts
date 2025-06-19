@@ -72,6 +72,7 @@ export default new SlashCommand({
 			['Chapter 6, Season 1', [RankedTrack.C6S1BR, RankedTrack.C6S1ZB]],
 			['Chapter 6, Season 2', [RankedTrack.C6S2BR, RankedTrack.C6S2ZB]],
 			['Galactic Batttle', [RankedTrack.GalacticBattleBR, RankedTrack.GalacticBattleZB]],
+			['Chapter 6, Season 3', [RankedTrack.C6S3BR, RankedTrack.C6S3ZB]],
 			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
 			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
@@ -83,11 +84,13 @@ export default new SlashCommand({
 			['Rocket Racing December 2024', RankedTrack.Dec24Racing],
 			['Rocket Racing February 2025', RankedTrack.Feb25Racing],
 			['Rocket Racing May 2025', RankedTrack.May25Racing],
+			['Rocket Racing June 2025', RankedTrack.June25Racing],
 			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
 			['Fortnite OG Season 2', [RankedTrack.OGS2BR, RankedTrack.OGS2ZB]],
 			['Fortnite OG Season 3', [RankedTrack.OGS3BR, RankedTrack.OGS3ZB]],
 			['Ballistic Season Zero', RankedTrack.BallisticS0],
 			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
+			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2],
 			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
 		];
 

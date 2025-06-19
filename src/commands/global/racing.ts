@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'June 2025', value: RankedTrack.June25Racing },
 				{ name: 'May 2025', value: RankedTrack.May25Racing },
 				{ name: 'Februrary 2025', value: RankedTrack.Feb25Racing },
 				{ name: 'December 2024', value: RankedTrack.Dec24Racing },

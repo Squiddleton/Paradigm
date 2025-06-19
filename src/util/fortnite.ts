@@ -663,7 +663,23 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 				'Fortnite: Remix',
 				'6'
 			][chapterIndex];
-			const seasonName = chapterName.startsWith('Fortnite') ? chapterName : overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
+			let seasonName = chapterName.startsWith('Fortnite')
+				? chapterName
+				: overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
+
+			if (chapterName === '6') {
+				switch (seasonName) {
+					case 3: {
+						seasonName = 'Galactic Battle';
+						break;
+					}
+					case 4: {
+						seasonName = '3';
+						break;
+					}
+				}
+			}
+
 			return `Chapter ${chapterName}, Season ${seasonName}: ${Math.floor((v ?? 0) / 100)}`;
 		})
 		.join('\n')}`;

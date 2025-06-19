@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'R&D Season 2', value: RankedTrack.BallisticRAndDS2 },
 				{ name: 'R&D Season 1', value: RankedTrack.BallisticRAndDS1 },
 				{ name: 'Season Zero', value: RankedTrack.BallisticS0 }
 			]
