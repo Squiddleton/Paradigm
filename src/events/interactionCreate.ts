@@ -203,17 +203,22 @@ export default new ClientEvent({
 
 				const firstIsUnknownInteraction = isUnknownInteraction(error);
 
-				console.error(
-					`An error has occurred while executing the ${command.name} command: `,
-					{
-						date,
-						guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
-						channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message'} (${interaction.channelId})`,
-						user: `${interaction.user.displayName} (${userId})`,
-						options: interaction.options.data
-					},
-					firstIsUnknownInteraction ? 'Unknown Interaction' : error
-				);
+				if (firstIsUnknownInteraction) {
+					console.error(`Unknown Interaction thrown by the ${command.name} command:`, interaction.options.data);
+				}
+				else {
+					console.error(
+						`An error has occurred while executing the ${command.name} command: `,
+						{
+							date,
+							guild: `${interaction.guild?.name ?? 'Direct Message'} (${interaction.guildId})`,
+							channel: `${inCachedGuild ? interaction.channel?.name ?? 'Unknown Channel' : 'Direct Message'} (${interaction.channelId})`,
+							user: `${interaction.user.displayName} (${userId})`,
+							options: interaction.options.data
+						},
+						error
+					);
+				}
 				const { owner } = client.application;
 				if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 				const errorMessage: InteractionReplyOptions = {
