@@ -20,10 +20,6 @@ export default new SlashCommand({
 				{
 					name: 'Normal',
 					value: 256
-				},
-				{
-					name: 'High',
-					value: 384
 				}
 			]
 		}
