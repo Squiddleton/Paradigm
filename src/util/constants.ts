@@ -232,7 +232,9 @@ export enum RankedTrack {
 	June25Racing = '0r4ng3',
 	C6S3BR = 'c0off3',
 	C6S3ZB = 'b3atle',
-	BallisticRAndDS2 = '8UFF3D'
+	BallisticRAndDS2 = '8UFF3D',
+	SquidGroundsReloadBR = '3Nd1nG',
+	SquidGroundsReloadZB = 'T1cK3t'
 }
 
 export enum RankingType {

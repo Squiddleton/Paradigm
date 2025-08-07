@@ -77,6 +77,7 @@ export default new SlashCommand({
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
 			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
 			['Reload Season 3', [RankedTrack.S3ReloadBR, RankedTrack.S3ReloadZB]],
+			['Reload Squid Grounds', [RankedTrack.SquidGroundsReloadBR, RankedTrack.SquidGroundsReloadZB]],
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],
 			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
 			['Rocket Racing Inferno Island', RankedTrack.InfernoIslandRacing],

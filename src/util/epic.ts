@@ -423,6 +423,14 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Reload
+		case 'reloadsg': {
+			seasonName = 'Reload Squid Grounds';
+			brTrackguid = RankedTrack.SquidGroundsReloadBR;
+			zbTrackguid = RankedTrack.SquidGroundsReloadZB;
+			backgroundPath = 'og.jpg';
+			invertText = true;
+			break;
+		}
 		case 'reloads3': {
 			seasonName = 'Reload Season 3';
 			brTrackguid = RankedTrack.S3ReloadBR;
