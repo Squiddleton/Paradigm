@@ -24,7 +24,7 @@ export const ChapterLengths = [
 	1, // OG
 	4, // Chapter 5
 	1, // Remix
-	4 // Chapter 6
+	5 // Chapter 6
 ];
 
 export namespace DiscordIds {
@@ -234,7 +234,15 @@ export enum RankedTrack {
 	C6S3ZB = 'b3atle',
 	BallisticRAndDS2 = '8UFF3D',
 	SquidGroundsReloadBR = '3Nd1nG',
-	SquidGroundsReloadZB = 'T1cK3t'
+	SquidGroundsReloadZB = 'T1cK3t',
+	C6S4BR = 'k1tt3n',
+	C6S4ZB = 'd0gg1e',
+	August25Racing = 't3ab4g'
+}
+
+export namespace CurrentRankedTrack {
+	export const Reload = 'reloadsg';
+	export const RocketRacing = RankedTrack.August25Racing;
 }
 
 export enum RankingType {
@@ -263,18 +271,18 @@ export const RankingTypeDisplayNames: Record<RankingType, string> = {
 	[RankingType.GetawayNoBuild]: 'Getaway (No Build)'
 };
 
-export const RankingTypeChoices: ApplicationCommandOptionChoiceData<string>[] = [
+export const RankingTypeChoices: (ApplicationCommandOptionChoiceData<string> & { discontinued?: boolean })[] = [
 	{ name: RankingTypeDisplayNames[RankingType.BattleRoyale], value: RankingType.BattleRoyale },
 	{ name: RankingTypeDisplayNames[RankingType.ZeroBuild], value: RankingType.ZeroBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadBuild], value: RankingType.ReloadBuild },
 	{ name: RankingTypeDisplayNames[RankingType.ReloadNoBuild], value: RankingType.ReloadNoBuild },
 	{ name: RankingTypeDisplayNames[RankingType.RocketRacing], value: RankingType.RocketRacing },
-	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild },
-	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild },
+	{ name: RankingTypeDisplayNames[RankingType.OGBuild], value: RankingType.OGBuild, discontinued: true },
+	{ name: RankingTypeDisplayNames[RankingType.OGNoBuild], value: RankingType.OGNoBuild, discontinued: true },
 	{ name: RankingTypeDisplayNames[RankingType.Ballistic], value: RankingType.Ballistic },
-	{ name: RankingTypeDisplayNames[RankingType.GetawayBuild], value: RankingType.GetawayBuild },
-	{ name: RankingTypeDisplayNames[RankingType.GetawayNoBuild], value: RankingType.GetawayNoBuild }
-] satisfies { name: string; value: RankingType }[];
+	{ name: RankingTypeDisplayNames[RankingType.GetawayBuild], value: RankingType.GetawayBuild, discontinued: true },
+	{ name: RankingTypeDisplayNames[RankingType.GetawayNoBuild], value: RankingType.GetawayNoBuild, discontinued: true }
+] satisfies { name: string; value: RankingType; discontinued?: boolean }[];
 
 export const RarityColors: Partial<Record<string, number>> = {
 	'Common': 0xbebdb7,

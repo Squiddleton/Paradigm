@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'Chapter 6 Season 4', value: 'c6s4' },
 				{ name: 'Chapter 6 Season 3', value: 'c6s3' },
 				{ name: 'Galactic Battle', value: 'gb' },
 				{ name: 'Chapter 6 Season 2', value: 'c6s2' },

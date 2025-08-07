@@ -21,6 +21,11 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
+			name: 'all',
+			description: 'Whether to include discontinued modes like OG and Getaway; defaults to false',
+			type: ApplicationCommandOptionType.Boolean
+		},
+		{
 			name: 'hide',
 			description: 'Whether to hide the command reply so only you can see it; default to false',
 			type: ApplicationCommandOptionType.Boolean
@@ -44,6 +49,7 @@ export default new SlashCommand({
 		const accountName = interaction.options.getString('player');
 		const user = interaction.options.getUser('user');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
+		const includeDiscontinued = interaction.options.getBoolean('all') ?? false;
 
 		const stats = await getStats(interaction, accountName, accountType, user);
 		if (stats === null) return;
@@ -59,7 +65,8 @@ export default new SlashCommand({
 		const components: JSONEncodable<APIMessageTopLevelComponent>[] = [];
 		const imageNames: string[] = [];
 
-		const tracks: [string, string | [string, string]][] = [
+		type Track = [string, string | [string, string]];
+		const currentTracks: Track[] = [
 			['Season Zero Pre-Reset', [RankedTrack.S0PBR, RankedTrack.S0PZB]],
 			['Season Zero', [RankedTrack.S0BR, RankedTrack.S0ZB]],
 			['Chapter 4, Season 4', [RankedTrack.C4S4BR, RankedTrack.C4S4ZB]],
@@ -73,6 +80,7 @@ export default new SlashCommand({
 			['Chapter 6, Season 2', [RankedTrack.C6S2BR, RankedTrack.C6S2ZB]],
 			['Galactic Batttle', [RankedTrack.GalacticBattleBR, RankedTrack.GalacticBattleZB]],
 			['Chapter 6, Season 3', [RankedTrack.C6S3BR, RankedTrack.C6S3ZB]],
+			['Chapter 6, Season 4', [RankedTrack.C6S4BR, RankedTrack.C6S4ZB]],
 			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
 			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
@@ -86,21 +94,28 @@ export default new SlashCommand({
 			['Rocket Racing February 2025', RankedTrack.Feb25Racing],
 			['Rocket Racing May 2025', RankedTrack.May25Racing],
 			['Rocket Racing June 2025', RankedTrack.June25Racing],
+			['Rocket Racing August 2025', RankedTrack.August25Racing],
+			['Ballistic Season Zero', RankedTrack.BallisticS0],
+			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
+			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2]
+		];
+		const discontinuedTracks: Track[] = [
 			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
 			['Fortnite OG Season 2', [RankedTrack.OGS2BR, RankedTrack.OGS2ZB]],
 			['Fortnite OG Season 3', [RankedTrack.OGS3BR, RankedTrack.OGS3ZB]],
-			['Ballistic Season Zero', RankedTrack.BallisticS0],
-			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
-			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2],
 			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
 		];
+		const tracks = includeDiscontinued ? currentTracks.concat(discontinuedTracks) : currentTracks;
 
 		components.push(
 			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History\nEpic Account ID: ${stats.account.id}`),
 			new SeparatorBuilder()
 		);
 
-		for (const { name, value } of RankingTypeChoices) {
+		for (const { name, value, discontinued } of RankingTypeChoices) {
+			if (discontinued && !includeDiscontinued)
+				continue; // Skip discontinued tracks
+
 			const trackProgresses = progress.filter(p => p.rankingType === value);
 			if (trackProgresses.length === 0 || trackProgresses.every(p => p.currentDivision === 0 && p.promotionProgress === 0))
 				continue;

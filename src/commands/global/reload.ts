@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
-import { PlatformChoices } from '../../util/constants.js';
+import { CurrentRankedTrack, PlatformChoices } from '../../util/constants.js';
 import { getStats, linkEpicAccount } from '../../util/fortnite.js';
 import { createRankedImage } from '../../util/epic.js';
 
@@ -49,7 +49,7 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
-		const season = interaction.options.getString('season') ?? 'reloadsg';
+		const season = interaction.options.getString('season') ?? CurrentRankedTrack.Reload;
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;

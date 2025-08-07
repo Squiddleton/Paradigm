@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType } from 'discord.js';
-import { PlatformChoices, RankedTrack } from '../../util/constants.js';
+import { CurrentRankedTrack, PlatformChoices, RankedTrack } from '../../util/constants.js';
 import { getStats, linkEpicAccount } from '../../util/fortnite.js';
 import { createRankedImage } from '../../util/epic.js';
 
@@ -24,6 +24,7 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'August 2025', value: RankedTrack.August25Racing },
 				{ name: 'June 2025', value: RankedTrack.June25Racing },
 				{ name: 'May 2025', value: RankedTrack.May25Racing },
 				{ name: 'Februrary 2025', value: RankedTrack.Feb25Racing },
@@ -52,7 +53,7 @@ export default new SlashCommand({
 
 		const accountName = interaction.options.getString('player');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
-		const season = interaction.options.getString('season') ?? RankedTrack.May25Racing;
+		const season = interaction.options.getString('season') ?? CurrentRankedTrack.RocketRacing;
 
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;

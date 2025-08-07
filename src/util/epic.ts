@@ -331,6 +331,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	switch (season) {
 		// Battle Royale
 		case null:
+		case 'c6s4': {
+			seasonName = 'Chapter 6 Season 4';
+			brTrackguid = RankedTrack.C6S4BR;
+			zbTrackguid = RankedTrack.C6S4ZB;
+			break;
+		}
 		case 'c6s3': {
 			seasonName = 'Chapter 6 Season 3';
 			brTrackguid = RankedTrack.C6S3BR;
@@ -464,6 +470,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Rocket Racing
+		case RankedTrack.August25Racing: {
+			racingTrackguid = season;
+			seasonName = 'Rocket Racing August 2025';
+			backgroundPath = 'rr-s0.webp';
+			break;
+		}
 		case RankedTrack.May25Racing: {
 			racingTrackguid = season;
 			seasonName = 'Rocket Racing May 2025';
