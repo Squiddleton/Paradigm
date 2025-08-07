@@ -1,6 +1,6 @@
 import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress } from '@squiddleton/epic';
-import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type EpicAccount, FortniteAPIError, type ShopEntry, type Stats } from '@squiddleton/fortnite-api';
+import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type EpicAccount, FortniteAPIError, type Shop, type ShopEntry, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } from '@squiddleton/util';
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
@@ -12,6 +12,7 @@ import { getUser, setEpicAccount } from './users.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
+import { setTimeout as wait } from 'timers/promises';
 
 let cachedBRCosmetics: BRCosmetic[] = [];
 let cachedCosmetics: AnyCosmetic[] = [];
@@ -42,7 +43,18 @@ export const getCosmeticName = (c: AnyCosmetic): string => {
  * @returns An array of cosmetic objects
  */
 export const fetchItemShop = async (): Promise<AnyCosmetic[]> => {
-	const shop = await fortniteAPI.shop();
+	let shop: Shop | null = null;
+	do {
+		try {
+			shop = await fortniteAPI.shop();
+		}
+		catch (error) {
+			if (!(error instanceof FortniteAPIError) || error.code !== 503) // Booting up error code
+				throw error;
+
+			await wait(60 * 1000); // Wait 1 minute before next attempt
+		}
+	} while (shop === null);
 
 	const withoutDupes: AnyCosmetic[] = [];
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
