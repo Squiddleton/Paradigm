@@ -681,13 +681,16 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 
 			if (chapterName === '6') {
 				switch (seasonName) {
+					case 1:
+					case 2:
+						break;
 					case 3: {
 						seasonName = 'Galactic Battle';
 						break;
 					}
-					case 4: {
-						seasonName = '3';
-						break;
+					default: {
+						if (typeof seasonName === 'number')
+							seasonName--;
 					}
 				}
 			}
