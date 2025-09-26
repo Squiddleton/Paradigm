@@ -8,6 +8,8 @@ import { checkWishlists, fetchCosmetics, postShopImages } from '../util/fortnite
 import { closeCompletedGiveaways } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
 import { GlobalFonts } from '@napi-rs/canvas';
+import { FortniteAPIError } from '@squiddleton/fortnite-api';
+import { setTimeout as wait } from 'node:timers/promises';
 
 export default new ClientEvent({
 	name: 'ready',
@@ -36,7 +38,19 @@ export default new ClientEvent({
 		// Specific times
 		schedule('30 0 0 * * *', measureInterval('Daily reset', async () => {
 			await postVBuckMissions(client);
-			await postShopImages(client);
+			let posted = false;
+			while (!posted) {
+				try {
+					await postShopImages(client);
+					posted = true;
+				}
+				catch (e) {
+					if (e instanceof FortniteAPIError && e.code === 503) // Catch API booting up
+						await wait(60_000); // Wait one minute, then try again
+					else
+						throw e;
+				}
+			}
 			await checkWishlists(client);
 		}), { timezone: 'Etc/UTC' });
 

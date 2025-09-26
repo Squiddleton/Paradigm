@@ -3,6 +3,7 @@ import { createShopImage } from '../../util/fortnite.js';
 import { ApplicationCommandOptionType, chatInputApplicationCommandMention } from 'discord.js';
 import { DiscordIds } from '../../util/constants.js';
 import guildModel from '../../models/guilds.js';
+import { FortniteAPIError } from '@squiddleton/fortnite-api';
 
 export default new SlashCommand({
 	name: 'shop',
@@ -27,7 +28,19 @@ export default new SlashCommand({
 	scope: 'Global',
 	async execute(interaction) {
 		await interaction.reply('Generating shop image...');
-		const image = await createShopImage(interaction.options.getInteger('quality') ?? undefined);
+		let image: Buffer;
+		try {
+			image = await createShopImage(interaction.options.getInteger('quality') ?? undefined);
+		}
+		catch (e) {
+			if (e instanceof FortniteAPIError && e.code === 503) {
+				await interaction.editReply('FortniteAPI is currently booting up. Please try again in a minute.');
+				return;
+			}
+			else {
+				throw e;
+			}
+		}
 		let content = null;
 		if (interaction.inCachedGuild()) {
 			const guildDocument = await guildModel.findById(interaction.guildId);
