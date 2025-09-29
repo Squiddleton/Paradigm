@@ -3,7 +3,7 @@ import { schedule } from 'node-cron';
 import memberModel from '../models/members.js';
 import userModel from '../models/users.js';
 import { DiscordClient } from '../util/classes.js';
-import { postVBuckMissions, checkRankedTracking } from '../util/epic.js';
+import { postVBuckMissions, checkRankedTracking, checkSTWAchievementProgress } from '../util/epic.js';
 import { checkWishlists, fetchCosmetics, postShopImages } from '../util/fortnite.js';
 import { closeCompletedGiveaways } from '../util/functions.js';
 import { fetchUsers, removeOldUsers } from '../util/users.js';
@@ -66,9 +66,9 @@ export default new ClientEvent({
 		}), { timezone: 'America/New_York' });
 
 		// Intervals
-		// schedule('*/10 * * * *', measureInterval('STW progress embed update', async () => {
-		// 	await checkSTWAchievementProgress(client);
-		// }));
+		schedule('*/30 * * * *', measureInterval('STW progress embed update', async () => {
+			await checkSTWAchievementProgress(client);
+		}));
 
 		schedule('*/5 * * * *', measureInterval('Ranked tracking check', async () => {
 			await checkRankedTracking(client);
