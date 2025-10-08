@@ -178,7 +178,8 @@ export const createShopImage = async (side = 256) => {
 	const entries = shop.entries.filter(e => 'newDisplayAsset' in e && e.newDisplayAsset.renderImages?.length && (e.brItems !== undefined || e.cars !== undefined));
 	entries.sort((a, b) => {
 		const regex = /\d*\.\d+/;
-		if (a.layout.rank !== b.layout.rank) return b.layout.rank - a.layout.rank;
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if ((a.layout !== undefined && b.layout !== undefined) && (a.layout.rank !== b.layout.rank)) return b.layout.rank - a.layout.rank;
 		if (a.layoutId !== b.layoutId) {
 			let aLayout = regex.exec(a.layoutId)?.[0];
 			let bLayout = regex.exec(b.layoutId)?.[0];
