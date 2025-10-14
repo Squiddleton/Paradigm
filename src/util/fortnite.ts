@@ -243,7 +243,7 @@ export const createShopImage = async (side = 256) => {
 		ctx.font = `${side / 10}px fortnite`;
 		ctx.fillStyle = 'white';
 		ctx.textAlign = 'left';
-		ctx.fillText(`${entry.regularPrice}`, side * 0.2, side * 0.95, side / 2);
+		ctx.fillText(`${entry.finalPrice}`, side * 0.2, side * 0.95, side / 2);
 
 		ctx.textAlign = 'center';
 
