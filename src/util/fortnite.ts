@@ -29,7 +29,7 @@ export const fetchCosmetics = async () => {
 		cachedCosmetics = unflat.flat().filter(c => 'name' in c || 'title' in c);
 	}
 	catch (error) {
-		if (!(error instanceof FortniteAPIError) || error.code !== 503) throw error;
+		if (!(error instanceof FortniteAPIError) || error.code < 500 || error.code > 599) throw error;
 	}
 };
 
