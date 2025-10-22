@@ -24,6 +24,8 @@ export default new SlashCommand({
 			description: 'Which season to check ranked stats in; defaults to current',
 			type: ApplicationCommandOptionType.String,
 			choices: [
+				{ name: 'Season 5', value: 'reloads5' },
+				{ name: 'Season 4', value: 'reloads4' },
 				{ name: 'Squid Grounds', value: 'reloadsg' },
 				{ name: 'Season 3', value: 'reloads3' },
 				{ name: 'Season 2', value: 'reloads2' },

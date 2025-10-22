@@ -429,6 +429,22 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Reload
+		case 'reloads5': {
+			seasonName = 'Reload Season 5';
+			brTrackguid = RankedTrack.S5ReloadBR;
+			zbTrackguid = RankedTrack.S5ReloadZB;
+			backgroundPath = 'og.jpg';
+			invertText = true;
+			break;
+		}
+		case 'reloads4': {
+			seasonName = 'Reload Season 4';
+			brTrackguid = RankedTrack.S4ReloadBR;
+			zbTrackguid = RankedTrack.S4ReloadZB;
+			backgroundPath = 'og.jpg';
+			invertText = true;
+			break;
+		}
 		case 'reloadsg': {
 			seasonName = 'Reload Squid Grounds';
 			brTrackguid = RankedTrack.SquidGroundsReloadBR;
@@ -519,6 +535,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			break;
 		}
 		// Ballistic
+		case RankedTrack.BallisticRAndDS3: {
+			ballisticTrackguid = season;
+			seasonName = 'Ballistic R&D Season 3';
+			backgroundPath = 'ballistic.jpg';
+			break;
+		}
 		case RankedTrack.BallisticRAndDS2: {
 			ballisticTrackguid = season;
 			seasonName = 'Ballistic R&D Season 2';

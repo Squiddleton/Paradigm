@@ -237,11 +237,16 @@ export enum RankedTrack {
 	SquidGroundsReloadZB = 'T1cK3t',
 	C6S4BR = 'k1tt3n',
 	C6S4ZB = 'd0gg1e',
-	August25Racing = 't3ab4g'
+	August25Racing = 't3ab4g',
+	S4ReloadBR = '7H0m4S',
+	S4ReloadZB = '5oL4R3',
+	BallisticRAndDS3 = 'H4CK3D',
+	S5ReloadBR = 'Dr4g0N',
+	S5ReloadZB = 'g0Tc5A'
 }
 
 export namespace CurrentRankedTrack {
-	export const Reload = 'reloadsg';
+	export const Reload = 'reloads5';
 	export const RocketRacing = RankedTrack.August25Racing;
 }
 

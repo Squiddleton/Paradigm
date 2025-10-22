@@ -85,6 +85,8 @@ export default new SlashCommand({
 			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
 			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
 			['Reload Season 3', [RankedTrack.S3ReloadBR, RankedTrack.S3ReloadZB]],
+			['Reload Season 4', [RankedTrack.S4ReloadBR, RankedTrack.S4ReloadZB]],
+			['Reload Season 5', [RankedTrack.S5ReloadBR, RankedTrack.S5ReloadZB]],
 			['Reload Squid Grounds', [RankedTrack.SquidGroundsReloadBR, RankedTrack.SquidGroundsReloadZB]],
 			['Rocket Racing Season Zero', RankedTrack.S0Racing],
 			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
@@ -97,7 +99,8 @@ export default new SlashCommand({
 			['Rocket Racing August 2025', RankedTrack.August25Racing],
 			['Ballistic Season Zero', RankedTrack.BallisticS0],
 			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
-			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2]
+			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2],
+			['Ballistic R&D Season 3', RankedTrack.BallisticRAndDS3]
 		];
 		const discontinuedTracks: Track[] = [
 			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
