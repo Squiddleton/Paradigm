@@ -24,7 +24,8 @@ export const ChapterLengths = [
 	1, // OG
 	4, // Chapter 5
 	1, // Remix
-	5 // Chapter 6
+	6, // Chapter 6
+	1 // Chapter 7
 ];
 
 export namespace DiscordIds {
@@ -242,8 +243,92 @@ export enum RankedTrack {
 	S4ReloadZB = '5oL4R3',
 	BallisticRAndDS3 = 'H4CK3D',
 	S5ReloadBR = 'Dr4g0N',
-	S5ReloadZB = 'g0Tc5A'
+	S5ReloadZB = 'g0Tc5A',
+	S9Racing = 'th3wh0',
+	C6SimpsonsBR = 'm0rt4l',
+	C6SimpsonsZB = 'd13nt3',
+	C7S1BR = 'sw0rd2',
+	C7S1ZB = 'dut13s',
+	S10Racing = 'tupp3r',
+	C7S1Ballistic = 'F0RC3D',
+	C7S1ReloadBR = 'S4B3R5',
+	C7S1ReloadZB = 'T4BL3D'
 }
+
+export const RankedTrackDisplayNames: Partial<Record<string, string>> = {
+	[RankedTrack.S0PBR]: 'Season Zero Pre-Reset',
+	[RankedTrack.S0PZB]: 'Season Zero Pre-Reset',
+	[RankedTrack.S0BR]: 'Season Zero',
+	[RankedTrack.S0ZB]: 'Season Zero',
+	[RankedTrack.C4S4BR]: 'Chapter 4, Season 4',
+	[RankedTrack.C4S4ZB]: 'Chapter 4, Season 4',
+	[RankedTrack.OGBR]: 'Fortnite: OG',
+	[RankedTrack.OGZB]: 'Fortnite: OG',
+	[RankedTrack.C5S1BR]: 'Chapter 5, Season 1',
+	[RankedTrack.C5S1ZB]: 'Chapter 5, Season 1',
+	[RankedTrack.S0Racing]: 'Rocket Racing Season Zero',
+	[RankedTrack.C5S2BR]: 'Chapter 5, Season 2',
+	[RankedTrack.C5S2ZB]: 'Chapter 5, Season 2',
+	[RankedTrack.NeonRushRacing]: 'Rocket Racing Season 1',
+	[RankedTrack.C5S3BR]: 'Chapter 5, Season 3',
+	[RankedTrack.C5S3ZB]: 'Chapter 5, Season 3',
+	[RankedTrack.InfernoIslandRacing]: 'Rocket Racing Season 2',
+	[RankedTrack.C5S4BR]: 'Chapter 5, Season 4',
+	[RankedTrack.C5S4ZB]: 'Chapter 5, Season 4',
+	[RankedTrack.S0ReloadBR]: 'Reload Seasonm Zero',
+	[RankedTrack.S0ReloadZB]: 'Reload Season Zero',
+	[RankedTrack.Oct24Racing]: 'Rocket Racing Season 3',
+	[RankedTrack.RemixBR]: 'Fortnite: Remix',
+	[RankedTrack.RemixZB]: 'Fortnite: Remix',
+	[RankedTrack.RemixReloadBR]: 'Reload Remix',
+	[RankedTrack.RemixReloadZB]: 'Reload Remix',
+	[RankedTrack.Dec24Racing]: 'Rocket Racing Season 4',
+	[RankedTrack.C6S1BR]: 'Chapter 6, Season 1',
+	[RankedTrack.C6S1ZB]: 'Chapter 6, Season 1',
+	[RankedTrack.BallisticS0]: 'Ballistic Season Zero',
+	[RankedTrack.OGS0BR]: 'OG Season Zero',
+	[RankedTrack.OGS0ZB]: 'OG Season Zero',
+	[RankedTrack.OGS2BR]: 'OG Season 2',
+	[RankedTrack.OGS2ZB]: 'OG Season 2',
+	[RankedTrack.S2ReloadBR]: 'Reload Season 2',
+	[RankedTrack.S2ReloadZB]: 'Reload Season 2',
+	[RankedTrack.Feb25Racing]: 'Rocket Racing Season 5',
+	[RankedTrack.C6S2BR]: 'Chapter 6, Season 2',
+	[RankedTrack.C6S2ZB]: 'Chapter 6, Season 2',
+	[RankedTrack.GetawayBR]: 'Getaway',
+	[RankedTrack.GetawayZB]: 'Getaway',
+	[RankedTrack.OGS3BR]: 'OG Season 3',
+	[RankedTrack.OGS3ZB]: 'OG Season 3',
+	[RankedTrack.BallisticRAndDS1]: 'Ballistic R&D Season 1',
+	[RankedTrack.S3ReloadBR]: 'Reload Season 3',
+	[RankedTrack.S3ReloadZB]: 'Reload Season 3',
+	[RankedTrack.GalacticBattleBR]: 'Galactic Battle',
+	[RankedTrack.GalacticBattleZB]: 'Galactic Battle',
+	[RankedTrack.May25Racing]: 'Rocket Racing Season 6',
+	[RankedTrack.June25Racing]: 'Rocket Racing Season 7',
+	[RankedTrack.C6S3BR]: 'Chapter 6, Season 3',
+	[RankedTrack.C6S3ZB]: 'Chapter 6, Season 3',
+	[RankedTrack.BallisticRAndDS2]: 'Ballistic R&D Season 2',
+	[RankedTrack.SquidGroundsReloadBR]: 'Reload Squid Grounds',
+	[RankedTrack.SquidGroundsReloadZB]: 'Reload Squid Grounds',
+	[RankedTrack.C6S4BR]: 'Chapter 6, Season 4',
+	[RankedTrack.C6S4ZB]: 'Chapter 6, Season 4',
+	[RankedTrack.August25Racing]: 'Rocket Racing Season 8',
+	[RankedTrack.S4ReloadBR]: 'Reload Season 4',
+	[RankedTrack.S4ReloadZB]: 'Reload Season 4',
+	[RankedTrack.BallisticRAndDS3]: 'Ballistic R&D Season 3',
+	[RankedTrack.S5ReloadBR]: 'Reload Season 5',
+	[RankedTrack.S5ReloadZB]: 'Reload Season 5',
+	[RankedTrack.S9Racing]: 'Rocket Racing Season 9',
+	[RankedTrack.C6SimpsonsBR]: 'Fortnite | The Simpsons',
+	[RankedTrack.C6SimpsonsZB]: 'Fortnite | The Simpsons',
+	[RankedTrack.C7S1BR]: 'Chapter 7, Season 1',
+	[RankedTrack.C7S1ZB]: 'Chapter 7, Season 1',
+	[RankedTrack.S10Racing]: 'Rocket Racing Season 10',
+	[RankedTrack.C7S1Ballistic]: 'Ballistic R&D Season 4',
+	[RankedTrack.C7S1ReloadBR]: 'Reload Season 6',
+	[RankedTrack.C7S1ReloadZB]: 'Reload Season 6'
+} satisfies Record<RankedTrack, string>;
 
 export namespace CurrentRankedTrack {
 	export const Reload = 'reloads5';

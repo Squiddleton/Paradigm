@@ -331,6 +331,18 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	switch (season) {
 		// Battle Royale
 		case null:
+		case 'c7s1': {
+			seasonName = 'Chapter 7 Season 1';
+			brTrackguid = RankedTrack.C7S1BR;
+			zbTrackguid = RankedTrack.C7S1ZB;
+			break;
+		}
+		case 'c6sms2': {
+			seasonName = 'Chapter 6 Season MS2';
+			brTrackguid = RankedTrack.C6SimpsonsBR;
+			zbTrackguid = RankedTrack.C6SimpsonsZB;
+			break;
+		}
 		case 'c6s4': {
 			seasonName = 'Chapter 6 Season 4';
 			brTrackguid = RankedTrack.C6S4BR;

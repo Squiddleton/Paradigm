@@ -1,9 +1,9 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, Colors, ContainerBuilder, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
-import { divisionNames, PlatformChoices, RankedEmojiIds, RankedTrack, RankingTypeChoices } from '../../util/constants.js';
+import { divisionNames, PlatformChoices, RankedEmojiIds, RankedTrackDisplayNames, RankingTypeChoices } from '../../util/constants.js';
 import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
-import { getTrackProgress } from '../../util/epic.js';
+import { getRankedTracks, getTrackProgress } from '../../util/epic.js';
 import { formatPossessive } from '@squiddleton/util';
 
 export default new SlashCommand({
@@ -65,50 +65,13 @@ export default new SlashCommand({
 		const components: JSONEncodable<APIMessageTopLevelComponent>[] = [];
 		const imageNames: string[] = [];
 
-		type Track = [string, string | [string, string]];
-		const currentTracks: Track[] = [
-			['Season Zero Pre-Reset', [RankedTrack.S0PBR, RankedTrack.S0PZB]],
-			['Season Zero', [RankedTrack.S0BR, RankedTrack.S0ZB]],
-			['Chapter 4, Season 4', [RankedTrack.C4S4BR, RankedTrack.C4S4ZB]],
-			['Fortnite: OG', [RankedTrack.OGBR, RankedTrack.OGZB]],
-			['Chapter 5, Season 1', [RankedTrack.C5S1BR, RankedTrack.C5S1ZB]],
-			['Chapter 5, Season 2', [RankedTrack.C5S2BR, RankedTrack.C5S2ZB]],
-			['Chapter 5, Season 3', [RankedTrack.C5S3BR, RankedTrack.C5S3ZB]],
-			['Chapter 5, Season 4', [RankedTrack.C5S4BR, RankedTrack.C5S4ZB]],
-			['Fortnite: Remix', [RankedTrack.RemixBR, RankedTrack.RemixZB]],
-			['Chapter 6, Season 1', [RankedTrack.C6S1BR, RankedTrack.C6S1ZB]],
-			['Chapter 6, Season 2', [RankedTrack.C6S2BR, RankedTrack.C6S2ZB]],
-			['Galactic Batttle', [RankedTrack.GalacticBattleBR, RankedTrack.GalacticBattleZB]],
-			['Chapter 6, Season 3', [RankedTrack.C6S3BR, RankedTrack.C6S3ZB]],
-			['Chapter 6, Season 4', [RankedTrack.C6S4BR, RankedTrack.C6S4ZB]],
-			['Reload Season Zero', [RankedTrack.S0ReloadBR, RankedTrack.S0ReloadZB]],
-			['Reload Remix', [RankedTrack.RemixReloadBR, RankedTrack.RemixReloadZB]],
-			['Reload Season 2', [RankedTrack.S2ReloadBR, RankedTrack.S2ReloadZB]],
-			['Reload Season 3', [RankedTrack.S3ReloadBR, RankedTrack.S3ReloadZB]],
-			['Reload Season 4', [RankedTrack.S4ReloadBR, RankedTrack.S4ReloadZB]],
-			['Reload Season 5', [RankedTrack.S5ReloadBR, RankedTrack.S5ReloadZB]],
-			['Reload Squid Grounds', [RankedTrack.SquidGroundsReloadBR, RankedTrack.SquidGroundsReloadZB]],
-			['Rocket Racing Season Zero', RankedTrack.S0Racing],
-			['Rocket Racing Neon Rush', RankedTrack.NeonRushRacing],
-			['Rocket Racing Inferno Island', RankedTrack.InfernoIslandRacing],
-			['Rocket Racing October 2024', RankedTrack.Oct24Racing],
-			['Rocket Racing December 2024', RankedTrack.Dec24Racing],
-			['Rocket Racing February 2025', RankedTrack.Feb25Racing],
-			['Rocket Racing May 2025', RankedTrack.May25Racing],
-			['Rocket Racing June 2025', RankedTrack.June25Racing],
-			['Rocket Racing August 2025', RankedTrack.August25Racing],
-			['Ballistic Season Zero', RankedTrack.BallisticS0],
-			['Ballistic R&D Season 1', RankedTrack.BallisticRAndDS1],
-			['Ballistic R&D Season 2', RankedTrack.BallisticRAndDS2],
-			['Ballistic R&D Season 3', RankedTrack.BallisticRAndDS3]
-		];
-		const discontinuedTracks: Track[] = [
-			['Fortnite OG Season Zero', [RankedTrack.OGS0BR, RankedTrack.OGS0ZB]],
-			['Fortnite OG Season 2', [RankedTrack.OGS2BR, RankedTrack.OGS2ZB]],
-			['Fortnite OG Season 3', [RankedTrack.OGS3BR, RankedTrack.OGS3ZB]],
-			['Getaway', [RankedTrack.GetawayBR, RankedTrack.GetawayZB]]
-		];
-		const tracks = includeDiscontinued ? currentTracks.concat(discontinuedTracks) : currentTracks;
+		let tracks = (await getRankedTracks()) ?? [];
+		if (includeDiscontinued) {
+			tracks = tracks.filter(track => {
+				const choice = RankingTypeChoices.find(choice => choice.name === track.rankingType);
+				return !choice?.discontinued;
+			});
+		}
 
 		components.push(
 			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History\nEpic Account ID: ${stats.account.id}`),
@@ -125,7 +88,11 @@ export default new SlashCommand({
 
 			let currentDivisionImage = 'unknown';
 
-			trackProgresses.sort((a, b) => tracks.findIndex(t => t[1].includes(a.trackguid)) - tracks.findIndex(t => t[1].includes(b.trackguid)));
+			trackProgresses.sort((a, b) => {
+				const aBegin = new Date(tracks.find(track => track.trackguid === a.trackguid)?.beginTime ?? 0);
+				const bBegin = new Date(tracks.find(track => track.trackguid === b.trackguid)?.beginTime ?? 0);
+				return bBegin.getTime() - aBegin.getTime();
+			});
 
 			const section = new SectionBuilder();
 			const text = new TextDisplayBuilder()
@@ -135,7 +102,7 @@ export default new SlashCommand({
 					const emoji = emojis.get(emojiId);
 					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
 
-					if (i === trackProgresses.length - 1) { // Last progress is of most recent ranked session
+					if (i === 0) { // First progress is of most recent ranked session
 						currentDivisionImage = isUnknown
 							? 'unknown'
 							: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
@@ -144,9 +111,9 @@ export default new SlashCommand({
 						return null;
 					}
 
-					const seasonName = tracks.find(t => t[1] === track.trackguid || t[1].includes(track.trackguid));
+					const seasonName = RankedTrackDisplayNames[track.trackguid] ?? 'Unknown Season';
 
-					return `${seasonName?.[0] ?? 'Unknown Season'}: ${(!isUnknown
+					return `${seasonName}: ${(!isUnknown
 						? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
 						: emoji.toString())}`;
 				}).filter(content => content !== null).join('\n'));

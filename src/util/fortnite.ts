@@ -689,6 +689,10 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 						seasonName = 'Galactic Battle';
 						break;
 					}
+					case 6: {
+						seasonName = 'The Simpsons';
+						break;
+					}
 					default: {
 						if (typeof seasonName === 'number')
 							seasonName--;
