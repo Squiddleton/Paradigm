@@ -674,7 +674,8 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 				'Fortnite: OG',
 				'5',
 				'Fortnite: Remix',
-				'6'
+				'6',
+				'7'
 			][chapterIndex];
 			let seasonName = chapterName.startsWith('Fortnite')
 				? chapterName
