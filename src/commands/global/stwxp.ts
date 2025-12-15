@@ -36,7 +36,7 @@ export default new SlashCommand({
 		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
 		if (stats === null) return;
 
-		const profile = callEpicFunction(client => client.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', stats.account.id));
+		const profile = await callEpicFunction(client => client.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', stats.account.id));
 
 		// @ts-expect-error Checked as of 12/5/24
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
