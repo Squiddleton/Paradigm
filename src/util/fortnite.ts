@@ -167,7 +167,7 @@ export const checkWishlists = async (client: DiscordClient<true>, debug = false)
  * @param side - The length and width of each shop entry in pixels
  * @returns A buffer image displaying every relevant cosmetic in the current item shop.
  */
-export const createShopImage = async (side = 256) => {
+export const createShopImage = async (side = 200) => {
 	const entriesPerRow = 8;
 	const gap = side * 0.05;
 	const headerHeight = side * 0.5;

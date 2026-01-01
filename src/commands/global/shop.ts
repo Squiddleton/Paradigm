@@ -20,7 +20,7 @@ export default new SlashCommand({
 				},
 				{
 					name: 'Normal',
-					value: 256
+					value: 200
 				}
 			]
 		}
