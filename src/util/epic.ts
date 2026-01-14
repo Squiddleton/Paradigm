@@ -20,9 +20,9 @@ export const callEpicFunction = async <T>(callback: (client: EpicClient) => T): 
 	}
 	catch (error) {
 		const isEpicAuthError = (e: unknown) => e instanceof EpicAPIError && [400, 401].includes(e.status);
-		const isEpicInternalError = (e: unknown) => e instanceof EpicAPIError && e.status >= 500 && e.status < 600;
+		const isEpicInternalError = (e: unknown): e is EpicAPIError => e instanceof EpicAPIError && e.status >= 500 && e.status < 600;
 
-		if (isEpicInternalError(error)) throw new Error(`The Epic Games API is currently unavailable at ${new Date()}.`);
+		if (isEpicInternalError(error)) throw new Error(`The Epic Games API is currently unavailable at ${new Date()} (Status ${error.status}).`);
 		else if (!isEpicAuthError(error)) throw error;
 
 		await epicClient.auth.authenticate(config.epicDeviceAuth);
