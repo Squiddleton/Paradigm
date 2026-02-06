@@ -40,15 +40,16 @@ export default new SlashCommand({
 
 		// @ts-expect-error Checked as of 12/5/24
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
-		const attributes = Object.values(profile.profileChanges[0].profile.items).find(v => v.templateId === 'Token:stw_accolade_tracker').attributes as { weekly_xp: number; last_reset: string; last_update: string };
+		const attributes = Object.values(profile.profileChanges[0].profile.items).find(v => v.templateId === 'Token:stw_accolade_tracker').attributes as { weekly_xp?: number; last_reset: string; last_update: string };
+		const weeklyXP = attributes.weekly_xp ?? 0;
 
 		await interaction.editReply({ embeds: [
 			new EmbedBuilder()
 				.setTitle(`Save the World XP: ${stats.account.name}`)
 				.setFields(
-					{ name: 'Current XP', value: attributes.weekly_xp.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',') },
+					{ name: 'Current XP', value: weeklyXP.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',') },
 					{ name: 'Maximum XP', value: '4,000,000' },
-					{ name: 'Reached Limit?', value: attributes.weekly_xp >= 4_000_000 ? 'Yes' : 'No' },
+					{ name: 'Reached Limit?', value: weeklyXP >= 4_000_000 ? 'Yes' : 'No' },
 					{ name: 'Last Weekly XP Reset', value: time(new Date(attributes.last_reset)) }
 				)
 				.setFooter({ text: 'Last Update' })
