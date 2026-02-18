@@ -200,12 +200,13 @@ export default new ClientEvent({
 					return;
 				}
 
-				const isUnknownInteraction = (e: unknown) => e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownInteraction;
+				const commonErrors: (string | number)[] = [RESTJSONErrorCodes.UnknownInteraction, RESTJSONErrorCodes.UnknownMessage];
+				const isCommonError = (e: unknown) => e instanceof DiscordAPIError && commonErrors.includes(e.code);
 
-				const firstIsUnknownInteraction = isUnknownInteraction(error);
+				const firstIsCommonError = isCommonError(error);
 
-				if (firstIsUnknownInteraction) {
-					console.error(`Unknown Interaction thrown by the ${command.name} command:`, interaction.options.data);
+				if (firstIsCommonError) {
+					console.error(`Common error thrown by the ${command.name} command:`, interaction.options.data);
 				}
 				else {
 					console.error(
@@ -223,7 +224,7 @@ export default new ClientEvent({
 				const { owner } = client.application;
 				if (!(owner instanceof User)) throw new Error(ErrorMessage.NotUserOwned);
 				const errorMessage: InteractionReplyOptions = {
-					content: firstIsUnknownInteraction
+					content: firstIsCommonError
 						? 'That command timed out internally; please try again.'
 						: `There was an error while executing that command!  ${userId === owner.id ? (error instanceof Error ? error.message : 'The error is not an Error instance.') : `Please contact ${owner.displayName} if this issue persists.`}`,
 					flags: MessageFlags.Ephemeral
@@ -234,7 +235,7 @@ export default new ClientEvent({
 					else await interaction.reply(errorMessage);
 				}
 				catch (error2) {
-					if (!isUnknownInteraction(error2)) console.error(error2);
+					if (!isCommonError(error2)) console.error(error2);
 				}
 			}
 		}
