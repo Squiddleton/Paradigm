@@ -197,6 +197,7 @@ export default new ClientEvent({
 					};
 					if (interaction.replied || interaction.deferred) await interaction.followUp(errorMessage);
 					else await interaction.reply(errorMessage);
+					return;
 				}
 
 				const isUnknownInteraction = (e: unknown) => e instanceof DiscordAPIError && e.code === RESTJSONErrorCodes.UnknownInteraction;
