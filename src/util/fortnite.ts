@@ -260,7 +260,8 @@ export const createShopImage = async (side = 200) => {
 		ctx.fillStyle = 'white';
 		ctx.font = `${side / 8}px fortnite`;
 		const bundle = entry.bundle as Bundle | undefined;
-		ctx.fillText(bundle !== undefined ? bundle.name : (entry.brItems?.[0].name ?? entry.layout.name), side / 2, side * 0.84, side * 0.97);
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		ctx.fillText(bundle !== undefined ? bundle.name : (entry.brItems?.[0]?.name ?? entry.layout?.name) ?? 'Bundle', side / 2, side * 0.84, side * 0.97);
 
 		// Banner
 		if ('banner' in entry) {
