@@ -23,7 +23,7 @@ export default new SlashCommand({
 		await interaction.reply({
 			embeds: [
 				new EmbedBuilder()
-					.setTitle('Helios')
+					.setTitle('Current Fortnite Map')
 					.setImage(map.images.pois)
 					.setFields([
 						{ name: 'Named POIs', value: map.pois.filter(p => !p.id.includes('UnNamedPOI')).length.toString(), inline: true },
