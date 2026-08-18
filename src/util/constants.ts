@@ -158,8 +158,10 @@ export const PlatformChoices: StringChoices = [
 	{ name: 'PlayStation', value: 'psn' }
 ];
 
+export const RankedEmojiUnknown = '1297963362239516672';
+
 export const RankedEmojiIds = [
-	'1297963362239516672', // Unknown
+	RankedEmojiUnknown, // Unknown
 	'1297963226557841429', // Bronze I
 	'1297963246896021514',
 	'1297963262607888444',

@@ -2,11 +2,10 @@ import { EpicAPIError, type EpicClient, getBattlePassLevels, type EpicStats, typ
 import type { FortniteWebsite, STWProgress, STWPublicProfile, STWTrackedAccount, TrackedUser, WorldInfo } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
-import { AccessibleChannelPermissions, ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
+import { ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
 import { quantify } from '@squiddleton/util';
 import type { DiscordClient } from './classes.js';
-import guildModel from '../models/guilds.js';
-import { codeBlock, EmbedBuilder, PermissionFlagsBits, roleMention } from 'discord.js';
+import { codeBlock, roleMention } from 'discord.js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
 import type { EpicAccount } from '@squiddleton/fortnite-api';
 import { isUnknownRank } from './fortnite.js';
@@ -68,6 +67,7 @@ export const fetchStates = () => callEpicFunction(client => client.fortnite.getT
  * @param cachedNames - The display names of the past shop tabs
  * @returns Whether the new shop tab names and quantities are different than the old ones
  */
+/*
 export const postShopSections = async (client: DiscordClient<true>, currentNamesOrUndefined?: string[], cachedNames: string[] = []) => {
 	const [oldState, newState] = await fetchStates();
 	const currentNames = currentNamesOrUndefined ?? await fetchShopNames(newState);
@@ -128,6 +128,7 @@ export const postShopSections = async (client: DiscordClient<true>, currentNames
 	}
 	return true;
 };
+*/
 
 export const postVBuckMissions = async (client: DiscordClient<true>) => {
 	const worldInfo = await callEpicFunction(client => client.auth.get<WorldInfo>(EpicEndpoint.WorldInfo));
@@ -166,7 +167,7 @@ export const getSTWProgress = async (accountId: string): Promise<STWProgress[] |
 		{ templateId: 'Quest:achievement_savesurvivors', name: 'Save Survivors', increment: 100, max: 10_000 }
 	];
 
-	const items = Object.values(profile.profileChanges[0].profile.items).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
+	const items = Object.values(profile.profileChanges[0]?.profile.items ?? {}).filter(item => achievementQuests.some(quest => item.templateId === quest.templateId));
 
 	return items.map(item => {
 		const quest = achievementQuests.find(quest => quest.templateId === item.templateId);
@@ -211,8 +212,7 @@ export const createSTWProgressImage = async () => {
 
 	ctx.fillText('STW Progress', w / 2, fontSize * 1.2);
 
-	for (let i = 0; i < accounts.length; i++) {
-		const account = accounts[i];
+	for (const [i, account] of accounts.entries()) {
 		const y = h * (i + 1.5) / 5;
 		ctx.fillText(account.n, w / 15, y);
 
@@ -245,8 +245,7 @@ export const createSTWProgressImage = async () => {
 	}
 
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
-	for (let i = 0; i < quests.length; i++) {
-		const quest = quests[i];
+	for (const [i, quest] of quests.entries()) {
 		ctx.fillText(quest, w * (i + 1.5) / 6, h / 5);
 	}
 
@@ -622,7 +621,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 		const isUnknown = isUnknownRank(progress);
 		const divisionIconName = isUnknown
 			? 'unknown'
-			: divisionNames[progress.currentDivision].toLowerCase().replace(' ', '');
+			: (divisionNames[progress.currentDivision] ?? 'unknown').toLowerCase().replace(' ', '');
 
 		if (progress.currentPlayerRanking === null) {
 			ctx.beginPath();
@@ -707,8 +706,9 @@ export const getLevelStats = async (accountId: string): Promise<Partial<Record<s
 	const getBulkStats = (client: EpicClient) => client.fortnite.getBulkStats({ accountIds: [accountId], stats });
 	const bulkStats = await callEpicFunction(getBulkStats);
 
-	if (bulkStats.length === 0) return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
-	return bulkStats[0].stats;
+	const firstBulkStats = bulkStats.at(0);
+	if (!firstBulkStats) return 'This account\'s stats are private. If this is your account, go into Fortnite => Settings => Account and Privacy => Public Game Stats => On.';
+	return firstBulkStats.stats;
 };
 
 export const getRankedStats = async (accountId: string): Promise<EpicStats['stats'] | null> => {

@@ -386,7 +386,7 @@ export const reviewGiveaway = async (interaction: CachedSlashOrMessageContextMen
 	const entrants = Object.entries(quantify(giveaway.entrants)).map(([name, amount], index) => `${index + 1}. ${userMention(name)}${amount > 1 ? ` x${amount}` : ''}`);
 
 	const embed = new EmbedBuilder()
-		.setTitle(giveawayMessage.embeds[0].title)
+		.setTitle(giveawayMessage.embeds.at(0)?.title ?? null)
 		.setThumbnail(interaction.guild.iconURL())
 		.setColor('Blue')
 		.setDescription(`Entrants (${entrants.length}):\n${entrants.slice(0, inc).join('\n') || 'None'}`)

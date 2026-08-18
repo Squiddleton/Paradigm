@@ -1,7 +1,7 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
 import { ApplicationCommandOptionType, Colors, ContainerBuilder, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
-import { divisionNames, PlatformChoices, RankedEmojiIds, RankedTrackDisplayNames, RankingTypeChoices } from '../../util/constants.js';
+import { divisionNames, PlatformChoices, RankedEmojiIds, RankedEmojiUnknown, RankedTrackDisplayNames, RankingTypeChoices } from '../../util/constants.js';
 import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
 import { getRankedTracks, getTrackProgress } from '../../util/epic.js';
 import { formatPossessive } from '@squiddleton/util';
@@ -98,14 +98,14 @@ export default new SlashCommand({
 			const text = new TextDisplayBuilder()
 				.setContent(`## ${name}\n` + trackProgresses.map((track, i) => {
 					const isUnknown = isUnknownRank(track);
-					const emojiId = isUnknown ? RankedEmojiIds[0] : RankedEmojiIds[track.currentDivision + 1];
-					const emoji = emojis.get(emojiId);
+					const emojiId = isUnknown ? RankedEmojiUnknown : RankedEmojiIds.at(track.currentDivision + 1);
+					const emoji = emojis.get(emojiId ?? RankedEmojiUnknown);
 					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
 
 					if (i === 0) { // First progress is of most recent ranked session
 						currentDivisionImage = isUnknown
 							? 'unknown'
-							: divisionNames[track.currentDivision].toLowerCase().replace(' ', '');
+							: (divisionNames[track.currentDivision] ?? 'unknown').toLowerCase().replace(' ', '');
 					}
 					else if (track.currentDivision === 0) {
 						return null;

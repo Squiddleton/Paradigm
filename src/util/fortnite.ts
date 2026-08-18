@@ -224,7 +224,7 @@ export const createShopImage = async (side = 200) => {
 		ctx.fillRect(0, 0, side, side);
 
 		// Item image
-		const imageURL = entry.newDisplayAsset.renderImages?.[0].image;
+		const imageURL = entry.newDisplayAsset.renderImages?.[0]?.image;
 		if (imageURL !== undefined) {
 			const image = await loadImage(imageURL);
 			ctx.drawImage(image, 0, 0, side, side);
@@ -317,8 +317,7 @@ export const createShopImage = async (side = 200) => {
 	ctx.fillText('Want a notification when an item appears in the item shop? Add the app The Paradigm, and use "/wishlist add"!', totalWidth / 2, totalHeight - (footerHeight * 0.75));
 	ctx.fillText('Want automatic item shop posts in your own server? Add the bot and use "/settings edit"!', totalWidth / 2, totalHeight - (footerHeight * 0.25));
 
-	for (let i = 0; i < entries.length; i++) {
-		const item = entries[i];
+	for (const [i, item] of entries.entries()) {
 		const row = Math.floor(i / entriesPerRow);
 		const dy = gap + row * (gap + side) + headerHeight;
 		const col = i % entriesPerRow;
@@ -338,7 +337,7 @@ export const createShopImage = async (side = 200) => {
  * @returns A discord.js color resolvable, or null if the cosmetic has no series or its rarity is absent from the RarityColors enum
  */
 export const getCosmeticColor = (cosmetic: AnyCosmetic): ColorResolvable | null => {
-	const seriesColor = 'series' in cosmetic ? cosmetic.series?.colors[0].slice(0, 6) : undefined;
+	const seriesColor = 'series' in cosmetic ? cosmetic.series?.colors[0]?.slice(0, 6) : undefined;
 	return seriesColor === undefined
 		? 'rarity' in cosmetic ? RarityColors[cosmetic.rarity.displayValue] ?? null : null
 		: `#${seriesColor}`;
@@ -369,7 +368,7 @@ export const createCosmeticEmbed = (cosmetic: AnyCosmetic) => {
 		]);
 	// .setFooter({ text: cosmetic.id }); TODO: Un-comment when Discord fixes embed formatting issues
 	if ('shopHistory' in cosmetic && cosmetic.shopHistory !== undefined) {
-		const debut = cosmetic.shopHistory[0];
+		const debut = cosmetic.shopHistory[0] ?? 0;
 		embed.addFields({ name: 'Shop History', value: `First: ${time(new Date(debut))}\nLast: ${time(new Date(cosmetic.shopHistory.at(-1) ?? debut))}\nTotal: ${cosmetic.shopHistory.length}`, inline: true });
 	}
 	if ('gameplayTags' in cosmetic && cosmetic.gameplayTags?.includes('Cosmetics.Gating.RatingMin.Teen')) embed.setFooter({ text: 'You cannot use this item in experiences rated Everyone 10+ or lower.' });
@@ -564,27 +563,29 @@ export const createStyleListeners = async (interaction: ChatInputCommandInteract
 				await i.deferUpdate();
 
 				if (!i.isStringSelectMenu()) throw new TypeError(ErrorMessage.FalseTypeguard.replace('{value}', i.componentType.toString()));
-				const [value] = i.values;
+				const value = i.values.at(0);
 				const cosmetic = cosmetics.find(c => c.id === i.customId);
 				if (cosmetic) {
-					const variants = cosmetic.variants?.[0].options;
+					const variants = cosmetic.variants?.[0]?.options;
 					if (variants) {
-						const imageURL = value.startsWith('truedefault')
+						const imageURL = value?.startsWith('truedefault')
 							? cosmetic.images.featured ?? cosmetic.images.icon ?? cosmetic.images.smallIcon
 							: variants.find(v => v.tag === value)?.image;
 
-						if (typeof imageURL !== 'string') throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', value));
+						if (typeof imageURL !== 'string') throw new Error(ErrorMessage.UnexpectedValue.replace('{value}', `${value}`));
 
 						options[cosmetic.type.displayValue] = imageURL;
 
 						const newAttachmentBuilder = await createLoadoutAttachment(outfit, backbling, pickaxe, glider, wrap, chosenBackground, options);
 						components = components.map(c => {
-							const [menu] = c.components;
+							const menu = c.components.at(0);
+							if (!menu)
+								throw new Error('Missing Menu Component');
 							const menuJSON = menu.toJSON();
 							if (menuJSON.type === ComponentType.Button || (menuJSON.type === ComponentType.StringSelect && menuJSON.custom_id !== cosmetic.id)) return c;
 
 							if (menu instanceof StringSelectMenuBuilder) {
-								menu.setOptions(value.startsWith('truedefault')
+								menu.setOptions(value?.startsWith('truedefault')
 									? [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault', default: true }, ...variants.map(v => ({ label: v.name ?? 'Unknown', value: v.tag })).slice(0, 24)]
 									: [{ label: `Default ${cosmetic.type.displayValue}`, value: 'truedefault' }, ...variants.map(v => ({ label: v.name ?? 'Unknown', value: v.tag, default: v.tag === value })).slice(0, 24)]
 								);
@@ -677,7 +678,7 @@ export const getLevelsString = async (options: LevelCommandOptions): Promise<Int
 				'Fortnite: Remix',
 				'6',
 				'7'
-			][chapterIndex];
+			].at(chapterIndex) ?? '?';
 			let seasonName = chapterName.startsWith('Fortnite')
 				? chapterName
 				: overallSeason - ChapterLengths.slice(0, chapterIndex).reduce(sum);
