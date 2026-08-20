@@ -1,13 +1,14 @@
 import { SlashCommand } from '@squiddleton/discordjs-util';
 import type { AccountType } from '@squiddleton/fortnite-api';
-import { ApplicationCommandOptionType, DiscordAPIError, RESTJSONErrorCodes } from 'discord.js';
-import { PlatformChoices } from '../../util/constants.js';
-import { getStats, linkEpicAccount } from '../../util/fortnite.js';
-import { createRankedImage } from '../../util/epic.js';
+import { ApplicationCommandOptionType, Colors, ContainerBuilder, MessageFlags, SectionBuilder, SeparatorBuilder, TextDisplayBuilder, type APIMessageTopLevelComponent, type JSONEncodable } from 'discord.js';
+import { divisionNames, PlatformChoices, RankedEmojiIds, RankedEmojiUnknown, RankedTrackDisplayNames, RankingTypeChoices } from '../../util/constants.js';
+import { getStats, isUnknownRank, linkEpicAccount } from '../../util/fortnite.js';
+import { getRankedTracks, getTrackProgress } from '../../util/epic.js';
+import { formatPossessive } from '@squiddleton/util';
 
 export default new SlashCommand({
 	name: 'ranked',
-	description: 'Display a Fortnite player\'s Ranked stats',
+	description: 'Display a Fortnite player\'s all-time Ranked stats',
 	options: [
 		{
 			name: 'player',
@@ -20,27 +21,14 @@ export default new SlashCommand({
 			type: ApplicationCommandOptionType.User
 		},
 		{
-			name: 'season',
-			description: 'Which season to check ranked stats in; defaults to current',
-			type: ApplicationCommandOptionType.String,
-			choices: [
-				{ name: 'Chapter 7 Season 1', value: 'c7s1' },
-				{ name: 'Chapter 6 Season MS2', value: 'c6sms2' },
-				{ name: 'Chapter 6 Season 4', value: 'c6s4' },
-				{ name: 'Chapter 6 Season 3', value: 'c6s3' },
-				{ name: 'Galactic Battle', value: 'gb' },
-				{ name: 'Chapter 6 Season 2', value: 'c6s2' },
-				{ name: 'Chapter 6 Season 1', value: 'c6s1' },
-				{ name: 'Fortnite: Remix', value: 'remix' },
-				{ name: 'Chapter 5 Season 4', value: 'c5s4' },
-				{ name: 'Chapter 5 Season 3', value: 'c5s3' },
-				{ name: 'Chapter 5 Season 2', value: 'c5s2' },
-				{ name: 'Chapter 5 Season 1', value: 'c5s1' },
-				{ name: 'Fortnite: OG', value: 'og' },
-				{ name: 'Chapter 4 Season 4', value: 'c4s4' },
-				{ name: 'Season Zero', value: 'zero' },
-				{ name: 'Season Zero (Pre-Reset)', value: 'zeroprereset' }
-			]
+			name: 'all',
+			description: 'Whether to include discontinued modes like OG and Getaway; defaults to false',
+			type: ApplicationCommandOptionType.Boolean
+		},
+		{
+			name: 'hide',
+			description: 'Whether to hide the command reply so only you can see it; default to false',
+			type: ApplicationCommandOptionType.Boolean
 		},
 		{
 			name: 'platform',
@@ -56,27 +44,106 @@ export default new SlashCommand({
 	],
 	scope: 'Global',
 	async execute(interaction) {
-		await interaction.deferReply();
+		await interaction.deferReply({ flags: interaction.options.getBoolean('hide') ? MessageFlags.Ephemeral : undefined });
 
 		const accountName = interaction.options.getString('player');
-		const season = interaction.options.getString('season');
+		const user = interaction.options.getUser('user');
 		const accountType = (interaction.options.getString('platform') ?? 'epic') as AccountType;
+		const includeDiscontinued = interaction.options.getBoolean('all') ?? false;
 
-		const stats = await getStats(interaction, accountName, accountType, interaction.options.getUser('user'));
+		const stats = await getStats(interaction, accountName, accountType, user);
 		if (stats === null) return;
 
-		const buffer = await createRankedImage(stats.account, true, 'br', season);
-		if (buffer === null) {
-			await interaction.editReply('The Epic Games stats API is currently unavailable. Please try again in a few minutes.');
+		const progress = await getTrackProgress(stats.account.id);
+		if (progress === null) {
+			await interaction.editReply({ content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
 			return;
 		}
 
-		try {
-			await interaction.editReply({ files: [buffer] });
+		const app = await interaction.client.application.fetch();
+		const emojis = await app.emojis.fetch();
+		const components: JSONEncodable<APIMessageTopLevelComponent>[] = [];
+		const imageNames: string[] = [];
+
+		let tracks = (await getRankedTracks()) ?? [];
+		if (includeDiscontinued) {
+			tracks = tracks.filter(track => {
+				const choice = RankingTypeChoices.find(choice => choice.name === track.rankingType);
+				return !choice?.discontinued;
+			});
 		}
-		catch (error) {
-			if (!(error instanceof DiscordAPIError) || error.code !== RESTJSONErrorCodes.UnknownMessage) throw error;
+
+		components.push(
+			new TextDisplayBuilder().setContent(`# ${formatPossessive(stats.account.name)} Ranked History\nEpic Account ID: ${stats.account.id}`),
+			new SeparatorBuilder()
+		);
+
+		for (const { name, value, discontinued } of RankingTypeChoices) {
+			if (discontinued && !includeDiscontinued)
+				continue; // Skip discontinued tracks
+
+			const trackProgresses = progress.filter(p => p.rankingType === value);
+			if (trackProgresses.length === 0 || trackProgresses.every(p => p.currentDivision === 0 && p.promotionProgress === 0))
+				continue;
+
+			let currentDivisionImage = 'unknown';
+
+			trackProgresses.sort((a, b) => {
+				const aBegin = new Date(tracks.find(track => track.trackguid === a.trackguid)?.beginTime ?? 0);
+				const bBegin = new Date(tracks.find(track => track.trackguid === b.trackguid)?.beginTime ?? 0);
+				return bBegin.getTime() - aBegin.getTime();
+			});
+
+			const section = new SectionBuilder();
+			const text = new TextDisplayBuilder()
+				.setContent(`## ${name}\n` + trackProgresses.map((track, i) => {
+					const isUnknown = isUnknownRank(track);
+					const emojiId = isUnknown ? RankedEmojiUnknown : RankedEmojiIds.at(track.currentDivision + 1);
+					const emoji = emojis.get(emojiId ?? RankedEmojiUnknown);
+					if (emoji === undefined) throw new Error(`No emoji found for for division ${track.currentDivision}`);
+
+					if (i === 0) { // First progress is of most recent ranked session
+						currentDivisionImage = isUnknown
+							? 'unknown'
+							: (divisionNames[track.currentDivision] ?? 'unknown').toLowerCase().replace(' ', '');
+					}
+					else if (track.currentDivision === 0) {
+						return null;
+					}
+
+					const seasonName = RankedTrackDisplayNames[track.trackguid] ?? 'Unknown Season';
+
+					return `${seasonName}: ${(!isUnknown
+						? `${emoji} ${!track.currentPlayerRanking ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
+						: emoji.toString())}`;
+				}).filter(content => content !== null).join('\n'));
+
+			if (!imageNames.includes(currentDivisionImage))
+				imageNames.push(currentDivisionImage);
+
+			const colors = [
+				{ div: 'bronze', color: Colors.Orange },
+				{ div: 'silver', color: Colors.DarkerGrey },
+				{ div: 'gold', color: Colors.Gold },
+				{ div: 'platinum', color: Colors.LightGrey },
+				{ div: 'diamond', color: Colors.Blurple },
+				{ div: 'elite', color: Colors.DarkButNotBlack },
+				{ div: 'champion', color: Colors.Red },
+				{ div: 'unreal', color: Colors.Purple }
+			];
+
+			section
+				.addTextDisplayComponents(text)
+				.setThumbnailAccessory(thumbnail => thumbnail.setURL(`attachment://${currentDivisionImage}.png`));
+
+			const container = new ContainerBuilder()
+				.addSectionComponents(section)
+				.setAccentColor(colors.find(arr => currentDivisionImage.includes(arr.div))?.color ?? Colors.Blue);
+
+			components.push(container);
 		}
+
+		await interaction.editReply({ components, files: imageNames.map(image => `./assets/ranked/${image}.png`), flags: MessageFlags.IsComponentsV2 });
 
 		if (interaction.options.getBoolean('link')) await linkEpicAccount(interaction, stats.account);
 	}
