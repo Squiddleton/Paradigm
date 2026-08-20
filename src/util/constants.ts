@@ -25,7 +25,7 @@ export const ChapterLengths = [
 	4, // Chapter 5
 	1, // Remix
 	6, // Chapter 6
-	1 // Chapter 7
+	4 // Chapter 7
 ];
 
 export namespace DiscordIds {
