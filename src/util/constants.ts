@@ -428,4 +428,4 @@ export const UnitChoices: StringChoices = getEnumKeys(UnitsToMS).map(u => ({ nam
 
 export const SPRITE_STATUSES: SpriteStatus[] = ['Missing', 'Collected', 'Lost', 'Mastered'];
 
-export const SPRITE_VARIANTS: SpriteVariant[] = ['Gold'];
+export const SPRITE_VARIANTS: SpriteVariant[] = ['Gold', 'Gummy', 'Galaxy', 'Gem', 'Holofoil', 'Cube', 'Quack', 'Cheat Master'];
