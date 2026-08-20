@@ -2,7 +2,7 @@ import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type EpicAccount, FortniteAPIError, type Shop, type ShopEntry, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, ContainerBuilder, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, type SelectMenuComponentOptionData, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, ContainerBuilder, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, type SelectMenuComponentOptionData, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, italic, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, SPRITE_STATUSES, SPRITE_VARIANTS, Time } from './constants.js';
 import { createRankedImage, getLevelStats } from './epic.js';
@@ -966,6 +966,8 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Cosmetics', cosmeticStrings, inc);
 };
 
+export const getSpriteEmoji = (client: Client<true>, sprite: Sprite) => client.application.emojis.cache.find(emoji => emoji.name === `${sprite.name.replaceAll(' ', '').replaceAll('-', '')}${sprite.variant?.replaceAll(' ', '').replace('Gummy', 'Gum').replace('Galaxy', 'Gal') ?? ''}`);
+
 export const getSpriteModeOptions = (defaultVal?: string) => {
 	return SPRITE_STATUSES.map(mode => {
 		const statusEmoji = {
@@ -995,8 +997,6 @@ export const isSpriteVariant = (str: string): str is SpriteVariant => {
 };
 
 export const getSprites = (client: Client<true>, userId: string, displayName: string, selectedStatus?: string) => {
-	const getSpriteEmoji = (sprite: Sprite) => client.application.emojis.cache.find(emoji => emoji.name === `${sprite.name.replaceAll(' ', '').replaceAll('-', '')}${sprite.variant?.replaceAll(' ', '').replace('Gummy', 'Gum').replace('Galaxy', 'Gal') ?? ''}`);
-
 	const uniqueSpriteNames: string[] = [];
 	for (const sprite of SPRITES) {
 		if (!uniqueSpriteNames.includes(sprite.name)) uniqueSpriteNames.push(sprite.name);
@@ -1021,7 +1021,7 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 
 			if (status === 'Missing') container.clearAccentColor();
 
-			const spriteEmoji = getSpriteEmoji(sprite);
+			const spriteEmoji = getSpriteEmoji(client, sprite);
 			const statusEmoji = {
 				Missing: '❌',
 				Collected: '✅',
@@ -1067,7 +1067,7 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 		const lastRow = spriteSelects.at(-1);
 		if (!lastRow) continue;
 
-		const emoji = getSpriteEmoji(sprite)?.id;
+		const emoji = getSpriteEmoji(client, sprite)?.id;
 
 		const option: SelectMenuComponentOptionData = {
 			label: `${sprite.variant ? `${sprite.variant} ` : ''}${sprite.name}`,
@@ -1086,4 +1086,35 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 			new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select.setPlaceholder(`Sprite Page ${i + 1}`))
 		).slice(0, 3)
 	];
+};
+
+export const compareSprites = (client: Client<true>, userId1: string, username1: string, userId2: string, username2: string): ContainerBuilder => {
+	const { sprites: user1Sprites } = getUser(userId1) ?? { sprites: [] };
+	const { sprites: user2Sprites } = getUser(userId2) ?? { sprites: [] };
+	const user1Missing = SPRITES.filter(s => {
+		const found = user1Sprites.find(currentS => currentS.name === s.name && currentS.variant === s.variant);
+		const isMissing = !found || found.status === 'Missing';
+		return isMissing && user2Sprites.some(s2 => s2.name === s.name && s2.variant === s.variant && s2.status !== 'Missing');
+	});
+	const user2Missing = SPRITES.filter(s => {
+		const found = user2Sprites.find(currentS => currentS.name === s.name && currentS.variant === s.variant);
+		const isMissing = !found || found.status === 'Missing';
+		return isMissing && user1Sprites.some(s1 => s1.name === s.name && s1.variant === s.variant && s1.status !== 'Missing');
+	});
+
+	const toText = (has: string, needs: string, sprites: Sprite[]) => {
+		const listText = sprites.length > 0
+			? sprites.map(s =>
+				`${getSpriteEmoji(client, s)} ${s.variant ? `${s.variant} ` : ''}${s.name}`
+			).join(', ')
+			: italic('None');
+		return `## ${has} Has & ${needs} Needs:\n${listText}`;
+	};
+
+	const container = new ContainerBuilder()
+		.addTextDisplayComponents(t => t.setContent(`# ${username1} x ${username2} Sprites`))
+		.addTextDisplayComponents(text => text.setContent(toText(username1, username2, user2Missing)))
+		.addTextDisplayComponents(text => text.setContent(toText(username2, username1, user1Missing)));
+
+	return container;
 };

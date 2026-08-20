@@ -285,9 +285,8 @@ export default new ClientEvent({
 					return;
 				}
 
-				const newMode = interaction.values.at(0);
 				await interaction.deferUpdate();
-				const components = getSprites(interaction.client, interaction.user.id, (interaction.inCachedGuild() ? interaction.member : interaction.user).displayName, newMode);
+				const components = getSprites(interaction.client, interaction.user.id, (interaction.inCachedGuild() ? interaction.member : interaction.user).displayName, interaction.values.at(0));
 				await interaction.editReply({ components, flags: MessageFlags.IsComponentsV2 });
 			}
 			else if (interaction.customId.startsWith('sprites-page-')) {
