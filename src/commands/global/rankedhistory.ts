@@ -114,7 +114,7 @@ export default new SlashCommand({
 					const seasonName = RankedTrackDisplayNames[track.trackguid] ?? 'Unknown Season';
 
 					return `${seasonName}: ${(!isUnknown
-						? `${emoji} ${track.currentPlayerRanking === null ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
+						? `${emoji} ${!track.currentPlayerRanking ? `${Math.round(track.promotionProgress * 100)}%` : `#${track.currentPlayerRanking}`}`
 						: emoji.toString())}`;
 				}).filter(content => content !== null).join('\n'));
 
