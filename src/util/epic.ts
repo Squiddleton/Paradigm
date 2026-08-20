@@ -293,9 +293,9 @@ export const checkRankedTracking = async (client: DiscordClient<true>) => {
 	}
 };
 
-export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null>;
-export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season?: string | null): Promise<Buffer | null | 'Unknown'>;
-export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr' | 'b', season: string | null = null) {
+export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string | null): Promise<Buffer | null>;
+export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string | null): Promise<Buffer | null | 'Unknown'>;
+export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season: string | null = null) {
 	const trackProgress = await getTrackProgress(account.id);
 	if (trackProgress === null) return null;
 
@@ -309,17 +309,12 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	let seasonName: string;
 	let brTrackguid = currentTracks[RankingType.BattleRoyale].trackguid as RankedTrack;
 	let zbTrackguid = currentTracks[RankingType.ZeroBuild].trackguid as RankedTrack;
-	let ballisticTrackguid = currentTracks[RankingType.Ballistic].trackguid as RankedTrack;
 	let racingTrackguid = currentTracks[RankingType.RocketRacing].trackguid as RankedTrack;
 	let backgroundPath = 'general.jpg';
 	let invertText = false;
 
 	if (season === null) {
 		switch (rankingType) {
-			case 'b': {
-				season = ballisticTrackguid;
-				break;
-			}
 			case 'rr': {
 				season = racingTrackguid;
 				break;
@@ -545,31 +540,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 			backgroundPath = 'rr-s0.webp';
 			break;
 		}
-		// Ballistic
-		case RankedTrack.BallisticRAndDS3: {
-			ballisticTrackguid = season;
-			seasonName = 'Ballistic R&D Season 3';
-			backgroundPath = 'ballistic.jpg';
-			break;
-		}
-		case RankedTrack.BallisticRAndDS2: {
-			ballisticTrackguid = season;
-			seasonName = 'Ballistic R&D Season 2';
-			backgroundPath = 'ballistic.jpg';
-			break;
-		}
-		case RankedTrack.BallisticRAndDS1: {
-			ballisticTrackguid = season;
-			seasonName = 'Ballistic R&D Season 1';
-			backgroundPath = 'ballistic.jpg';
-			break;
-		}
-		case RankedTrack.BallisticS0: {
-			ballisticTrackguid = season;
-			seasonName = 'Ballistic Season Zero';
-			backgroundPath = 'ballistic.jpg';
-			break;
-		}
 		default: {
 			throw new Error(`No case found for season ${season}`);
 		}
@@ -597,9 +567,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	ctx.font = `${fontSize / 2}px fortnite, jetbrains`;
 	if (rankingType === 'rr') {
 		ctx.fillText('Rocket Racing', width * 0.5, height - (fontSize / 4), width / 2);
-	}
-	else if (rankingType === 'b') {
-		ctx.fillText('Ballistic', width * 0.5, height - (fontSize / 4), width / 2);
 	}
 	else {
 		ctx.fillText('Battle Royale', width * 0.25, height - (fontSize / 4), width / 2);
@@ -685,10 +652,6 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 
 	if (rankingType === 'rr') {
 		const progress = getTrack(racingTrackguid);
-		await drawRankedImage(width * 0.25, progress);
-	}
-	else if (rankingType === 'b') {
-		const progress = getTrack(ballisticTrackguid);
 		await drawRankedImage(width * 0.25, progress);
 	}
 	else {
