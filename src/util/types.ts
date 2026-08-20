@@ -30,6 +30,13 @@ export interface DisplayUserProperties {
 	same: boolean;
 }
 
+export type SpriteVariant = 'Gold' | 'Gummy' | 'Galaxy' | 'Gem' | 'Holofoil' | 'Cube' | 'Quack' | 'Cheat Master';
+
+export interface Sprite {
+	name: string;
+	variant: SpriteVariant | null;
+}
+
 export type Template<T> = T & {
 	_activeDate: DateString;
 	lastModified: DateString;
@@ -164,10 +171,17 @@ export interface IMilestone {
 	rarity: string;
 }
 
+export type SpriteStatus = 'Missing' | 'Collected' | 'Lost' | 'Mastered';
+
+export interface ISprite extends Sprite {
+	status: SpriteStatus;
+}
+
 export interface IUser {
 	_id: Snowflake;
 	epicAccountId: string | null;
 	wishlistCosmeticIds: string[];
+	sprites: ISprite[];
 }
 
 export type UserDocument = HydratedDocument<IUser>;

@@ -2,17 +2,18 @@ import { type Image, createCanvas, loadImage } from '@napi-rs/canvas';
 import { type HabaneroTrackProgress } from '@squiddleton/epic';
 import { type AccountType, type AnyCosmetic, type BRCosmetic, type Bundle, type EpicAccount, FortniteAPIError, type Shop, type ShopEntry, type Stats } from '@squiddleton/fortnite-api';
 import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } from '@squiddleton/util';
-import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type ColorResolvable, Colors, type CommandInteraction, ComponentType, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
+import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, ContainerBuilder, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, type SelectMenuComponentOptionData, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
-import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, Time } from './constants.js';
+import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, SPRITE_STATUSES, SPRITE_VARIANTS, Time } from './constants.js';
 import { createRankedImage, getLevelStats } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
-import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, LevelCommandOptions, Links, StatsCommandOptions, StringOption } from './types.js';
+import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, LevelCommandOptions, Links, Sprite, SpriteStatus, SpriteVariant, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
 import fortniteAPI from '../clients/fortnite.js';
 import guildModel from '../models/guilds.js';
 import userModel from '../models/users.js';
 import { setTimeout as wait } from 'timers/promises';
+import { SPRITES } from '../data/sprites.js';
 
 let cachedBRCosmetics: BRCosmetic[] = [];
 let cachedCosmetics: AnyCosmetic[] = [];
@@ -963,4 +964,126 @@ export const viewWishlist = async (interaction: UserContextMenuCommandInteractio
 	});
 
 	if (willUseButtons) paginate(interaction, message, embed, buttons, 'Cosmetics', cosmeticStrings, inc);
+};
+
+export const getSpriteModeOptions = (defaultVal?: string) => {
+	return SPRITE_STATUSES.map(mode => {
+		const statusEmoji = {
+			Missing: '❌',
+			Collected: '✅',
+			Lost: '❔',
+			Mastered: '👑'
+		}[mode];
+
+		return ({
+			label: `Mark as ${mode}`,
+			value: mode,
+			emoji: statusEmoji,
+			default: mode === defaultVal
+		});
+	});
+};
+
+export const isSpriteStatus = (str: string): str is SpriteStatus => {
+	const statuses: string[] = SPRITE_STATUSES;
+	return statuses.includes(str);
+};
+
+export const isSpriteVariant = (str: string): str is SpriteVariant => {
+	const variants: string[] = SPRITE_VARIANTS;
+	return variants.includes(str);
+};
+
+export const getSprites = (client: Client<true>, userId: string, displayName: string, selectedStatus?: string) => {
+	const getSpriteEmoji = (sprite: Sprite) => client.application.emojis.cache.find(emoji => emoji.name === `${sprite.name.replaceAll(' ', '').replaceAll('-', '')}${sprite.variant?.replaceAll(' ', '').replace('Gummy', 'Gum').replace('Galaxy', 'Gal') ?? ''}`);
+
+	const uniqueSpriteNames: string[] = [];
+	for (const sprite of SPRITES) {
+		if (!uniqueSpriteNames.includes(sprite.name)) uniqueSpriteNames.push(sprite.name);
+	}
+
+	const { sprites } = getUser(userId) ?? { sprites: [] };
+	const filteredSprites = sprites.filter(s => SPRITES.some(currentS => currentS.name === s.name && currentS.variant === s.variant));
+
+	const text: string[] = [];
+	const container = new ContainerBuilder().setAccentColor(Colors.Green);
+
+	// Add header to first container only
+	container.addTextDisplayComponents(text => text.setContent(`# ${formatPossessive(displayName)} Sprites`));
+
+	for (const spriteName of uniqueSpriteNames) {
+		const spriteColumns: string[] = [];
+
+		// Group sprites by name
+		for (const sprite of SPRITES.filter(sprite => sprite.name === spriteName)) {
+			const found = filteredSprites.find(s => s.name === sprite.name && s.variant === sprite.variant);
+			const status = found?.status ?? 'Missing';
+
+			if (status === 'Missing') container.clearAccentColor();
+
+			const spriteEmoji = getSpriteEmoji(sprite);
+			const statusEmoji = {
+				Missing: '❌',
+				Collected: '✅',
+				Lost: '❔',
+				Mastered: '👑'
+			}[status];
+
+			spriteColumns.push(`${spriteEmoji}${statusEmoji}`);
+		}
+
+		text.push(spriteColumns.join(' '));
+	}
+
+	container.addTextDisplayComponents(t => t.setContent(text.join('\n')));
+	// const containers = containersAndText.map(ct => ct.container.addTextDisplayComponents(text => text.setContent(ct.text.join('\n'))));
+
+	// Add footer to last container
+	container.addTextDisplayComponents(text => text.setContent(
+		`${filteredSprites.filter(s => s.status !== 'Missing').length}/${SPRITES.length} Collected | ${filteredSprites.filter(s => s.status === 'Mastered').length}/${SPRITES.length} Mastered`
+	));
+
+	const modeRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(new StringSelectMenuBuilder()
+		.setOptions(getSpriteModeOptions(selectedStatus))
+		.setMinValues(0)
+		.setMaxValues(1)
+		.setCustomId(`sprite-mode-${userId}`)
+		.setPlaceholder('Mark as:')
+	);
+
+	if (!selectedStatus) return [container, modeRow];
+
+	const spriteSelects: StringSelectMenuBuilder[] = [];
+
+	for (const [i, sprite] of SPRITES.entries()) {
+		const remainder = (i % 25);
+		const needsNewRow = remainder === 0;
+		if (needsNewRow)
+			spriteSelects.push(new StringSelectMenuBuilder()
+				.setCustomId(`sprites-update-first${i + 25}-${userId}`)
+				.setMinValues(0)
+			);
+
+		const lastRow = spriteSelects.at(-1);
+		if (!lastRow) continue;
+
+		const emoji = getSpriteEmoji(sprite)?.id;
+
+		const option: SelectMenuComponentOptionData = {
+			label: `${sprite.variant ? `${sprite.variant} ` : ''}${sprite.name}`,
+			value: `${sprite.name}_${sprite.variant}`,
+			emoji
+		};
+
+		lastRow.addOptions(option);
+		lastRow.setMaxValues(remainder + 1);
+	}
+
+	return [
+		container,
+		modeRow,
+		...spriteSelects.map((select, i) =>
+			new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select.setPlaceholder(`Sprite Page ${i + 1}`))
+		).slice(0, 3)
+	];
 };

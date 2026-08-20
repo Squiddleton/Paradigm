@@ -16,6 +16,7 @@ export default new ClientEvent({
 	once: true,
 	async execute(client) {
 		await client.application.fetch();
+		await client.application.emojis.fetch();
 		DiscordClient.assertReadyClient(client);
 		GlobalFonts.registerFromPath('./fonts/fortnite.otf', 'fortnite');
 		GlobalFonts.registerFromPath('./fonts/jetbrains-mono.ttf', 'jetbrains');

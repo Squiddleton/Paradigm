@@ -1,5 +1,5 @@
 import type { Snowflake } from 'discord.js';
-import type { UserDocument } from './types.js';
+import type { Sprite, SpriteStatus, UserDocument } from './types.js';
 import userModel from '../models/users.js';
 
 const cachedUsers = new Map<Snowflake, UserDocument>();
@@ -42,5 +42,20 @@ export const saveUser = async (user: UserDocument) => {
 
 export const setEpicAccount = async (userId: Snowflake, epicAccountId: string) => {
 	const user = await userModel.findByIdAndUpdate(userId, { epicAccountId }, { new: true, upsert: true });
+	updateUserCache(user);
+};
+
+export const updateSpriteStatus = async (userId: Snowflake, sprites: Sprite[], status: SpriteStatus) => {
+	const user = await userModel.findByIdAndUpdate(userId, {}, { new: true, upsert: true });
+	for (const sprite of sprites) {
+		const existing = user.sprites.find(s => s.name === sprite.name && s.variant === sprite.variant);
+		if (existing) {
+			existing.status = status;
+		}
+		else {
+			user.sprites.push({ ...sprite, status });
+		}
+	}
+	await user.save();
 	updateUserCache(user);
 };

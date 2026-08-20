@@ -1,6 +1,6 @@
 import { getEnumKeys } from '@squiddleton/util';
 import { type ApplicationCommandOptionAllowedChannelTypes, type ApplicationCommandOptionChoiceData, type ApplicationCommandOptionData, ApplicationCommandOptionType, ChannelType, PermissionFlagsBits } from 'discord.js';
-import type { StringChoices } from './types.js';
+import type { SpriteStatus, SpriteVariant, StringChoices } from './types.js';
 
 export const AccessibleChannelPermissions = [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages];
 
@@ -425,3 +425,7 @@ export enum UnitsToMS {
 }
 
 export const UnitChoices: StringChoices = getEnumKeys(UnitsToMS).map(u => ({ name: u, value: u }));
+
+export const SPRITE_STATUSES: SpriteStatus[] = ['Missing', 'Collected', 'Lost', 'Mastered'];
+
+export const SPRITE_VARIANTS: SpriteVariant[] = ['Gold'];

@@ -2,7 +2,7 @@ import { ClientEvent } from '@squiddleton/discordjs-util';
 import { EpicAPIError } from '@squiddleton/epic';
 import { type BRCosmetic, FortniteAPIError, type Playlist } from '@squiddleton/fortnite-api';
 import { removeDuplicates } from '@squiddleton/util';
-import { type ApplicationCommandOptionChoiceData, DiscordAPIError, type InteractionReplyOptions, MessageFlags, RESTJSONErrorCodes, type Snowflake, User } from 'discord.js';
+import { type ApplicationCommandOptionChoiceData, ComponentType, DiscordAPIError, type InteractionReplyOptions, MessageFlags, RESTJSONErrorCodes, type Snowflake, type StringSelectMenuComponent, User } from 'discord.js';
 import { type Rating, findBestMatch } from 'string-similarity';
 import epicClient from '../clients/epic.js';
 import fortniteAPI from '../clients/fortnite.js';
@@ -11,8 +11,8 @@ import guildModel from '../models/guilds.js';
 import memberModel from '../models/members.js';
 import { DiscordClient } from '../util/classes.js';
 import { ErrorMessage } from '../util/constants.js';
-import { getBRCosmetics, getCosmeticName, getCosmetics } from '../util/fortnite.js';
-import { getUser } from '../util/users.js';
+import { getBRCosmetics, getCosmeticName, getCosmetics, getSprites, isSpriteStatus, isSpriteVariant } from '../util/fortnite.js';
+import { getUser, updateSpriteStatus } from '../util/users.js';
 
 export default new ClientEvent({
 	name: 'interactionCreate',
@@ -276,6 +276,62 @@ export default new ClientEvent({
 				{ $push: { 'giveaways.$.entrants': { $each: entries } } }
 			);
 			await interaction.editReply(`You have successfully entered${entries.length === 1 ? '' : ` ${entries.length} times due to your roles`}. Check back when the giveaway ends to see if you won.`);
+		}
+		else if (interaction.isStringSelectMenu()) {
+			if (interaction.customId.startsWith('sprite-mode-')) {
+				const expectedUserId = interaction.customId.split('-').at(-1);
+				if (expectedUserId !== interaction.user.id) {
+					await interaction.reply({ content: 'You cannot interact with another user\'s collection.', flags: MessageFlags.Ephemeral });
+					return;
+				}
+
+				const newMode = interaction.values.at(0);
+				await interaction.deferUpdate();
+				const components = getSprites(interaction.client, interaction.user.id, (interaction.inCachedGuild() ? interaction.member : interaction.user).displayName, newMode);
+				await interaction.editReply({ components, flags: MessageFlags.IsComponentsV2 });
+			}
+			else if (interaction.customId.startsWith('sprites-page-')) {
+				const expectedUserId = interaction.customId.split('-').at(-1);
+				if (expectedUserId !== interaction.user.id) {
+					await interaction.reply({ content: 'You cannot interact with another user\'s collection.', flags: MessageFlags.Ephemeral });
+					return;
+				}
+
+				// TODO
+			}
+			else if (interaction.customId.startsWith('sprites-update-')) {
+				const expectedUserId = interaction.customId.split('-').at(-1);
+				if (expectedUserId !== interaction.user.id) {
+					await interaction.reply({ content: 'You cannot interact with another user\'s collection.', flags: MessageFlags.Ephemeral });
+					return;
+				}
+
+				const status = interaction.message.components.find(row => row.type === ComponentType.ActionRow)
+					?.components.find((c): c is StringSelectMenuComponent => c.type === ComponentType.StringSelect && c.customId.startsWith('sprite-mode'))
+					?.options.find(o => o.default)?.value;
+
+				if (!status || !isSpriteStatus(status)) {
+					await interaction.reply('Invalid marking mode selected.');
+					return;
+				}
+
+				await interaction.deferUpdate();
+
+				const spriteVals = interaction.values;
+				const sprites = spriteVals.map(s => {
+					const [spriteName, spriteVariant] = s.split('_');
+					if (!spriteName || !spriteVariant || (spriteVariant !== 'null' && !isSpriteVariant(spriteVariant))) return null;
+					return {
+						name: spriteName,
+						variant: spriteVariant === 'null' ? null : spriteVariant
+					};
+				}).filter(s => s !== null);
+
+				await updateSpriteStatus(interaction.user.id, sprites, status);
+				const components = getSprites(interaction.client, interaction.user.id, (interaction.inCachedGuild() ? interaction.member : interaction.user).displayName, status);
+
+				await interaction.editReply({ components, flags: MessageFlags.IsComponentsV2 });
+			}
 		}
 	}
 });
