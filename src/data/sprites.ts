@@ -473,40 +473,16 @@ export const SPRITES: Sprite[] = [
 	}
 	*/
 	{
-		name: 'Bush',
-		variant: null
-	},
-	{
-		name: 'Bush',
-		variant: 'Gold'
-	},
-	{
-		name: 'Bush',
-		variant: 'Cheat Master'
-	},
-	{
 		name: 'Adventure',
 		variant: null
-	},
-	{
-		name: 'Adventure',
-		variant: 'Gold'
 	},
 	{
 		name: 'Adventure',
 		variant: 'Cheat Master'
 	},
 	{
-		name: 'Jonesy',
-		variant: null
-	},
-	{
-		name: 'Jonesy',
+		name: 'Adventure',
 		variant: 'Gold'
-	},
-	{
-		name: 'Jonesy',
-		variant: 'Cheat Master'
 	},
 	{
 		name: '8-Bit',
@@ -514,47 +490,35 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: '8-Bit',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: '8-Bit',
-		variant: 'Cheat Master'
-	},
-	{
-		name: 'Storm Scout',
-		variant: null
-	},
-	{
-		name: 'Storm Scout',
 		variant: 'Gold'
 	},
 	{
-		name: 'Storm Scout',
-		variant: 'Cheat Master'
-	},
-	{
-		name: 'Shadow',
+		name: 'Jonesy',
 		variant: null
 	},
 	{
-		name: 'Shadow',
-		variant: 'Gold'
-	},
-	{
-		name: 'Shadow',
+		name: 'Jonesy',
 		variant: 'Cheat Master'
 	},
 	{
-		name: 'Tails',
+		name: 'Jonesy',
+		variant: 'Gold'
+	},
+	{
+		name: 'Bush',
 		variant: null
 	},
 	{
-		name: 'Tails',
-		variant: 'Gold'
+		name: 'Bush',
+		variant: 'Cheat Master'
 	},
 	{
-		name: 'Tails',
-		variant: 'Cheat Master'
+		name: 'Bush',
+		variant: 'Gold'
 	},
 	{
 		name: 'Killswitch',
@@ -562,11 +526,35 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: 'Killswitch',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: 'Killswitch',
+		variant: 'Gold'
+	},
+	{
+		name: 'Tails',
+		variant: null
+	},
+	{
+		name: 'Tails',
 		variant: 'Cheat Master'
+	},
+	{
+		name: 'Tails',
+		variant: 'Gold'
+	},
+	{
+		name: 'Shadow',
+		variant: null
+	},
+	{
+		name: 'Shadow',
+		variant: 'Cheat Master'
+	},
+	{
+		name: 'Shadow',
+		variant: 'Gold'
 	},
 	{
 		name: 'Sonic',
@@ -574,11 +562,11 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: 'Sonic',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: 'Sonic',
-		variant: 'Cheat Master'
+		variant: 'Gold'
 	},
 	{
 		name: 'Jackrabbit',
@@ -586,11 +574,11 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: 'Jackrabbit',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: 'Jackrabbit',
-		variant: 'Cheat Master'
+		variant: 'Gold'
 	},
 	{
 		name: 'Klombo',
@@ -598,11 +586,11 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: 'Klombo',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: 'Klombo',
-		variant: 'Cheat Master'
+		variant: 'Gold'
 	},
 	{
 		name: 'Crown',
@@ -610,10 +598,22 @@ export const SPRITES: Sprite[] = [
 	},
 	{
 		name: 'Crown',
-		variant: 'Gold'
+		variant: 'Cheat Master'
 	},
 	{
 		name: 'Crown',
+		variant: 'Gold'
+	},
+	{
+		name: 'Storm Scout',
+		variant: null
+	},
+	{
+		name: 'Storm Scout',
 		variant: 'Cheat Master'
+	},
+	{
+		name: 'Storm Scout',
+		variant: 'Gold'
 	}
 ];
