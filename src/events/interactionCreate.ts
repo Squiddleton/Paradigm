@@ -305,7 +305,9 @@ export default new ClientEvent({
 					return;
 				}
 
-				const status = interaction.message.components.find(row => row.type === ComponentType.ActionRow)
+				const status = interaction.message.components
+					.find(comp => comp.type === ComponentType.Container)
+					?.components.find(row => row.type === ComponentType.ActionRow)
 					?.components.find((c): c is StringSelectMenuComponent => c.type === ComponentType.StringSelect && c.customId.startsWith('sprite-mode'))
 					?.options.find(o => o.default)?.value;
 
