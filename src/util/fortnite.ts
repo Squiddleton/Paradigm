@@ -1038,11 +1038,6 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 	container.addTextDisplayComponents(t => t.setContent(text.join('\n')));
 	// const containers = containersAndText.map(ct => ct.container.addTextDisplayComponents(text => text.setContent(ct.text.join('\n'))));
 
-	// Add footer to last container
-	container.addTextDisplayComponents(text => text.setContent(
-		`${filteredSprites.filter(s => s.status !== 'Missing').length}/${SPRITES.length} Collected | ${filteredSprites.filter(s => s.status === 'Mastered').length}/${SPRITES.length} Mastered`
-	));
-
 	const modeRow = new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(new StringSelectMenuBuilder()
 		.setOptions(getSpriteModeOptions(selectedStatus))
 		.setMinValues(0)
@@ -1051,16 +1046,19 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 		.setPlaceholder('Mark as:')
 	);
 
-	if (!selectedStatus) return [container, modeRow];
+	container.addActionRowComponents(modeRow);
+
+	if (!selectedStatus) return [container];
 
 	const spriteSelects: StringSelectMenuBuilder[] = [];
+	const SPRITES_PER_ROW = 24;
 
 	for (const [i, sprite] of SPRITES.entries()) {
-		const remainder = (i % 25);
+		const remainder = (i % SPRITES_PER_ROW);
 		const needsNewRow = remainder === 0;
 		if (needsNewRow)
 			spriteSelects.push(new StringSelectMenuBuilder()
-				.setCustomId(`sprites-update-first${i + 25}-${userId}`)
+				.setCustomId(`sprites-update-first${i + SPRITES_PER_ROW}-${userId}`)
 				.setMinValues(0)
 			);
 
@@ -1079,13 +1077,17 @@ export const getSprites = (client: Client<true>, userId: string, displayName: st
 		lastRow.setMaxValues(remainder + 1);
 	}
 
-	return [
-		container,
-		modeRow,
-		...spriteSelects.map((select, i) =>
-			new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select.setPlaceholder(`Sprite Page ${i + 1}`))
-		).slice(0, 3)
-	];
+	const selectRows = spriteSelects.map((select, i) =>
+		new ActionRowBuilder<StringSelectMenuBuilder>().setComponents(select.setPlaceholder(`Sprite Page ${i + 1}`))
+	);
+	container.addActionRowComponents(selectRows);
+
+	// Add footer to last container
+	container.addTextDisplayComponents(text => text.setContent(
+		`${filteredSprites.filter(s => s.status !== 'Missing').length}/${SPRITES.length} Collected | ${filteredSprites.filter(s => s.status === 'Mastered').length}/${SPRITES.length} Mastered`
+	));
+
+	return [container];
 };
 
 export const compareSprites = (client: Client<true>, userId1: string, username1: string, userId2: string, username2: string): ContainerBuilder => {
