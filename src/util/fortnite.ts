@@ -5,7 +5,7 @@ import { formatPossessive, getRandomItem, normalize, removeDuplicates, sum } fro
 import { ActionRowBuilder, AttachmentBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, type Client, type ColorResolvable, Colors, type CommandInteraction, ComponentType, ContainerBuilder, DiscordAPIError, EmbedBuilder, type InteractionReplyOptions, type Message, type MessageActionRowComponentBuilder, MessageFlags, RESTJSONErrorCodes, type SelectMenuComponentOptionData, StringSelectMenuBuilder, type User, type UserContextMenuCommandInteraction, bold, chatInputApplicationCommandMention, hideLinkEmbed, italic, time, underline, userMention } from 'discord.js';
 import type { DiscordClient } from './classes.js';
 import { AccessibleChannelPermissions, AccessibleChannelPermissionsWithImages, BackgroundURL, ChapterLengths, DiscordIds, ErrorMessage, RarityColors, SPRITE_STATUSES, SPRITE_VARIANTS, Time } from './constants.js';
-import { createRankedImage, getLevelStats } from './epic.js';
+import { getLevelStats } from './epic.js';
 import { createPaginationButtons, isKey, messageComponentCollectorFilter, paginate } from './functions.js';
 import type { ButtonOrMenu, CosmeticDisplayType, Dimensions, DisplayUserProperties, LevelCommandOptions, Links, Sprite, SpriteStatus, SpriteVariant, StatsCommandOptions, StringOption } from './types.js';
 import { getUser, setEpicAccount } from './users.js';
@@ -850,13 +850,8 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 		}
 		else {
 			try {
-				const { account, image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
+				const { image } = await fortniteAPI.stats({ id: userResult.epicAccountId, image: options.input, timeWindow: options.timeWindow });
 				await interaction.editReply({ content: options.content, files: [image] });
-				const buffer = await createRankedImage(account, isContextMenu, 'br');
-				if (buffer !== 'Unknown') {
-					if (buffer === null) await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
-					else await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, files: [buffer] });
-				}
 			}
 			catch (error) {
 				await handleStatsError(interaction, error);
@@ -867,11 +862,6 @@ export const sendStatsImages = async (interaction: CommandInteraction, options: 
 		try {
 			const { account, image } = await fortniteAPI.stats({ name: options.accountName, accountType: options.accountType, image: options.input, timeWindow: options.timeWindow });
 			await interaction.editReply({ files: [image] });
-			const buffer = await createRankedImage(account, isContextMenu, 'br');
-			if (buffer !== 'Unknown') {
-				if (buffer === null) await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, content: 'The Epic Games stats API is currently unavailable. Please try again in a few minutes.' });
-				else await interaction.followUp({ flags: isContextMenu ? MessageFlags.Ephemeral : undefined, files: [buffer] });
-			}
 
 			if (interaction.isChatInputCommand() && interaction.options.getBoolean('link')) await linkEpicAccount(interaction, account, true);
 		}

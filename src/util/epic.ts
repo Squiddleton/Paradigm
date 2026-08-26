@@ -2,13 +2,11 @@ import { EpicAPIError, type EpicClient, getBattlePassLevels, type EpicStats, typ
 import type { FortniteWebsite, STWProgress, STWPublicProfile, STWTrackedAccount, TrackedUser, WorldInfo } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
-import { ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, RankedTrack, RankingType } from './constants.js';
+import { ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, type RankingType } from './constants.js';
 import { quantify } from '@squiddleton/util';
 import type { DiscordClient } from './classes.js';
 import { codeBlock, roleMention } from 'discord.js';
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import type { EpicAccount } from '@squiddleton/fortnite-api';
-import { isUnknownRank } from './fortnite.js';
 
 export const trackedModes = new Map<string, TrackedUser>();
 
@@ -293,6 +291,7 @@ export const checkRankedTracking = async (client: DiscordClient<true>) => {
 	}
 };
 
+/*
 export function createRankedImage(account: EpicAccount, returnUnknown: true, rankingType: 'br' | 'rr', season?: string | null): Promise<Buffer | null>;
 export function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season?: string | null): Promise<Buffer | null | 'Unknown'>;
 export async function createRankedImage(account: EpicAccount, returnUnknown: boolean, rankingType: 'br' | 'rr', season: string | null = null) {
@@ -595,6 +594,7 @@ export async function createRankedImage(account: EpicAccount, returnUnknown: boo
 	const buffer = await canvas.encode('jpeg');
 	return buffer;
 }
+*/
 
 export const getLevelStats = async (accountId: string): Promise<Partial<Record<string, number>> | string> => {
 	const seasons = ChapterLengths.reduce((p, c) => p + c, 0);
