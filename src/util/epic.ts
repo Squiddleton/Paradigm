@@ -19,8 +19,7 @@ export const callEpicFunction = async <T>(callback: (client: EpicClient) => T): 
 		const isEpicAuthError = (e: unknown) => e instanceof EpicAPIError && [400, 401].includes(e.status);
 		const isEpicInternalError = (e: unknown): e is EpicAPIError => e instanceof EpicAPIError && e.status >= 500 && e.status < 600;
 
-		if (isEpicInternalError(error)) throw new Error(`The Epic Games API is currently unavailable at ${new Date()} (Status ${error.status}).`);
-		else if (!isEpicAuthError(error)) throw error;
+		if (isEpicInternalError(error) || !isEpicAuthError(error)) throw error;
 
 		await epicClient.auth.authenticate(config.epicDeviceAuth);
 		ret = await callback(epicClient);
@@ -154,7 +153,13 @@ const privateAccounts = new Set();
 
 export const getSTWProgress = async (accountId: string): Promise<STWProgress[] | null> => {
 	const getProfile = (client: EpicClient): Promise<STWPublicProfile> => client.fortnite.postMCPOperation('QueryPublicProfile', 'campaign', undefined, 'public', accountId) as Promise<STWPublicProfile>;
-	const profile = await callEpicFunction(getProfile);
+	let profile: STWPublicProfile;
+	try {
+		profile = await callEpicFunction(getProfile);
+	}
+	catch {
+		return null;
+	}
 
 	privateAccounts.delete(accountId);
 	const achievementQuests = [
