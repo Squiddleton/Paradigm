@@ -1,12 +1,11 @@
 import { EpicAPIError, type EpicClient, getBattlePassLevels, type EpicStats, type HabaneroTrackProgress, type ShortHabaneroTrack, type TimelineChannelData, type TimelineClientEventsState } from '@squiddleton/epic';
-import type { FortniteWebsite, STWProgress, STWPublicProfile, STWTrackedAccount, TrackedUser, WorldInfo } from './types.js';
+import type { FortniteWebsite, TrackedUser, WorldInfo } from './types.js';
 import epicClient from '../clients/epic.js';
 import config from '../config.js';
 import { ChapterLengths, DiscordIds, divisionNames, EpicEndpoint, ErrorMessage, type RankingType } from './constants.js';
 import { quantify } from '@squiddleton/util';
 import type { DiscordClient } from './classes.js';
 import { codeBlock, roleMention } from 'discord.js';
-import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 export const trackedModes = new Map<string, TrackedUser>();
 
@@ -149,6 +148,8 @@ export const postVBuckMissions = async (client: DiscordClient<true>) => {
 		await stwChannel.send('There\'s nothing.');
 };
 
+/*
+Removed endpoint
 const privateAccounts = new Set();
 
 export const getSTWProgress = async (accountId: string): Promise<STWProgress[] | null> => {
@@ -255,6 +256,7 @@ export const createSTWProgressImage = async () => {
 	const buffer = await canvas.encode('jpeg');
 	return buffer;
 };
+*/
 
 const allCachedProgresses = new Map<string, HabaneroTrackProgress[]>();
 export const checkRankedTracking = async (client: DiscordClient<true>) => {
@@ -651,6 +653,8 @@ export const getCurrentRankedTracks = async (): Promise<Record<RankingType, Shor
 
 export const getTrackProgress = async (accountId: string): Promise<HabaneroTrackProgress[] | null> => callEpicFunction(client => client.fortnite.getTrackProgress({ accountId }));
 
+/*
+Outdated endpoint
 export const checkSTWAchievementProgress = async (client: DiscordClient<true>) => {
 	const STWTrackedAccounts: STWTrackedAccount[] = [
 		{ id: 'fa646860d86c4def9716359b4d1a0ff8', name: 'Squid', progress: await getSTWProgress('fa646860d86c4def9716359b4d1a0ff8') },
@@ -684,6 +688,7 @@ export const checkSTWAchievementProgress = async (client: DiscordClient<true>) =
 		if (foundNew) account.progress = allNewProgress;
 	}
 };
+*/
 
 /**
  * Claims the daily Save the World login reward.
